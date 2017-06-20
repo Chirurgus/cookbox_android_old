@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name" translatable="false">Cookbox</string>
+    <string name="main_search_title">Search</string>
+    <string name="main_context_delte_title">Delete</string>
+</resources>
