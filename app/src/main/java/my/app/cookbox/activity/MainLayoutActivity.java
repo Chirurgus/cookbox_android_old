@@ -1,44 +1,29 @@
 package my.app.cookbox.activity;
 
-import android.app.VoiceInteractor;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.sqlite.SQLiteException;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.DocumentsProvider;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.os.EnvironmentCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOError;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -46,7 +31,7 @@ import my.app.cookbox.R;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.sqlite.SqlController;
-import my.app.cookbox.utility.Permissions;
+import my.app.cookbox.utility.RecipeAdapter;
 
 public class MainLayoutActivity extends AppCompatActivity {
 
@@ -63,7 +48,7 @@ public class MainLayoutActivity extends AppCompatActivity {
         _sqlctrl = new SqlController(this);
         _rlist = _sqlctrl.getAllBasicRecipes();
         _radapter = new RecipeAdapter(_rlist, this);
-        _lv =  (ListView) findViewById(R.id.main_list_view1);
+        _lv =  (ListView) findViewById(android.R.id.list);
         _lv.setAdapter(_radapter);
         _lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

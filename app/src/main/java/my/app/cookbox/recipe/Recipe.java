@@ -10,8 +10,8 @@ import java.util.TreeMap;
 
 public class Recipe {
 
-    public Recipe() {}
-    public Recipe(long id) {}
+    public Recipe() { _id = NO_ID; }
+    public Recipe(long id) { _id = id; }
     public Recipe(long id,
                   String name,
                   String short_desc,
@@ -31,6 +31,10 @@ public class Recipe {
     }
 
     //public enum Unit { unity, gram, undef }
+
+    public BasicRecipe getBasicRecipe() {
+        return new BasicRecipe(_id, _name, _short_desc, _tags);
+    }
 
     public long getId() { return _id; }
     public String getName() { return _name; }

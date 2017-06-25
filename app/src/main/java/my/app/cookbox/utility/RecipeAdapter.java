@@ -1,4 +1,4 @@
-package my.app.cookbox.activity;
+package my.app.cookbox.utility;
 
 import android.content.Context;
 import android.util.Log;
@@ -26,7 +26,7 @@ import static android.support.constraint.BuildConfig.DEBUG;
 
 public class RecipeAdapter extends BaseAdapter {
 
-    RecipeAdapter(ArrayList<BasicRecipe> d, Context c) {
+    public RecipeAdapter(ArrayList<BasicRecipe> d, Context c) {
         _data = d;
         _context = c;
         _inflater = (LayoutInflater) _context.getSystemService(_context.LAYOUT_INFLATER_SERVICE);

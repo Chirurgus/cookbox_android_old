@@ -15,12 +15,12 @@
         android:clickable="true"
         app:backgroundTint="@color/colorPrimary"
         app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="@+id/main_list_view1"
-        app:layout_constraintRight_toRightOf="@+id/main_list_view1"
+        app:layout_constraintBottom_toBottomOf="@android:id/list"
+        app:layout_constraintRight_toRightOf="@android:id/list"
         app:srcCompat="@drawable/ic_add_black_24dp" />
 
     <ListView
-        android:id="@+id/main_list_view1"
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="multipleChoiceModal"

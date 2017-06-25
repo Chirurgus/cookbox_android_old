@@ -2,22 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:weightSum="100">
 
     <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+        android:id="@+id/modify_text_item_text1"
+        android:layout_weight="90"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-            <android.support.design.widget.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:hint="Quantity" />
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="Quantity" />
     </android.support.design.widget.TextInputLayout>
 
     <ImageButton
-        android:id="@+id/modify_simple_del_button1"
+        android:id="@+id/modify_text_item_del_button1"
+        android:layout_weight="10"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:src="@drawable/ic_close_black_24dp"
