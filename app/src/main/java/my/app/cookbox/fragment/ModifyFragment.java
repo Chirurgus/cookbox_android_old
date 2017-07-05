@@ -42,7 +42,43 @@ public class ModifyFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.modify_layout, container, false);
+        View ret_view = inflater.inflate(R.layout.modify_layout, container, false);
+
+        Button ing_b = (Button) ret_view.findViewById(R.id.modify_ingredient_button);
+        ing_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expandIngredientList();
+            }
+        });
+
+        Button ins_b = (Button) ret_view.findViewById(R.id.modify_instruction_button);
+        ins_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expandInstructionList();
+            }
+        });
+
+        Button cmnt_b = (Button) ret_view.findViewById(R.id.modify_comment_button);
+        cmnt_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expandCommentList();
+            }
+        });
+
+        Button tag_b = (Button) ret_view.findViewById(R.id.modify_tag_button);
+        tag_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              expandTagList();
+            }
+        });
+
+        populateFields(_recipe);
+
+        return ret_view;
     }
 
     @Override
@@ -61,52 +97,13 @@ public class ModifyFragment extends Fragment{
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        populateFields(_recipe);
-
-        Button ing_b = (Button) getActivity().findViewById(R.id.modify_ingredient_button);
-        ing_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandIngredientList();
-            }
-        });
-
-        Button ins_b = (Button) getActivity().findViewById(R.id.modify_instruction_button);
-        ins_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandInstructionList();
-            }
-        });
-
-        Button cmnt_b = (Button) getActivity().findViewById(R.id.modify_comment_button);
-        cmnt_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandCommentList();
-            }
-        });
-
-        Button tag_b = (Button) getActivity().findViewById(R.id.modify_tag_button);
-        tag_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              expandTagList();
-            }
-        });
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         Log.d(TAG, TAG + ".onPause called.");
 
         updateRecipeList();
 
-        Toast toast = Toast.makeText(getContext(), "Recipe saved.",Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getContext(), "Recipe  would be saved.",Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -118,7 +115,7 @@ public class ModifyFragment extends Fragment{
     }
 
     private Recipe readRecipe(long id) {
-        String name = getEditTextFromId(R.id.modify_edit_text_name).getText().toString();
+        String name = getEditTextFromId(R.id.modify_edit_text_name, getActivity()).getText().toString();
         String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc).getText().toString();
         String short_desc = getEditTextFromId(R.id.modify_edit_text_long_desc).getText().toString();
         String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc).getText().toString();
@@ -351,8 +348,8 @@ public class ModifyFragment extends Fragment{
             parent.removeView(ll);
     }
 
-    private EditText getEditTextFromId(int view_id) {
-       return ((TextInputLayout) _parent.findViewById(view_id)).getEditText();
+    private EditText getEditTextFromId(int view_id, View parent) {
+       return ((TextInputLayout) parent.findViewById(view_id)).getEditText();
     }
 
     private static String TAG = "ModifyRecipeActivity";
