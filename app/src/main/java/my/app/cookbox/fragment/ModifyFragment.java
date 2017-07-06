@@ -115,11 +115,11 @@ public class ModifyFragment extends Fragment{
     }
 
     private Recipe readRecipe(long id) {
-        String name = getEditTextFromId(R.id.modify_edit_text_name, getActivity()).getText().toString();
-        String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc).getText().toString();
-        String short_desc = getEditTextFromId(R.id.modify_edit_text_long_desc).getText().toString();
-        String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc).getText().toString();
-        float tgt_qty = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty).getText().toString());
+        String name = getEditTextFromId(R.id.modify_edit_text_name, null).getText().toString();
+        String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, null).getText().toString();
+        String short_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, null).getText().toString();
+        String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, null).getText().toString();
+        float tgt_qty = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty, null).getText().toString());
 
         ArrayList<String> ing_list = new ArrayList<>();
         ArrayList<Float> ing_qty_list = new ArrayList<>();
@@ -182,19 +182,19 @@ public class ModifyFragment extends Fragment{
     }
 
     private void populateFields(Recipe r) {
-        EditText name = getEditTextFromId(R.id.modify_edit_text_name);
+        EditText name = getEditTextFromId(R.id.modify_edit_text_name, null);
         name.setText(r.getName());
 
-        EditText short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc);
+        EditText short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, null);
         short_desc.setText(r.getShortDescription());
 
-        EditText long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc);
+        EditText long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, null);
         long_desc.setText(r.getLongDescription());
 
-        EditText tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc);
+        EditText tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, null);
         tgt_desc.setText(r.getTargetDescription());
 
-        EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty);
+        EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty, null);
         target_qty.setText(r.getTargetQuantity().toString());
 
         for (int i = 0; i < r.getIngredientDescriptions().size(); ++i) {
@@ -349,7 +349,12 @@ public class ModifyFragment extends Fragment{
     }
 
     private EditText getEditTextFromId(int view_id, View parent) {
-       return ((TextInputLayout) parent.findViewById(view_id)).getEditText();
+        if (parent != null) {
+            return ((TextInputLayout) parent.findViewById(view_id)).getEditText();
+        }
+        else {
+            return ((TextInputLayout) _parent.findViewById(view_id)).getEditText();
+        }
     }
 
     private static String TAG = "ModifyRecipeActivity";
