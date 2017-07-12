@@ -1,15 +1,11 @@
 package my.app.cookbox.fragment;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -22,16 +18,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.TestActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 /**
  * Created by Alexander on 015, 15 Jun.
@@ -42,9 +34,9 @@ public class ModifyFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View ret_view = inflater.inflate(R.layout.modify_layout, container, false);
+        _root_view = inflater.inflate(R.layout.modify_layout, container, false);
 
-        Button ing_b = (Button) ret_view.findViewById(R.id.modify_ingredient_button);
+        Button ing_b = (Button) _root_view.findViewById(R.id.modify_ingredient_button);
         ing_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,7 +44,7 @@ public class ModifyFragment extends Fragment{
             }
         });
 
-        Button ins_b = (Button) ret_view.findViewById(R.id.modify_instruction_button);
+        Button ins_b = (Button) _root_view.findViewById(R.id.modify_instruction_button);
         ins_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +52,7 @@ public class ModifyFragment extends Fragment{
             }
         });
 
-        Button cmnt_b = (Button) ret_view.findViewById(R.id.modify_comment_button);
+        Button cmnt_b = (Button) _root_view.findViewById(R.id.modify_comment_button);
         cmnt_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,7 +60,7 @@ public class ModifyFragment extends Fragment{
             }
         });
 
-        Button tag_b = (Button) ret_view.findViewById(R.id.modify_tag_button);
+        Button tag_b = (Button) _root_view.findViewById(R.id.modify_tag_button);
         tag_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +70,7 @@ public class ModifyFragment extends Fragment{
 
         populateFields(_recipe);
 
-        return ret_view;
+        return _root_view;
     }
 
     @Override
@@ -88,7 +80,7 @@ public class ModifyFragment extends Fragment{
         _parent = (TestActivity) getActivity();
 
         Bundle args = getArguments();
-        if (args != null) {
+        if (args != null && args.getLong("id") != Recipe.NO_ID) {
             _recipe = _parent.getSqlController().getRecipe(args.getLong("id"));
         }
         else {
@@ -115,29 +107,27 @@ public class ModifyFragment extends Fragment{
     }
 
     private Recipe readRecipe(long id) {
-        String name = getEditTextFromId(R.id.modify_edit_text_name, null).getText().toString();
-        String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, null).getText().toString();
-        String short_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, null).getText().toString();
-        String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, null).getText().toString();
-        float tgt_qty = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty, null).getText().toString());
+        String name = getEditTextFromId(R.id.modify_edit_text_name, _root_view).getText().toString();
+        String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view).getText().toString();
+        String short_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view).getText().toString();
+        String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, _root_view).getText().toString();
+        float tgt_qty = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view).getText().toString());
 
         ArrayList<String> ing_list = new ArrayList<>();
         ArrayList<Float> ing_qty_list = new ArrayList<>();
         ArrayList<Long> ing_other_rec = new ArrayList<>();
 
-        LinearLayout ing_ll = (LinearLayout) _parent.findViewById(R.id.modify_ingredient_list);
+        LinearLayout ing_ll = (LinearLayout) _root_view.findViewById(R.id.modify_ingredient_list);
         for (int i = 0; i < ing_ll.getChildCount(); ++i) {
             RelativeLayout rl = (RelativeLayout) ing_ll.getChildAt(i);
-            String qty = ((TextInputLayout) rl.findViewById(R.id.modify_list_item_edit_text1))
-                    .getEditText().getText().toString();
+            String qty = getEditTextFromId(R.id.modify_list_item_edit_text1, rl).getText().toString();
             try {
                 ing_qty_list.add(Float.parseFloat(qty));
             }
             catch (Exception e) {
                 ing_qty_list.add((float) -1);
             }
-            ing_list.add(((TextInputLayout) rl.findViewById(R.id.modify_list_item_edit_text2))
-                    .getEditText().getText().toString());
+            ing_list.add(getEditTextFromId(R.id.modify_list_item_edit_text2, rl).getText().toString());
             Spinner sp = (Spinner) rl.findViewById(R.id.modify_list_item_spinner);
             if (sp.getSelectedItemPosition() != 0) {
                 ing_other_rec.add(_parent.getAllBasicRecipes().get(sp.getSelectedItemPosition() - 1).getId());
@@ -149,7 +139,7 @@ public class ModifyFragment extends Fragment{
 
         ArrayList<String> ins_list = new ArrayList<>();
 
-        LinearLayout ins_ll = (LinearLayout) _parent.findViewById(R.id.modify_instruction_list);
+        LinearLayout ins_ll = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
         for (int i = 0; i < ins_ll.getChildCount(); ++i) {
             LinearLayout ll = (LinearLayout) ins_ll.getChildAt(i);
             TextView desc_tv = ((TextInputLayout) ll.getChildAt(0)).getEditText();
@@ -159,7 +149,7 @@ public class ModifyFragment extends Fragment{
 
         ArrayList<String> tag_list = new ArrayList<>();
 
-        LinearLayout tag_ll = (LinearLayout) _parent.findViewById(R.id.modify_tag_list);
+        LinearLayout tag_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
         for (int i = 0; i < tag_ll.getChildCount(); ++i) {
             LinearLayout ll = (LinearLayout) tag_ll.getChildAt(i);
             TextView tag_tv = ((TextInputLayout) ll.getChildAt(0)).getEditText();
@@ -169,7 +159,7 @@ public class ModifyFragment extends Fragment{
 
         ArrayList<String> cmnt_list = new ArrayList<>();
 
-        LinearLayout comment_ll = (LinearLayout) _parent.findViewById(R.id.modify_comment_list);
+        LinearLayout comment_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
         for (int i = 0; i < comment_ll.getChildCount(); ++i) {
             LinearLayout ll = (LinearLayout) comment_ll.getChildAt(i);
             TextView cmnt_tv = ((TextInputLayout) ll.getChildAt(0)).getEditText();
@@ -182,30 +172,30 @@ public class ModifyFragment extends Fragment{
     }
 
     private void populateFields(Recipe r) {
-        EditText name = getEditTextFromId(R.id.modify_edit_text_name, null);
+        EditText name = getEditTextFromId(R.id.modify_edit_text_name, _root_view);
         name.setText(r.getName());
 
-        EditText short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, null);
+        EditText short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, _root_view);
         short_desc.setText(r.getShortDescription());
 
-        EditText long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, null);
+        EditText long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view);
         long_desc.setText(r.getLongDescription());
 
-        EditText tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, null);
+        EditText tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, _root_view);
         tgt_desc.setText(r.getTargetDescription());
 
-        EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty, null);
+        EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view);
         target_qty.setText(r.getTargetQuantity().toString());
 
         for (int i = 0; i < r.getIngredientDescriptions().size(); ++i) {
             expandIngredientList();
-            LinearLayout parent_ll = (LinearLayout) _parent.findViewById(R.id.modify_ingredient_list);
+            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_ingredient_list);
             RelativeLayout rl = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
-            EditText ing_qty = ((TextInputLayout) rl.findViewById(R.id.modify_list_item_edit_text1)).getEditText();
+            EditText ing_qty = getEditTextFromId(R.id.modify_list_item_edit_text1, rl);
             ing_qty.setText(r.getIngredientQuantity().get(i).toString());
 
-            EditText ing_desc = ((TextInputLayout) rl.findViewById(R.id.modify_list_item_edit_text2)).getEditText();
+            EditText ing_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, rl);
             ing_desc.setText(r.getIngredientDescriptions().get(i));
 
             Spinner other_r_sp = (Spinner) rl.findViewById(R.id.modify_list_item_spinner);
@@ -231,28 +221,28 @@ public class ModifyFragment extends Fragment{
 
         for (int i = 0; i < r.getInstructions().size(); ++i) {
             expandInstructionList();
-            LinearLayout parent_ll = (LinearLayout) _parent.findViewById(R.id.modify_instruction_list);
+            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
             LinearLayout ll = (LinearLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
-            EditText ins_desc = ((TextInputLayout) ll.findViewById(R.id.modify_text_item_text1)).getEditText();
+            EditText ins_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             ins_desc.setText(r.getInstructions().get(i));
         }
 
         for (int i = 0; i < r.getTags().size(); ++i) {
             expandTagList();
-            LinearLayout parent_ll = (LinearLayout) _parent.findViewById(R.id.modify_tag_list);
+            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
             LinearLayout ll = (LinearLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
-            EditText tag_desc = ((TextInputLayout) ll.findViewById(R.id.modify_text_item_text1)).getEditText();
+            EditText tag_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             tag_desc.setText(r.getTags().get(i));
         }
 
         for (int i = 0; i < r.getComments().size(); ++i) {
             expandCommentList();
-            LinearLayout parent_ll = (LinearLayout) _parent.findViewById(R.id.modify_tag_list);
+            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
             LinearLayout ll = (LinearLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
-            EditText cmnt_desc = ((TextInputLayout) ll.findViewById(R.id.modify_text_item_text1)).getEditText();
+            EditText cmnt_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, _root_view);
             cmnt_desc.setText(r.getComments().get(i));
         }
     }
@@ -272,64 +262,55 @@ public class ModifyFragment extends Fragment{
         RelativeLayout rl
                 = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
-                        .inflate(R.layout.modify_ingredient_item_layout, null));
+                        .inflate(R.layout.modify_item_layout, null));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        LinearLayout ll
-                = (LinearLayout) getActivity().findViewById(R.id.modify_ingredient_list);
-        ll.addView(rl,lp);
+        final LinearLayout parent_ll
+                = (LinearLayout) _root_view.findViewById(R.id.modify_ingredient_list);
+        parent_ll.addView(rl,lp);
 
         ImageButton b = (ImageButton) rl.findViewById(R.id.modify_list_item_del_button1);
-            b.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    ((LinearLayout) v.getParent().getParent()).removeView((RelativeLayout) v.getParent());
-                }
-            });
+        b.setOnClickListener(_onClickListener);
     }
 
     private void expandInstructionList() {
-         LinearLayout rl
-                = ((LinearLayout) getActivity()
+         RelativeLayout rl
+                = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
-                        .inflate(R.layout.modify_text_item_layout, null));
+                        .inflate(R.layout.modify_item_layout, null));
+        rl.removeViewAt(3);//remove spinner
+        rl.removeViewAt(0);//remove quantity
+
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        LinearLayout ll
-                = (LinearLayout) getActivity().findViewById(R.id.modify_instruction_list);
-        ll.addView(rl,lp);
-        ImageButton b = (ImageButton) ll.findViewById(R.id.modify_text_item_del_button1);
-        b.setOnClickListener(new View.OnClickListener() {
-                         @Override
-                         public void onClick(View v) {
-                ((LinearLayout) v.getParent().getParent()).removeView((LinearLayout) v.getParent());
-        }
-      });
+        final LinearLayout parent_ll
+                = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
+        parent_ll.addView(rl,lp);
+        ImageButton b = (ImageButton) rl.findViewById(R.id.modify_list_item_del_button1);
+        b.setOnClickListener(_onClickListener);
     }
 
     private void expandCommentList() {
-         LinearLayout ll
-                = ((LinearLayout) getActivity()
+        RelativeLayout rl
+                = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
-                        .inflate(R.layout.modify_text_item_layout, null));
+                        .inflate(R.layout.modify_item_layout, null));
+        rl.removeViewAt(3);//remove spinner
+        rl.removeViewAt(0);//remove quantity
+
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        LinearLayout parent_ll = (LinearLayout) getActivity().findViewById(R.id.modify_comment_list);
-        parent_ll.addView(ll,lp);
-        ImageButton b = (ImageButton) ll.findViewById(R.id.modify_text_item_del_button1);
-        b.setOnClickListener(new View.OnClickListener() {
-                         @Override
-                         public void onClick(View v) {
-                ((LinearLayout) v.getParent().getParent()).removeView((LinearLayout) v.getParent());
-        }
-    });
+        final LinearLayout parent_ll
+                = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
+        parent_ll.addView(rl,lp);
+        ImageButton b = (ImageButton) rl.findViewById(R.id.modify_list_item_del_button1);
+        b.setOnClickListener(_onClickListener);
     }
 
     private void expandTagList() {
@@ -349,93 +330,19 @@ public class ModifyFragment extends Fragment{
     }
 
     private EditText getEditTextFromId(int view_id, View parent) {
-        if (parent != null) {
             return ((TextInputLayout) parent.findViewById(view_id)).getEditText();
-        }
-        else {
-            return ((TextInputLayout) _parent.findViewById(view_id)).getEditText();
-        }
     }
 
-    private static String TAG = "ModifyRecipeActivity";
+    private static String TAG = "ModifyFragment";
 
     private TestActivity _parent = null;
+    private View _root_view = null;
     private Recipe _recipe = new Recipe();
-    /*
-    private Recipe readRecipe() {
-       String name = ((EditText) getActivity().findViewById(R.id.modify_edit_text_name)).getText().toString();
-       String short_desc = ((EditText) getActivity().findViewById(R.id.modify_edit_text_short_desc)).getText().toString();
-       String long_desc = ((EditText) getActivity().findViewById(R.id.modify_edit_text_long_desc)).getText().toString();
-        String target_desc = ((EditText) getActivity().findViewById(R.id.modify_edit_text_tgt_desc)).getText().toString();
-        float target_qty = Float.parseFloat(((EditText) getActivity()
-                .findViewById(R.id.modify_edit_text_tgt_qty)).getText().toString());
-        ArrayList<Float> ingredient_qty = new ArrayList<>();
-        ArrayList<String> ingredient_desc = new ArrayList<>();
-        ArrayList<Long> other_recipes = new ArrayList<>();
-        LinearLayout ing_ll = (LinearLayout) getActivity().findViewById(R.id.modify_ingredient_list);
-        for (int i = 0; i < ing_ll.getChildCount(); ++i) {
-            RelativeLayout rl = ((RelativeLayout) ing_ll.getChildAt(i));
-            TextView qty = (TextView) rl.findViewById(R.id.modify_recipe_list_item_qty);
-            TextView desc = (TextView) rl.findViewById(R.id.modify_recipe_list_item_desc);
-            Spinner spinner = (Spinner) rl.findViewById(R.id.modify_recipe_list_item_spinner);
 
-            ingredient_qty.add(Float.parseFloat(qty.getText().toString()));
-            ingredient_desc.add(desc.getText().toString());
-
-
+    private View.OnClickListener _onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ((ViewGroup) v.getParent().getParent()).removeView((ViewGroup) v.getParent());
         }
-    }
-
-    private View expandIngredients() {
-        RelativeLayout rl
-                = ((RelativeLayout) getActivity()
-                        .getLayoutInflater()
-                        .inflate(R.layout.modify_ingredient_item_layout, null));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        LinearLayout ll
-                = (LinearLayout) getActivity().findViewById(R.id.modify_ingredient_list);
-        ll.addView(rl,lp);
-        return rl;
-    }
-
-    private View expandInstructions() {
-         LinearLayout rl
-                = ((LinearLayout) getActivity()
-                        .getLayoutInflater()
-                        .inflate(R.layout.modify_text_item_layout, null));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        LinearLayout ll
-                = (LinearLayout) getActivity().findViewById(R.id.modify_instruction_list);
-        ll.addView(rl,lp);
-        return rl;
-    }
-
-    private View expandComments() {
-         LinearLayout rl
-                = ((LinearLayout) getActivity()
-                        .getLayoutInflater()
-                        .inflate(R.layout.modify_text_item_layout, null));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        LinearLayout ll
-                = (LinearLayout) getActivity().findViewById(R.id.modify_comment_list);
-        ll.addView(rl,lp);
-        return rl;
-    }
-
-    private View expandTags() {
-        //TAGS are not implemented as of yet.
-        Toast t = Toast.makeText(getContext(), "Tags are not supported, yet.", Toast.LENGTH_SHORT);
-        t.show();
-        return null;
-    }
-    */
+    };
 }
