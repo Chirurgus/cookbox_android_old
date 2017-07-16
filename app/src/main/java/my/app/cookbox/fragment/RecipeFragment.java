@@ -2,6 +2,7 @@ package my.app.cookbox.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.net.LinkAddress;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -78,26 +79,7 @@ public class RecipeFragment extends BaseFragment {
         //Keep screen on
         getParent().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.recipe_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.recipe_edit:
-                Intent intent = new Intent(this, ModifyRecipeActivity.class);
-                intent.putExtra("id", _recipe.getId());
-                startActivityForResult(intent,  0);//don't care for result
-                return true;
-            default:
-                return false;
-        }
-    }
-
+    //TODO: Add edit menu option.
 
     private void populateFields(final Recipe r) {
         TextView name = (TextView) getRootView().findViewById(R.id.recipe_text_name);
@@ -116,23 +98,24 @@ public class RecipeFragment extends BaseFragment {
             expandIngredientList();
             IngredientIds iids = _ingList.get(_ingList.size() - 1);
 
-            TextView ing_qty = (TextView) getRootView().findViewById(iids.qty_id);
+            LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_ingredient_list);
+
+            RelativeLayout ing_item = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
+
+            TextView ing_qty = (TextView) ing_item.getChildAt(0);
             ing_qty.setText(r.getIngredientQuantity().get(i).toString());
 
-            TextView ing_desc = (TextView) getRootView().findViewById(iids.desc_id);
+            TextView ing_desc = (TextView) ing_item.getChildAt(1);
             ing_desc.setText(r.getIngredientDescriptions().get(i));
 
-            TextView other_r = (TextView) getRootView().findViewById(iids.other_id);
+            TextView other_r = (TextView) ing_item.getChildAt(2);
             if (r.getOtherRecipeIds().get(i) != Recipe.NO_ID) {
-                BasicRecipe basic_other = _sqlctrl.getBasicRecipe(r.getOtherRecipeIds().get(i));
-                final int final_i = i;
-                other_r.setText(basic_other.getName() + " View Recipe");
+                final BasicRecipe br = getParent().getSqlController().getBasicRecipe(r.getOtherRecipeIds().get(i));
+                other_r.setText(br.getName() + " View Recipe");
                 other_r.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getApplicationContext(), RecipeActivity.class);
-                        intent.putExtra("id", r.getOtherRecipeIds().get(final_i));
-                        startActivity(intent);
+                        //TODO: Open link to another recipe.
                     }
                 });
             }
@@ -140,26 +123,29 @@ public class RecipeFragment extends BaseFragment {
 
         for (int i = 0; i < r.getInstructions().size(); ++i) {
             expandInstructionList();
-            InstructionIds iids = _insList.get(_insList.size() - 1);
 
-            TextView ins_desc = (TextView) getRootView().findViewById(iids.desc_id);
+            LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_instruction_list);
+
+            TextView ins_desc = (TextView) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
             ins_desc.setText("" + (i + 1) + ": " + r.getInstructions().get(i));
-        }
-
-        for (int i = 0; i < r.getTags().size(); ++i) {
-            expandTagList();
-            TagIds tids = _tagList.get(_tagList.size() - 1);
-
-            TextView tag_desc = (TextView) getRootView().findViewById(tids.tag_id);
-            tag_desc.setText(r.getTags().get(i));
         }
 
         for (int i = 0; i < r.getComments().size(); ++i) {
             expandCommentList();
-            CommentIds cids = _cmntList.get(_cmntList.size() - 1);
 
-            TextView cmnt_desc = (TextView) getRootView().findViewById(cids.comment_id);
+            LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_comment_list)
+
+            TextView cmnt_desc = (TextView) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
             cmnt_desc.setText(r.getComments().get(i));
+        }
+
+        for (int i = 0; i < r.getTags().size(); ++i) {
+            expandTagList();
+
+            LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_tag_list)
+
+            TextView tag_desc = (TextView) parent_ll.getChildAt((parent_ll.getChildCount() - 1));
+            tag_desc.setText(r.getTags().get(i));
         }
     }
 
