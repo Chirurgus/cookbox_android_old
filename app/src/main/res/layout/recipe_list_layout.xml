@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Layout to display the recipe in the recipe list -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@drawable/select_background"
