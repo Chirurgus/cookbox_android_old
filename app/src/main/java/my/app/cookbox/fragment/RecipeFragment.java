@@ -132,7 +132,7 @@ public class RecipeFragment extends BaseFragment {
         for (int i = 0; i < r.getComments().size(); ++i) {
             expandCommentList();
 
-            LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_comment_list)
+            LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_comment_list);
 
             TextView cmnt_desc = (TextView) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
             cmnt_desc.setText(r.getComments().get(i));
@@ -207,7 +207,8 @@ public class RecipeFragment extends BaseFragment {
         LinearLayout parent_ll = (LinearLayout) getParent().findViewById(R.id.recipe_ingredient_list);
 
         for (int i = 0; i < parent_ll.getChildCount(); ++i) {
-            TextView tv = (TextView) parent_ll.getChildAt(i);
+            RelativeLayout rl = (RelativeLayout) parent_ll.getChildAt(i);
+            TextView tv = (TextView) rl.findViewById(R.id.recipe_list_text1);
             Float new_qty = _recipe.getIngredientQuantity().get(i) * _tgt_scale;
             tv.setText(new_qty.toString());
         }
