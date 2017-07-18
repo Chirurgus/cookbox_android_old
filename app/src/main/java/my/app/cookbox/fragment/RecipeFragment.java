@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +80,23 @@ public class RecipeFragment extends BaseFragment {
         //Keep screen on
         getParent().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-    //TODO: Add edit menu option.
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.recipe_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.recipe_edit :
+                getParent().startModifyFragment(_recipe.getId());
+                return true;
+            default:
+                return false;
+        }
+    }
 
     private void populateFields(final Recipe r) {
         TextView name = (TextView) getRootView().findViewById(R.id.recipe_text_name);

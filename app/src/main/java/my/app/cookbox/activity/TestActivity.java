@@ -2,7 +2,7 @@ package my.app.cookbox.activity;
 
 import android.os.Bundle;
 import android.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 
 import java.util.ArrayList;
 
@@ -18,16 +18,16 @@ import my.app.cookbox.utility.RecipeAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
 
         _rlist = _sqlctrl.getAllBasicRecipes();
-        //_listfrag = startListFragment();
+        _listfrag = startListFragment();
         //_modifyfrag = startModifyFragment(null);//_rlist.get(0).getId());
-        startRecipeFramgent(_rlist.get(0).getId());
+        //startRecipeFramgent(_rlist.get(0).getId());
     }
 
     public void addToRecipeList(BasicRecipe br) {
@@ -41,7 +41,7 @@ public class TestActivity extends AppCompatActivity {
         RecipeListFragment new_frag = new RecipeListFragment();
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.main_fragment_frame, new_frag);
+            ft.replace(R.id.main_fragment_frame, new_frag);
             ft.addToBackStack(null);
             ft.commit();
 
@@ -54,7 +54,8 @@ public class TestActivity extends AppCompatActivity {
        ModifyFragment new_frag = new ModifyFragment();
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.main_fragment_frame, new_frag);
+            ft.replace(R.id.main_fragment_frame, new_frag);
+
             ft.addToBackStack(null);
             if (id != null) {
                 Bundle args = new Bundle();
@@ -70,7 +71,7 @@ public class TestActivity extends AppCompatActivity {
         RecipeFragment new_frag = new RecipeFragment();
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.main_fragment_frame, new_frag);
+            ft.replace(R.id.main_fragment_frame, new_frag);
             ft.addToBackStack(null);
             if (id != null) {
                 Bundle args = new Bundle();

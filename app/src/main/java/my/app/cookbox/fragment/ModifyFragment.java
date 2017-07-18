@@ -3,6 +3,7 @@ package my.app.cookbox.fragment;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +30,7 @@ import my.app.cookbox.recipe.Recipe;
  * Created by Alexander on 015, 15 Jun.
  */
 
-public class ModifyFragment extends Fragment{
+public class ModifyFragment extends BaseFragment {
 
     @Nullable
     @Override
@@ -250,7 +251,7 @@ public class ModifyFragment extends Fragment{
     private void setupOtherRecipeSpinner(Spinner spinner) {
         ArrayList<String> names = new ArrayList<>();
         names.add("None");
-        for (BasicRecipe br : _parent.getAllBasicRecipes()) {
+        for (BasicRecipe br : getParent().getAllBasicRecipes()) {
             names.add(br.getName());
         }
         //unit_spinner_item will do just fine here
@@ -263,6 +264,7 @@ public class ModifyFragment extends Fragment{
                 = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
                         .inflate(R.layout.modify_item_layout, null));
+        setupOtherRecipeSpinner((Spinner) rl.getChildAt(3));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -332,6 +334,7 @@ public class ModifyFragment extends Fragment{
     private EditText getEditTextFromId(int view_id, View parent) {
             return ((TextInputLayout) parent.findViewById(view_id)).getEditText();
     }
+
 
     private static String TAG = "ModifyFragment";
 
