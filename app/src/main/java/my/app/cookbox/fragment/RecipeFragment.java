@@ -77,6 +77,7 @@ public class RecipeFragment extends BaseFragment {
             _recipe = new Recipe();
         }
 
+        setHasOptionsMenu(true);
         //Keep screen on
         getParent().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }

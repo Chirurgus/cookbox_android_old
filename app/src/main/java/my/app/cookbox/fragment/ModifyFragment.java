@@ -96,14 +96,14 @@ public class ModifyFragment extends BaseFragment {
 
         updateRecipeList();
 
-        Toast toast = Toast.makeText(getContext(), "Recipe  would be saved.",Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getContext(), "Recipe was saved.",Toast.LENGTH_SHORT);
         toast.show();
     }
 
 
     private void updateRecipeList() {
         _recipe = readRecipe(_recipe.getId());
-        //_recipe.setId(_parent.getSqlController().insertRecipe(_recipe));
+        _recipe.setId(_parent.getSqlController().insertRecipe(_recipe));
         _parent.addToRecipeList(_recipe.getBasicRecipe());
     }
 
@@ -142,8 +142,8 @@ public class ModifyFragment extends BaseFragment {
 
         LinearLayout ins_ll = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
         for (int i = 0; i < ins_ll.getChildCount(); ++i) {
-            LinearLayout ll = (LinearLayout) ins_ll.getChildAt(i);
-            TextView desc_tv = ((TextInputLayout) ll.getChildAt(0)).getEditText();
+            RelativeLayout rl = (RelativeLayout) ins_ll.getChildAt(i);
+            TextView desc_tv = ((TextInputLayout) rl.getChildAt(0)).getEditText();
 
             ins_list.add(desc_tv.getText().toString());
         }
@@ -152,8 +152,8 @@ public class ModifyFragment extends BaseFragment {
 
         LinearLayout tag_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
         for (int i = 0; i < tag_ll.getChildCount(); ++i) {
-            LinearLayout ll = (LinearLayout) tag_ll.getChildAt(i);
-            TextView tag_tv = ((TextInputLayout) ll.getChildAt(0)).getEditText();
+            RelativeLayout rl = (RelativeLayout) tag_ll.getChildAt(i);
+            TextView tag_tv = ((TextInputLayout) rl.getChildAt(0)).getEditText();
 
             tag_list.add(tag_tv.getText().toString());
         }
@@ -162,8 +162,8 @@ public class ModifyFragment extends BaseFragment {
 
         LinearLayout comment_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
         for (int i = 0; i < comment_ll.getChildCount(); ++i) {
-            LinearLayout ll = (LinearLayout) comment_ll.getChildAt(i);
-            TextView cmnt_tv = ((TextInputLayout) ll.getChildAt(0)).getEditText();
+            RelativeLayout rl = (RelativeLayout) comment_ll.getChildAt(i);
+            TextView cmnt_tv = ((TextInputLayout) rl.getChildAt(0)).getEditText();
 
             cmnt_list.add(cmnt_tv.getText().toString());
         }
@@ -223,7 +223,7 @@ public class ModifyFragment extends BaseFragment {
         for (int i = 0; i < r.getInstructions().size(); ++i) {
             expandInstructionList();
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
-            LinearLayout ll = (LinearLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
+            RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText ins_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             ins_desc.setText(r.getInstructions().get(i));
@@ -232,7 +232,7 @@ public class ModifyFragment extends BaseFragment {
         for (int i = 0; i < r.getTags().size(); ++i) {
             expandTagList();
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
-            LinearLayout ll = (LinearLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
+            RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText tag_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             tag_desc.setText(r.getTags().get(i));
@@ -240,10 +240,10 @@ public class ModifyFragment extends BaseFragment {
 
         for (int i = 0; i < r.getComments().size(); ++i) {
             expandCommentList();
-            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
-            LinearLayout ll = (LinearLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
+            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
+            RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
-            EditText cmnt_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, _root_view);
+            EditText cmnt_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             cmnt_desc.setText(r.getComments().get(i));
         }
     }

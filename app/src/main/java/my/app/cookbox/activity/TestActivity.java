@@ -3,6 +3,7 @@ package my.app.cookbox.activity;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ import my.app.cookbox.utility.RecipeAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class TestActivity extends FragmentActivity {
+public class TestActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
