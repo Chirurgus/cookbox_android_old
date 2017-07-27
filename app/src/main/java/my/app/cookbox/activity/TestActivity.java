@@ -43,7 +43,8 @@ public class TestActivity extends AppCompatActivity {
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.main_fragment_frame, new_frag);
-            ft.addToBackStack(null);
+            // A ListFragment is only added once.
+            //ft.addToBackStack(null);
             ft.commit();
 
             new_frag.setListAdapter(new RecipeAdapter(_rlist, this));
