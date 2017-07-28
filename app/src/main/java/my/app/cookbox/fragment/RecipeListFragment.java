@@ -1,9 +1,11 @@
 package my.app.cookbox.fragment;
 
 import android.app.ListFragment;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,6 +50,8 @@ public class RecipeListFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        registerForContextMenu(getListView());
+
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
@@ -73,8 +77,44 @@ public class RecipeListFragment extends ListFragment {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getActivity().getMenuInflater().inflate(R.menu.recipe_list_context,menu);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.rlist_context_edit:
+                ((TestActivity) getActivity()).startModifyFragment(
+                        ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id
+                );
+                return true;
+            case R.id.rlist_context_delete:
+                 int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+                 TestActivity parent = ((TestActivity) getActivity());
+                 try {
+                     parent.getSqlController().removeRecipe(parent.getAllBasicRecipes().get(pos).getId());
+                     parent.getAllBasicRecipes().remove(pos);
+                 }
+                catch (SQLiteException e) {
+                    Toast toast = Toast.makeText(
+                            parent,
+                            "Can't delete " + parent.getAllBasicRecipes().get(pos).getName() + ".",
+                            Toast.LENGTH_LONG
+                    );
+                    toast.show();
+                }
+
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
