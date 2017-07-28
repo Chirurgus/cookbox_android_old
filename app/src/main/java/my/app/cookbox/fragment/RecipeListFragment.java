@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import junit.framework.Test;
 
@@ -54,6 +55,14 @@ public class RecipeListFragment extends ListFragment {
             }
         });
 
+        getListView().setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //TODO show a context menu
+                //have to return true, otherwise an exception is thrown (in onCreateActionMode)
+                return true;
+            }
+        });
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.main_fab1);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,9 +80,6 @@ public class RecipeListFragment extends ListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem menu) {
         switch (menu.getItemId()) {
-            case R.id.main_refresh:
-                //TODO
-                return true;
             case R.id.main_search:
                 //TODO
                 return true;
@@ -82,6 +88,9 @@ public class RecipeListFragment extends ListFragment {
                 return true;
             case R.id.main_backup:
                 //backupRecipes();
+                return true;
+            case R.id.main_test:
+                Toast.makeText(getContext(),"" + Float.parseFloat("0.5"), Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return false;

@@ -439,7 +439,7 @@ public class SqlController extends SQLiteOpenHelper{
             do {
                 Ingredient ing = new Ingredient();
 
-                ing.quantity = c.getInt(c.getColumnIndex("quantity"));
+                ing.quantity = c.getFloat(c.getColumnIndex("quantity"));
                 ing.desc = c.getString(c.getColumnIndex("description"));
                 if (!c.isNull(c.getColumnIndex("other_recipe"))) {
                     ing.other_recipe = c.getLong(c.getColumnIndex("other_recipe"));
