@@ -1,10 +1,12 @@
 package my.app.cookbox.fragment;
 
 import android.app.ListFragment;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,8 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
-
-import junit.framework.Test;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,7 +88,7 @@ public class RecipeListFragment extends ListFragment {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.rlist_context_edit:
                 ((TestActivity) getActivity()).startModifyFragment(
@@ -96,20 +96,36 @@ public class RecipeListFragment extends ListFragment {
                 );
                 return true;
             case R.id.rlist_context_delete:
-                 int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
-                 TestActivity parent = ((TestActivity) getActivity());
-                 try {
-                     parent.getSqlController().removeRecipe(parent.getAllBasicRecipes().get(pos).getId());
-                     parent.getAllBasicRecipes().remove(pos);
-                 }
-                catch (SQLiteException e) {
-                    Toast toast = Toast.makeText(
-                            parent,
-                            "Can't delete " + parent.getAllBasicRecipes().get(pos).getName() + ".",
-                            Toast.LENGTH_LONG
-                    );
-                    toast.show();
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Are you sure?");
+                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //User clicked YES
+                         int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+                         TestActivity parent = ((TestActivity) getActivity());
+                         try {
+                             parent.getSqlController().removeRecipe(parent.getAllBasicRecipes().get(pos).getId());
+                             parent.getAllBasicRecipes().remove(pos);
+                         }
+                        catch (SQLiteException e) {
+                            Toast toast = Toast.makeText(
+                                    parent,
+                                    "Can't delete " + parent.getAllBasicRecipes().get(pos).getName() + ".",
+                                    Toast.LENGTH_LONG
+                            );
+                            toast.show();
+                        }
+                                dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //User clicked now
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
 
                 return true;
             default:

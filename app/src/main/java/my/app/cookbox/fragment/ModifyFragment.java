@@ -109,8 +109,8 @@ public class ModifyFragment extends BaseFragment {
 
     private Recipe readRecipe(long id) {
         String name = getEditTextFromId(R.id.modify_edit_text_name, _root_view).getText().toString();
+        String short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, _root_view).getText().toString();
         String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view).getText().toString();
-        String short_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view).getText().toString();
         String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, _root_view).getText().toString();
         float tgt_qty = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view).getText().toString());
 
