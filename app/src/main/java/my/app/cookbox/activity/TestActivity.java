@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 
@@ -29,6 +31,8 @@ public class TestActivity extends AppCompatActivity {
         _listfrag = startListFragment();
         //_modifyfrag = startModifyFragment(null);//_rlist.get(0).getId());
         //startRecipeFramgent(_rlist.get(0).getId());
+        ListView lv = (ListView) findViewById(R.id.drawer_list);
+        lv.setAdapter(new ArrayAdapter<String>(this, R.layout.recipe_list_item, new String[] {"one", "two", "three"}));
     }
 
     public void addToRecipeList(BasicRecipe br) {

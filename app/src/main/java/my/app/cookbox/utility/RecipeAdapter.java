@@ -55,7 +55,6 @@ public class RecipeAdapter extends BaseAdapter {
         }
         else {
             ret = _inflater.inflate(R.layout.recipe_list_layout, null);
-
         }
         TextView tv_name = (TextView) ret.findViewById(R.id.recipe_list_text1);
         TextView tv_desc = (TextView) ret.findViewById(R.id.recipe_list_text2);
