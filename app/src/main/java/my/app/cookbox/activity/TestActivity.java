@@ -3,7 +3,11 @@ package my.app.cookbox.activity;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 
@@ -29,6 +33,9 @@ public class TestActivity extends AppCompatActivity {
         _listfrag = startListFragment();
         //_modifyfrag = startModifyFragment(null);//_rlist.get(0).getId());
         //startRecipeFramgent(_rlist.get(0).getId());
+
+        ((ListView) findViewById(R.id.drawer_list))
+                .setAdapter(new ArrayAdapter<String>(this, R.layout.simple_list_text_layout ,new String[] {"hi", "sup", "la", "what'sup", "how is it it", "1", "1", "fflkes", "how are yotu", "what are you doing", "am i done yet?", "I think so"}));
     }
 
     public void addToRecipeList(BasicRecipe br) {
