@@ -1,5 +1,6 @@
 package my.app.cookbox.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
@@ -23,7 +24,7 @@ import my.app.cookbox.utility.RecipeAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

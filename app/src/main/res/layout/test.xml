@@ -9,19 +9,18 @@
     <!-- Contents of main view -->
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true" >
 
-        <!--
         <android.support.v7.widget.Toolbar
-            android:id="@+id/my_awesome_toolbar"
+            android:id="@+id/main_toolbar"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:minHeight="?attr/actionBarSize"
             android:background="?attr/colorPrimary" />
-        -->
+
 
         <FrameLayout
             android:id="@+id/main_fragment_frame"
@@ -34,7 +33,7 @@
 
     <ListView
         android:id="@+id/drawer_list"
-        android:layout_width="200dp"
+        android:layout_width="350dp"
         android:layout_height="match_parent"
         android:layout_gravity="left|start"
         android:background="#ffeeeeee"/>
