@@ -30,12 +30,22 @@
     </LinearLayout>
 
     <!-- Drawer contents -->
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="start"
+            android:background="#ffeeeeee">
 
-    <ListView
-        android:id="@+id/drawer_list"
-        android:layout_width="350dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="left|start"
-        android:background="#ffeeeeee"/>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_close_black_24dp"/>
+            <ListView
+                android:id="@+id/drawer_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+    </LinearLayout>
+
 
 </android.support.v4.widget.DrawerLayout>
