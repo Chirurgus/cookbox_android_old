@@ -31,6 +31,12 @@ public class RecipeAdapter extends BaseAdapter {
         _context = c;
         _inflater = (LayoutInflater) _context.getSystemService(_context.LAYOUT_INFLATER_SERVICE);
     }
+
+    public void updateDataset(ArrayList<BasicRecipe> d) {
+        _data.clear();
+        _data.addAll(d);
+        notifyDataSetChanged();
+    }
     @Override
     public int getCount() {
         return _data.size();

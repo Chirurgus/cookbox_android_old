@@ -1,76 +1,25 @@
 package my.app.cookbox.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BaseTransientBottomBar;
-import android.support.design.widget.TextInputLayout;
-import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import my.app.cookbox.R;
-import my.app.cookbox.activity.TestActivity;
-import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 
 /**
- * Created by Alexander on 015, 15 Jun.
+ * Created by Alexander on 003, 3 Sep.
  */
 
-public class ModifyFragment extends BaseFragment {
+    /*
+public class EditTagFragment extends BaseFragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        _root_view = inflater.inflate(R.layout.modify_layout, container, false);
+        _root_view = inflater.inflate(R.layout.modify_tag_layout, container, false);
 
-        Button ing_b = (Button) _root_view.findViewById(R.id.modify_ingredient_button);
-        ing_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandIngredientList();
-            }
-        });
-
-        Button ins_b = (Button) _root_view.findViewById(R.id.modify_instruction_button);
-        ins_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandInstructionList();
-            }
-        });
-
-        Button cmnt_b = (Button) _root_view.findViewById(R.id.modify_comment_button);
-        cmnt_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expandCommentList();
-            }
-        });
-
-        Button tag_b = (Button) _root_view.findViewById(R.id.modify_tag_button);
-        tag_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              expandTagList();
-            }
-        });
 
         populateFields(_recipe);
 
@@ -281,52 +230,6 @@ public class ModifyFragment extends BaseFragment {
         b.setOnClickListener(_onClickListener);
     }
 
-    private void expandInstructionList() {
-         RelativeLayout rl
-                = ((RelativeLayout) getActivity()
-                        .getLayoutInflater()
-                        .inflate(R.layout.modify_item_layout, null));
-        rl.removeViewAt(3);//remove spinner
-        rl.removeViewAt(0);//remove quantity
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        final LinearLayout parent_ll
-                = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
-        parent_ll.addView(rl,lp);
-        ImageButton b = (ImageButton) rl.findViewById(R.id.modify_list_item_del_button1);
-        b.setOnClickListener(_onClickListener);
-    }
-
-    private void expandCommentList() {
-        RelativeLayout rl
-                = ((RelativeLayout) getActivity()
-                        .getLayoutInflater()
-                        .inflate(R.layout.modify_item_layout, null));
-        rl.removeViewAt(3);//remove spinner
-        rl.removeViewAt(0);//remove quantity
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        final LinearLayout parent_ll
-                = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
-        parent_ll.addView(rl,lp);
-        ImageButton b = (ImageButton) rl.findViewById(R.id.modify_list_item_del_button1);
-        b.setOnClickListener(_onClickListener);
-    }
-
-    private void expandTagList() {
-        //TAGS are not implemented as of yet.
-        Toast t = Toast.makeText(getContext(), "Tags are not supported, yet.", Toast.LENGTH_SHORT);
-        t.show();
-    }
-
-
-
     private void popViewFromLinearLayout(LinearLayout parent) {
             if (parent.getChildCount() == 0) {
                 return;
@@ -353,3 +256,4 @@ public class ModifyFragment extends BaseFragment {
         }
     };
 }
+*/

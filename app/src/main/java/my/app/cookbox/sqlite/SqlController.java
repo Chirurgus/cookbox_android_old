@@ -5,18 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.transition.Slide;
 import android.util.Log;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
+import my.app.cookbox.recipe.RecipeTag;
 
 /**
  *
@@ -284,6 +279,74 @@ public class SqlController extends SQLiteOpenHelper{
             db.endTransaction();
         }
         return ret;
+    }
+
+    public ArrayList<RecipeTag> getAllRecipeTags() {
+        SQLiteDatabase db = getReadableDatabase();
+        db.beginTransaction();
+        ArrayList<RecipeTag> ret = new ArrayList<>();
+        try {
+            Cursor c = db.query("tag",
+                    new String[] {"id", "tag"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+            if (c.moveToFirst()) {
+                do {
+                    long id = c.getLong(c.getColumnIndex("id"));
+                    String name = c.getString(c.getColumnIndex("tag"));
+                    RecipeTag category = new RecipeTag(id, name);
+
+                    ret.add(category);
+                } while (c.moveToNext());
+            }
+            c.close();
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".getAllRecipeTags transaction failed.");
+        }
+        finally {
+            db.endTransaction();
+        }
+        return ret;
+    }
+
+    public ArrayList<BasicRecipe> getTaggedBasicRecipe(RecipeTag t) {
+        SQLiteDatabase db = getReadableDatabase();
+        db.beginTransaction();
+        ArrayList<BasicRecipe> ret = new ArrayList<>();
+        try {
+            Cursor c = db.query("tag_list",
+                    new String[] {"recipe_id"},
+                    "tag_id = ?",
+                    new String[] {"" + t.getId()},
+                    null,
+                    null,
+                    null);
+            if (c.moveToFirst()) {
+                ArrayList<Long> recipe_ids = new ArrayList<>(c.getCount());
+                do {
+                    recipe_ids.add(c.getLong(c.getColumnIndex("recipe_id")));
+                } while (c.moveToNext());
+
+                for (Long id : recipe_ids) {
+                    ret.add(getBasicRecipe(id));
+                }
+            }
+            c.close();
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".getAllTaggedBasicRecipe transaction failed.");
+        }
+        finally {
+            db.endTransaction();
+        }
+        return ret;
+
     }
 
     public long insertRecipe(Recipe r) {

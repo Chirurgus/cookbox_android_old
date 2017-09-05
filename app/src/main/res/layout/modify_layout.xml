@@ -1,189 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!--
-    <EditText
-        android:id="@+id/modify_edit_text_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:hint="Name" />
 
-    <EditText
-        android:id="@+id/modify_edit_text_short_desc"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_edit_text_name"
-        android:hint="Short description" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/modify_edit_text_long_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/modify_edit_text_short_desc"
-        android:layout_alignParentStart="true"
-        android:hint="Long description" />
-
-    <EditText
-        android:id="@+id/modify_edit_text_tgt_qty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_edit_text_long_desc"
-        android:inputType="numberDecimal"
-        android:hint="Quantity" />
-
-    <EditText
-        android:id="@+id/modify_edit_text_tgt_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/modify_edit_text_tgt_qty"
-        android:layout_below="@id/modify_edit_text_long_desc"
-        android:hint="Target Descripton" />
-    -->
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/modify_edit_text_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true">
-
-        <android.support.design.widget.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Name" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-            android:id="@+id/modify_edit_text_short_desc"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/modify_edit_text_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/modify_edit_text_name">
+            android:layout_alignParentTop="true">
 
             <android.support.design.widget.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Short description" />
-    </android.support.design.widget.TextInputLayout>
+                android:hint="Name" />
+        </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-            android:id="@+id/modify_edit_text_long_desc"
+        <android.support.design.widget.TextInputLayout
+                android:id="@+id/modify_edit_text_short_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/modify_edit_text_name">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Short description" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+                android:id="@+id/modify_edit_text_long_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            android:layout_below="@id/modify_edit_text_short_desc"
+            android:layout_alignParentStart="true">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Long description" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+                android:id="@+id/modify_edit_text_tgt_qty"
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/modify_edit_text_long_desc">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="Quantity" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+                android:id="@+id/modify_edit_text_tgt_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/modify_edit_text_tgt_qty"
+                android:layout_below="@id/modify_edit_text_long_desc">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text|textEmailAddress"
+                    android:hint="Target Descripton" />
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/modify_ingredient_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:layout_below="@id/modify_edit_text_short_desc"
-        android:layout_alignParentStart="true">
-
-            <android.support.design.widget.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Long description" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-            android:id="@+id/modify_edit_text_tgt_qty"
-            android:layout_width="96dp"
-            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/modify_edit_text_long_desc">
+            android:layout_below="@id/modify_edit_text_tgt_desc">
 
-            <android.support.design.widget.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:hint="Quantity" />
-    </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
 
-    <android.support.design.widget.TextInputLayout
-            android:id="@+id/modify_edit_text_tgt_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/modify_edit_text_tgt_qty"
-            android:layout_below="@id/modify_edit_text_long_desc">
-
-            <android.support.design.widget.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Target Descripton" />
-    </android.support.design.widget.TextInputLayout>
-
-    <LinearLayout
-        android:id="@+id/modify_ingredient_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_edit_text_tgt_desc">
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/modify_ingredient_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_ingredient_list"
-        android:text="Add an ingredient"
-        android:background="@null"/>
-
-    <LinearLayout
-        android:id="@+id/modify_instruction_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_ingredient_button">
-
-    </LinearLayout>
-
-    <Button
-            android:id="@+id/modify_instruction_button"
+        <Button
+            android:id="@+id/modify_ingredient_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/modify_instruction_list"
-            android:text="Add an instruction"
+            android:layout_below="@id/modify_ingredient_list"
+            android:text="Add an ingredient"
             android:background="@null"/>
 
-    <LinearLayout
-        android:id="@+id/modify_comment_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_instruction_button">
+        <LinearLayout
+            android:id="@+id/modify_instruction_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/modify_ingredient_button">
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <Button
-        android:id="@+id/modify_comment_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_comment_list"
-        android:text="Add a comment"
-        android:background="@null"/>
+        <Button
+                android:id="@+id/modify_instruction_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/modify_instruction_list"
+                android:text="Add an instruction"
+                android:background="@null"/>
 
-    <LinearLayout
-        android:id="@+id/modify_tag_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_comment_button">
+        <LinearLayout
+            android:id="@+id/modify_comment_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/modify_instruction_button">
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <Button
-        android:id="@+id/modify_tag_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/modify_tag_list"
-        android:text="Add a tag"
-        android:background="@null"/>
+        <Button
+            android:id="@+id/modify_comment_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/modify_comment_list"
+            android:text="Add a comment"
+            android:background="@null"/>
 
-</RelativeLayout>
+        <LinearLayout
+            android:id="@+id/modify_tag_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/modify_comment_button">
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/modify_tag_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/modify_tag_list"
+            android:text="Add a tag"
+            android:background="@null"/>
+
+    </RelativeLayout>
+
+</ScrollView>

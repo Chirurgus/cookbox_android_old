@@ -3,12 +3,11 @@ package my.app.cookbox.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -17,6 +16,7 @@ import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
+import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeAdapter;
 
@@ -30,19 +30,16 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
 
-        _rlist = _sqlctrl.getAllBasicRecipes();
+        selectCategory(null);
         _listfrag = startListFragment();
-        //_modifyfrag = startModifyFragment(null);//_rlist.get(0).getId());
-        //startRecipeFramgent(_rlist.get(0).getId());
 
-        ((ListView) findViewById(R.id.drawer_list))
-                .setAdapter(new ArrayAdapter<String>(this, R.layout.simple_list_text_layout ,new String[] {"hi", "sup", "la", "what'sup", "how is it it", "1", "1", "fflkes", "how are yotu", "what are you doing", "am i done yet?", "I think so"}));
+        setupNavigationDrawer();
     }
 
     public void addToRecipeList(BasicRecipe br) {
         _rlist.add(br);
         if (_listfrag != null) {
-            ((RecipeAdapter) _listfrag.getListAdapter()).notifyDataSetChanged();
+            ((RecipeAdapter) _listfrag.getListAdapter()).updateDataset(_rlist);
         }
     }
 
@@ -93,6 +90,15 @@ public class TestActivity extends Activity {
         return new_frag;
     }
 
+    public void selectCategory(RecipeTag tag) {
+        if (tag == null) {
+            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show();
+            _rlist = _sqlctrl.getAllBasicRecipes();
+            return;
+        }
+
+        _rlist = _sqlctrl.getTaggedBasicRecipe(tag);
+    }
 
     public ArrayList<BasicRecipe> getAllBasicRecipes() {
         return _rlist;
@@ -102,8 +108,23 @@ public class TestActivity extends Activity {
         return _sqlctrl;
     }
 
+    private void setupNavigationDrawer() {
+        ArrayList<RecipeTag> tags = _sqlctrl.getAllRecipeTags();
+        ((ListView) findViewById(R.id.drawer_list)).setAdapter(
+                new ArrayAdapter<RecipeTag>(this, R.layout.simple_list_text_layout ,tags)
+        );
+        ((ListView) findViewById(R.id.drawer_list)).setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                        selectCategory((RecipeTag) parent.getAdapter().getItem(pos));
+                        ((RecipeAdapter) _listfrag.getListAdapter()).updateDataset(_rlist);
+                    }
+                }
+        );
+    }
+
     private SqlController _sqlctrl = new SqlController(this);
-    private ArrayList<BasicRecipe> _rlist;
+    private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
     private RecipeListFragment _listfrag = null;
-    private ModifyFragment _modifyfrag = null;
 }
