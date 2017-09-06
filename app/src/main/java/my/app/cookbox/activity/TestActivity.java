@@ -1,11 +1,18 @@
 package my.app.cookbox.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -74,7 +81,7 @@ public class TestActivity extends Activity {
         return new_frag;
     }
 
-    public RecipeFragment startRecipeFramgent(Long id) {
+    public RecipeFragment startRecipeFragment(Long id) {
         RecipeFragment new_frag = new RecipeFragment();
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -108,12 +115,57 @@ public class TestActivity extends Activity {
         return _sqlctrl;
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.recipe_list_context,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+             case R.id.rlist_context_edit:
+                 Toast.makeText(this, "TODO", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.rlist_context_delete:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Are you sure?");
+                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+                        try {
+                            getSqlController().removeTag(getSqlController().getAllRecipeTags().get(pos).getId());
+                            populateDrawerTagList((ListView) findViewById(R.id.drawer_list));
+                        }
+                        catch (SQLiteException e) {
+                            Toast toast = Toast.makeText(
+                                    TestActivity.this,
+                                    "Can't delete " + getSqlController().getAllRecipeTags().get(pos).getName() + ".",
+                                    Toast.LENGTH_LONG
+                            );
+                            toast.show();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
     private void setupNavigationDrawer() {
-        ArrayList<RecipeTag> tags = _sqlctrl.getAllRecipeTags();
-        ((ListView) findViewById(R.id.drawer_list)).setAdapter(
-                new ArrayAdapter<RecipeTag>(this, R.layout.simple_list_text_layout ,tags)
-        );
-        ((ListView) findViewById(R.id.drawer_list)).setOnItemClickListener(
+        final ListView drawer_list = (ListView) findViewById(R.id.drawer_list);
+        populateDrawerTagList(drawer_list);
+        drawer_list.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
@@ -121,6 +173,43 @@ public class TestActivity extends Activity {
                         ((RecipeAdapter) _listfrag.getListAdapter()).updateDataset(_rlist);
                     }
                 }
+        );
+        registerForContextMenu(drawer_list);
+
+        final Button b = (Button) findViewById(R.id.drawer_button);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
+                builder.setTitle("Enter a Tag");
+
+                final EditText tag_name = new EditText(TestActivity.this);
+                builder.setView(tag_name);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String tag = tag_name.getText().toString();
+                        getSqlController().insertNewTag(tag);
+                        populateDrawerTagList(drawer_list);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+    }
+
+    private void populateDrawerTagList(ListView drawer_list) {
+        ArrayList<RecipeTag> tags = _sqlctrl.getAllRecipeTags();
+        drawer_list.setAdapter(
+                new ArrayAdapter<RecipeTag>(this, R.layout.simple_list_text_layout ,tags)
         );
     }
 

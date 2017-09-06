@@ -55,18 +55,10 @@ public class RecipeListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                ((TestActivity) getActivity()).startRecipeFramgent(id);
+                ((TestActivity) getActivity()).startRecipeFragment(id);
             }
         });
 
-        getListView().setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //TODO show a context menu
-                //have to return true, otherwise an exception is thrown (in onCreateActionMode)
-                return true;
-            }
-        });
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.main_fab1);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +107,7 @@ public class RecipeListFragment extends ListFragment {
                             );
                             toast.show();
                         }
-                                dialog.dismiss();
+                        dialog.dismiss();
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

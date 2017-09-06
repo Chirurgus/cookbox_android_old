@@ -396,6 +396,49 @@ public class SqlController extends SQLiteOpenHelper{
         return ret;
     }
 
+    public long addRecipeToTag(BasicRecipe r, RecipeTag tag) {
+        long ret = Recipe.NO_ID;
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put("recipe_id", r.getId());
+            cv.put("tag_id", tag.getId());
+
+            ret = db.replaceOrThrow("tag_list", null, cv);
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".addRecipeToTag transaction failed.");
+            throw e;
+        }
+        finally {
+            db.endTransaction();
+        }
+        return ret;
+    }
+
+    public long insertNewTag(String tag_name) {
+        long ret = Recipe.NO_ID;
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put("tag", tag_name);
+            ret = db.replaceOrThrow("tag", null, cv);
+
+            db.setTransactionSuccessful();
+        }
+        catch(Exception e) {
+            Log.e(TAG, TAG + ".insertTag transaction failed.");
+            throw e;
+        }
+        finally {
+            db.endTransaction();
+        }
+        return ret;
+    }
+
     public void removeRecipe(long id) {
         Log.v(TAG, TAG + ".removeRecipe called.");
 
@@ -426,6 +469,30 @@ public class SqlController extends SQLiteOpenHelper{
         }
         finally {
            db.endTransaction();
+        }
+    }
+
+    public void removeTag(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+        try {
+            db.delete("tag_list",
+                    "tag_id = ?",
+                    new String[] {"" + id}
+            );
+            db.delete("tag",
+                    "id = ?",
+                    new String[] {"" + id}
+            );
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".removeTag transaction failed.");
+            throw e;
+        }
+        finally {
+            db.endTransaction();
         }
     }
 
@@ -571,6 +638,8 @@ public class SqlController extends SQLiteOpenHelper{
     private long updateRecipe(Recipe r, SQLiteDatabase db) {
         ContentValues cv = new ContentValues();
         if (r.getId() != Recipe.NO_ID) {
+            /*
+            //dont konw what I was thinking
             Cursor c1 = db.query("recipe",
                     new String[] {"id"},
                     "id = ?",
@@ -582,6 +651,8 @@ public class SqlController extends SQLiteOpenHelper{
                 cv.put("id", r.getId());
             }
             c1.close();
+             */
+            cv.put("id", r.getId());
         }
         cv.put("name", r.getName());
         cv.put("short_description", r.getShortDescription());

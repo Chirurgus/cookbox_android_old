@@ -50,6 +50,12 @@
             android:id="@+id/drawer_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/drawer_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add a Tag"
+            android:background="@null"/>
 
     </LinearLayout>
 
