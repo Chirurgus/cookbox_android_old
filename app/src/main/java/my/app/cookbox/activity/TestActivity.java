@@ -118,16 +118,21 @@ public class TestActivity extends Activity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        getMenuInflater().inflate(R.menu.recipe_list_context,menu);
+        if (v.getId() == R.id.drawer_list) {
+            getMenuInflater().inflate(R.menu.drawer_list_context, menu);
+        }
+        else {
+            getMenuInflater().inflate(R.menu.recipe_list_context, menu);
+        }
     }
 
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-             case R.id.rlist_context_edit:
+            case R.id.dlist_context_edit:
                  Toast.makeText(this, "TODO", Toast.LENGTH_SHORT).show();
                 return true;
-            case R.id.rlist_context_delete:
+            case R.id.dlist_context_delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Are you sure?");
                 builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -157,6 +162,11 @@ public class TestActivity extends Activity {
                 dialog.show();
 
                 return true;
+            /*
+            //handled in RecipeListFragment
+            case R.id.dlist_context_edit:
+            case R.menu.drawer_list_context:
+             */
             default:
                 return super.onContextItemSelected(item);
         }
@@ -164,7 +174,9 @@ public class TestActivity extends Activity {
 
     private void setupNavigationDrawer() {
         final ListView drawer_list = (ListView) findViewById(R.id.drawer_list);
+
         populateDrawerTagList(drawer_list);
+
         drawer_list.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
@@ -174,6 +186,7 @@ public class TestActivity extends Activity {
                     }
                 }
         );
+
         registerForContextMenu(drawer_list);
 
         final Button b = (Button) findViewById(R.id.drawer_button);

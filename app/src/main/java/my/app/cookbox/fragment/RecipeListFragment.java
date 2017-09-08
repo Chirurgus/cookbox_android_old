@@ -1,5 +1,6 @@
 package my.app.cookbox.fragment;
 
+import android.animation.Animator;
 import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,9 +16,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -39,6 +44,7 @@ public class RecipeListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -49,6 +55,9 @@ public class RecipeListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        /* to prevent action mode from starting when on long click */
+        getListView().setChoiceMode(ListView.CHOICE_MODE_NONE);
 
         registerForContextMenu(getListView());
 
@@ -69,25 +78,22 @@ public class RecipeListFragment extends ListFragment {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        getActivity().getMenuInflater().inflate(R.menu.recipe_list_context,menu);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
     }
 
+    /* ContextMenu is created in TestActivity.onContextMenuCreated */
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.rlist_context_edit:
+                Toast.makeText(getActivity(), "rlist_context_edit", Toast.LENGTH_SHORT).show();
                 ((TestActivity) getActivity()).startModifyFragment(
                         ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id
                 );
                 return true;
             case R.id.rlist_context_delete:
+                Toast.makeText(getActivity(), "rlist_context_delete", Toast.LENGTH_SHORT).show();
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Are you sure?");
                 builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -159,5 +165,36 @@ public class RecipeListFragment extends ListFragment {
         //TODO
     }
     private boolean sort_order = false;
+
+}
+
+/* ActionModeListener for Tags */
+class RecipeListActionModeListener implements AbsListView.MultiChoiceModeListener {
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode actionMode, int pos, long id, boolean b) {
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        actionMode.getMenuInflater().inflate(R.menu.main_context_menu, menu);
+        actionMode.setTitle("Yay it's working");
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+
+    }
 
 }
