@@ -3,6 +3,7 @@ package my.app.cookbox.fragment;
 import android.animation.Animator;
 import android.app.ListFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -129,6 +130,12 @@ public class RecipeListFragment extends ListFragment {
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+
     }
 
     @Override

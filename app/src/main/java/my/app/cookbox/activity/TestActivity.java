@@ -2,11 +2,17 @@ package my.app.cookbox.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
+import android.support.annotation.Nullable;
+import android.view.ActionMode;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,19 +44,21 @@ public class TestActivity extends Activity {
         setContentView(R.layout.test);
 
         selectCategory(null);
-        _listfrag = startListFragment();
+        startListFragment(_rlist);
 
         setupNavigationDrawer();
     }
 
-    public void addToRecipeList(BasicRecipe br) {
-        _rlist.add(br);
-        if (_listfrag != null) {
-            ((RecipeAdapter) _listfrag.getListAdapter()).updateDataset(_rlist);
+    public void addToRecipeList(BasicRecipe new_br) {
+        for (int i = 0; i < _rlist.size(); ++i) {
+            if (_rlist.get(i).getId() == new_br.getId()) {
+                _rlist.set(i, new_br);
+            }
         }
+        ((RecipeAdapter) _toplistfrag.getListAdapter()).updateDataset(_rlist);
     }
 
-    public RecipeListFragment startListFragment() {
+    public RecipeListFragment startListFragment(ArrayList<BasicRecipe> rlist) {
         RecipeListFragment new_frag = new RecipeListFragment();
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -59,9 +67,9 @@ public class TestActivity extends Activity {
             //ft.addToBackStack(null);
             ft.commit();
 
-            new_frag.setListAdapter(new RecipeAdapter(_rlist, this));
+            new_frag.setListAdapter(new RecipeAdapter(rlist, this));
         }
-        return new_frag;
+        return _toplistfrag = new_frag;
     }
 
     public ModifyFragment startModifyFragment(Long id) {
@@ -130,6 +138,8 @@ public class TestActivity extends Activity {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dlist_context_edit:
+                _toplistfrag.setSelection(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                _toplistfrag.getListView().startActionMode( );
                  Toast.makeText(this, "TODO", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.dlist_context_delete:
@@ -226,7 +236,18 @@ public class TestActivity extends Activity {
         );
     }
 
+    private Fragment getTopFragmentOfType(Class obj) {
+        int count = getFragmentManager().getBackStackEntryCount();
+        for (int i = count; i-- > 0;) {
+            FragmentManager.BackStackEntry backStackEntry = getFragmentManager().getBackStackEntryAt(i);
+            Fragment fragment = getFragmentManager().findFragmentById(backStackEntry.getId());
+            if (fragment.isIns) {
+                return fragment;
+            }
+        }
+    }
+
     private SqlController _sqlctrl = new SqlController(this);
     private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
-    private RecipeListFragment _listfrag = null;
+    private RecipeListFragment _toplistfrag = null;
 }
