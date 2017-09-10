@@ -349,6 +349,36 @@ public class SqlController extends SQLiteOpenHelper{
 
     }
 
+    /*
+    public void updateRecipesTags(long tag_id, long[] recipe_ids) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (long recipe_id : recipe_ids) {
+                ContentValues cv = new ContentValues();
+                cv.put("tag_id", tag_id);
+                cv.put("recipe_id", recipe_id);
+                int u = db.updateWithOnConflict("tag_list",
+                        cv,
+                        null,
+                        null,
+                        SQLiteDatabase.CONFLICT_REPLACE
+                );
+                if (u == 0) {
+                    db.insertOrThrow("tag_list", null, cv);
+                }
+            }
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".updateRecipeTags transaction failed.");
+        }
+        finally {
+            db.endTransaction();
+        }
+    }
+    */
+
     public long insertRecipe(Recipe r) {
         Log.v(TAG, TAG + ".insertRecipe called.");
 
@@ -396,16 +426,22 @@ public class SqlController extends SQLiteOpenHelper{
         return ret;
     }
 
-    public long addRecipeToTag(BasicRecipe r, RecipeTag tag) {
-        long ret = Recipe.NO_ID;
+    public void addRecipeToTag(long recipe_id, long tag_id) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
             ContentValues cv = new ContentValues();
-            cv.put("recipe_id", r.getId());
-            cv.put("tag_id", tag.getId());
-
-            ret = db.replaceOrThrow("tag_list", null, cv);
+            cv.put("recipe_id", recipe_id);
+            cv.put("tag_id", tag_id);
+            int u = db.updateWithOnConflict("tag_list",
+                    cv,
+                    "recipe_id = ? && tag_id = ?",
+                    new String[] {recipe_id + "", tag_id + ""},
+                    SQLiteDatabase.CONFLICT_REPLACE);
+            if (u == 0) {
+                db.insertOrThrow("tag_list", null, cv);
+            }
+            db.setTransactionSuccessful();
         }
         catch (Exception e) {
             Log.e(TAG, TAG + ".addRecipeToTag transaction failed.");
@@ -414,7 +450,6 @@ public class SqlController extends SQLiteOpenHelper{
         finally {
             db.endTransaction();
         }
-        return ret;
     }
 
     public long insertNewTag(String tag_name) {
@@ -637,23 +672,7 @@ public class SqlController extends SQLiteOpenHelper{
 
     private long updateRecipe(Recipe r, SQLiteDatabase db) {
         ContentValues cv = new ContentValues();
-        if (r.getId() != Recipe.NO_ID) {
-            /*
-            //dont konw what I was thinking
-            Cursor c1 = db.query("recipe",
-                    new String[] {"id"},
-                    "id = ?",
-                    new String[] {"" + r.getId()},
-                    null,
-                    null,
-                    null);
-            if (c1.getCount() != 0) {
-                cv.put("id", r.getId());
-            }
-            c1.close();
-             */
-            cv.put("id", r.getId());
-        }
+        cv.put("id", r.getId());
         cv.put("name", r.getName());
         cv.put("short_description", r.getShortDescription());
         cv.put("long_description", r.getLongDescription());

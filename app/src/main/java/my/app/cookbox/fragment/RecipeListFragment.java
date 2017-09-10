@@ -175,33 +175,3 @@ public class RecipeListFragment extends ListFragment {
 
 }
 
-/* ActionModeListener for Tags */
-class RecipeListActionModeListener implements AbsListView.MultiChoiceModeListener {
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode actionMode, int pos, long id, boolean b) {
-    }
-
-    @Override
-    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        actionMode.getMenuInflater().inflate(R.menu.main_context_menu, menu);
-        actionMode.setTitle("Yay it's working");
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-        return false;
-    }
-
-    @Override
-    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-        return false;
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode actionMode) {
-
-    }
-
-}

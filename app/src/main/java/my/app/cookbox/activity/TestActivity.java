@@ -15,12 +15,14 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.util.ArrayList;
 
@@ -32,6 +34,9 @@ import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeAdapter;
+import my.app.cookbox.utility.TagSelectionActionMode;
+
+import static android.support.design.R.styleable.Toolbar;
 
 /**
  * Created by Alexander on 016, 16 Jun.
@@ -47,6 +52,18 @@ public class TestActivity extends Activity {
         startListFragment(_rlist);
 
         setupNavigationDrawer();
+    }
+
+    @Override
+    public void onActionModeStarted(ActionMode mode) {
+        super.onActionModeStarted(mode);
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        super.onActionModeFinished(mode);
+        TagSelectedRecipes(_tagactionmode.getTagId());
+        _tagactionmode = null;
     }
 
     public void addToRecipeList(BasicRecipe new_br) {
@@ -138,9 +155,12 @@ public class TestActivity extends Activity {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dlist_context_edit:
+                selectCategory(null);
+                _toplistfrag = startListFragment(_rlist);
                 _toplistfrag.setSelection(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                _toplistfrag.getListView().startActionMode( );
-                 Toast.makeText(this, "TODO", Toast.LENGTH_SHORT).show();
+                hideToolbar();
+                _tagactionmode = new TagSelectionActionMode(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
+                _toplistfrag.getListView().startActionMode(_tagactionmode);
                 return true;
             case R.id.dlist_context_delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -182,6 +202,24 @@ public class TestActivity extends Activity {
         }
     }
 
+    public void TagSelectedRecipes(long tag_id) {
+        long[] checked_ids = _toplistfrag.getListView().getCheckedItemIds();
+        for (long rid : checked_ids) {
+            _sqlctrl.addRecipeToTag(rid, _tagactionmode.getTagId());
+        }
+    }
+
+    private void showToolbar() {
+        android.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar.setVisibility(View.INVISIBLE);
+
+    }
+
+    private void hideToolbar() {
+        android.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar.setVisibility(View.VISIBLE);
+    }
+
     private void setupNavigationDrawer() {
         final ListView drawer_list = (ListView) findViewById(R.id.drawer_list);
 
@@ -192,7 +230,7 @@ public class TestActivity extends Activity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                         selectCategory((RecipeTag) parent.getAdapter().getItem(pos));
-                        ((RecipeAdapter) _listfrag.getListAdapter()).updateDataset(_rlist);
+                        ((RecipeAdapter) _toplistfrag.getListAdapter()).updateDataset(_rlist);
                     }
                 }
         );
@@ -236,18 +274,8 @@ public class TestActivity extends Activity {
         );
     }
 
-    private Fragment getTopFragmentOfType(Class obj) {
-        int count = getFragmentManager().getBackStackEntryCount();
-        for (int i = count; i-- > 0;) {
-            FragmentManager.BackStackEntry backStackEntry = getFragmentManager().getBackStackEntryAt(i);
-            Fragment fragment = getFragmentManager().findFragmentById(backStackEntry.getId());
-            if (fragment.isIns) {
-                return fragment;
-            }
-        }
-    }
-
     private SqlController _sqlctrl = new SqlController(this);
     private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
     private RecipeListFragment _toplistfrag = null;
+    private TagSelectionActionMode _tagactionmode = null;
 }
