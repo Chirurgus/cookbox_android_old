@@ -64,6 +64,7 @@ public class TestActivity extends Activity {
         super.onActionModeFinished(mode);
         TagSelectedRecipes(_tagactionmode.getTagId());
         _tagactionmode = null;
+        _tag_id = -1;
     }
 
     public void addToRecipeList(BasicRecipe new_br) {
@@ -155,12 +156,7 @@ public class TestActivity extends Activity {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dlist_context_edit:
-                selectCategory(null);
-                _toplistfrag = startListFragment(_rlist);
-                _toplistfrag.setSelection(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                hideToolbar();
-                _tagactionmode = new TagSelectionActionMode(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
-                _toplistfrag.getListView().startActionMode(_tagactionmode);
+                createTagActionMenu(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
                 return true;
             case R.id.dlist_context_delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -209,14 +205,29 @@ public class TestActivity extends Activity {
         }
     }
 
+    public void onListFragmentContentViewCreated() {
+        if (_tag_id != -1) {
+            hideToolbar();
+            _toplistfrag.setSelection(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+            _tagactionmode = new TagSelectionActionMode(_tag_id);
+            _toplistfrag.getListView().startActionMode(_tagactionmode);
+        }
+    }
+
+    private void createTagActionMenu(long tag_id) {
+        _tag_id = tag_id;
+        selectCategory(null);
+        _toplistfrag = startListFragment(_rlist);
+    }
+
     private void showToolbar() {
-        android.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setVisibility(View.INVISIBLE);
 
     }
 
     private void hideToolbar() {
-        android.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setVisibility(View.VISIBLE);
     }
 
@@ -274,6 +285,7 @@ public class TestActivity extends Activity {
         );
     }
 
+    private long _tag_id = -1;
     private SqlController _sqlctrl = new SqlController(this);
     private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
     private RecipeListFragment _toplistfrag = null;

@@ -56,9 +56,13 @@ public class RecipeListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ((TestActivity) getActivity()).onListFragmentContentViewCreated();
 
-        /* to prevent action mode from starting when on long click */
-        getListView().setChoiceMode(ListView.CHOICE_MODE_NONE);
+        Bundle args = getArguments();
+        if (args.getLong("tag_id", -1) != -1) {
+            getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        }
+        getListView().startActionMode()
 
         registerForContextMenu(getListView());
 
@@ -130,12 +134,6 @@ public class RecipeListFragment extends ListFragment {
             default:
                 return super.onContextItemSelected(item);
         }
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
-
     }
 
     @Override
