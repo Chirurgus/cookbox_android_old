@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -42,11 +43,12 @@ import static android.support.design.R.styleable.Toolbar;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class TestActivity extends Activity {
+public class TestActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
+        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));
 
         selectCategory(null);
         startListFragment(_rlist);
@@ -62,8 +64,9 @@ public class TestActivity extends Activity {
     @Override
     public void onActionModeFinished(ActionMode mode) {
         super.onActionModeFinished(mode);
-        TagSelectedRecipes(_tagactionmode.getTagId());
-        _tagactionmode = null;
+
+        TagSelectedRecipes(_tag_id);
+        showToolbar();
         _tag_id = -1;
     }
 
@@ -86,6 +89,25 @@ public class TestActivity extends Activity {
             ft.commit();
 
             new_frag.setListAdapter(new RecipeAdapter(rlist, this));
+        }
+        return _toplistfrag = new_frag;
+    }
+
+    public RecipeListFragment startListFragmentForTag(long tag_id) {
+        selectCategory(null);
+        _tag_id = tag_id;
+        RecipeListFragment new_frag = new RecipeListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putLong("tag_id", tag_id);
+        new_frag.setArguments(bundle);
+        if (new_frag != null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.main_fragment_frame, new_frag);
+            // A ListFragment is only added once.
+            //ft.addToBackStack(null);
+            ft.commit();
+
+            new_frag.setListAdapter(new RecipeAdapter(_rlist, this));
         }
         return _toplistfrag = new_frag;
     }
@@ -156,7 +178,8 @@ public class TestActivity extends Activity {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dlist_context_edit:
-                createTagActionMenu(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
+                startListFragmentForTag(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
+                hideToolbar();
                 return true;
             case R.id.dlist_context_delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -203,21 +226,6 @@ public class TestActivity extends Activity {
         for (long rid : checked_ids) {
             _sqlctrl.addRecipeToTag(rid, _tagactionmode.getTagId());
         }
-    }
-
-    public void onListFragmentContentViewCreated() {
-        if (_tag_id != -1) {
-            hideToolbar();
-            _toplistfrag.setSelection(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-            _tagactionmode = new TagSelectionActionMode(_tag_id);
-            _toplistfrag.getListView().startActionMode(_tagactionmode);
-        }
-    }
-
-    private void createTagActionMenu(long tag_id) {
-        _tag_id = tag_id;
-        selectCategory(null);
-        _toplistfrag = startListFragment(_rlist);
     }
 
     private void showToolbar() {
