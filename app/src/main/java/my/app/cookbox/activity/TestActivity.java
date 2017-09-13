@@ -31,11 +31,13 @@ import my.app.cookbox.R;
 import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
+import my.app.cookbox.fragment.TagSelectionListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeAdapter;
 import my.app.cookbox.utility.TagSelectionActionMode;
+import my.app.cookbox.utility.TagSelectionAdapter;
 
 import static android.support.design.R.styleable.Toolbar;
 
@@ -93,23 +95,21 @@ public class TestActivity extends AppCompatActivity {
         return _toplistfrag = new_frag;
     }
 
-    public RecipeListFragment startListFragmentForTag(long tag_id) {
+    public TagSelectionListFragment startTagSelectionListFragment(long tag_id) {
         selectCategory(null);
-        _tag_id = tag_id;
-        RecipeListFragment new_frag = new RecipeListFragment();
-        Bundle bundle = new Bundle();
-        bundle.putLong("tag_id", tag_id);
-        new_frag.setArguments(bundle);
+        TagSelectionListFragment new_frag = new TagSelectionListFragment();
         if (new_frag != null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
+            Bundle b = new Bundle();
+            b.putLong("tag_id", tag_id);
+            new_frag.setArguments(b);
             ft.replace(R.id.main_fragment_frame, new_frag);
-            // A ListFragment is only added once.
-            //ft.addToBackStack(null);
+            ft.addToBackStack(null);
             ft.commit();
 
-            new_frag.setListAdapter(new RecipeAdapter(_rlist, this));
+            new_frag.setListAdapter(new TagSelectionAdapter(_rlist, this));
         }
-        return _toplistfrag = new_frag;
+        return new_frag;
     }
 
     public ModifyFragment startModifyFragment(Long id) {

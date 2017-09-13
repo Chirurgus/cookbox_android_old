@@ -46,7 +46,6 @@ public class RecipeListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -64,6 +63,7 @@ public class RecipeListFragment extends ListFragment {
             getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
             getListView().startActionMode(new TagSelectionActionMode(tag_id));
         }
+
 
         registerForContextMenu(getListView());
 

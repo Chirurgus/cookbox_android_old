@@ -1,6 +1,7 @@
 package my.app.cookbox.utility;
 
 import android.content.Context;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,15 @@ public class RecipeAdapter extends BaseAdapter {
         _data.addAll(d);
         notifyDataSetChanged();
     }
+
+    public Context getContext() {
+        return _context;
+    }
+
+    public LayoutInflater getInflater() {
+        return _inflater;
+    }
+
     @Override
     public int getCount() {
         return _data.size();
@@ -60,7 +70,7 @@ public class RecipeAdapter extends BaseAdapter {
             ret = convertView;
         }
         else {
-            ret = _inflater.inflate(R.layout.recipe_list_layout, null);
+            ret = getInflater().inflate(R.layout.recipe_list_layout, null);
         }
         TextView tv_name = (TextView) ret.findViewById(R.id.recipe_list_text1);
         TextView tv_desc = (TextView) ret.findViewById(R.id.recipe_list_text2);
