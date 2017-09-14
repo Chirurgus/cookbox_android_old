@@ -3,9 +3,7 @@ package my.app.cookbox.fragment;
 import android.app.Fragment;
 import android.view.View;
 
-import junit.framework.Test;
-
-import my.app.cookbox.activity.TestActivity;
+import my.app.cookbox.activity.MainActivity;
 
 /**
  * Created by Alexander on 011, 11 Jul.
@@ -15,8 +13,8 @@ abstract public class BaseFragment extends Fragment {
     public BaseFragment() {
     }
 
-    public TestActivity getParent() {
-        return (TestActivity) super.getActivity();
+    public MainActivity getParent() {
+        return (MainActivity) super.getActivity();
     }
 
     public View getRootView() {

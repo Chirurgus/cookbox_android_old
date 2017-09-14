@@ -1,7 +1,6 @@
 package my.app.cookbox.utility;
 
 import android.content.Context;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,16 +9,10 @@ import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import my.app.cookbox.R;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
-
-import static android.support.constraint.BuildConfig.DEBUG;
 
 /**
  * Created by Alexander on 014,  14 Apr.
@@ -70,7 +63,7 @@ public class RecipeAdapter extends BaseAdapter {
             ret = convertView;
         }
         else {
-            ret = getInflater().inflate(R.layout.recipe_list_layout, null);
+            ret = getInflater().inflate(R.layout.recipe_list_item, null);
         }
         TextView tv_name = (TextView) ret.findViewById(R.id.recipe_list_text1);
         TextView tv_desc = (TextView) ret.findViewById(R.id.recipe_list_text2);

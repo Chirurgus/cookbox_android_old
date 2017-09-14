@@ -46,7 +46,7 @@ public class SqlController extends SQLiteOpenHelper{
         */
         db.beginTransaction();
         try {
-            String create_recipe_table = "CREATE TABLE recipe(\n" +
+            String create_recipe_table = "CREATE TABLE recipe_toolbar(\n" +
                     "  id integer primary key,\n" +
                     "  name text not null default \"\",\n" +
                     "  short_description text not null default \"\",\n" +
@@ -66,21 +66,21 @@ public class SqlController extends SQLiteOpenHelper{
                     ");";
             String create_tag_list_table = "CREATE TABLE tag_list(\n" +
                     "  tag_id integer not null references tag(id),\n" +
-                    "  recipe_id integer not null references recipe(id)\n" +
+                    "  recipe_id integer not null references recipe_toolbar(id)\n" +
                     ");";
             String create_instruction_list = "CREATE TABLE instruction_list(\n" +
-                    "  recipe_id integer references recipe(id),\n" +
+                    "  recipe_id integer references recipe_toolbar(id),\n" +
                     "  position integer not null,\n" +
                     "  instruction text not null\n" +
                     ");";
             String create_ingredient_list = "CREATE TABLE ingredient_list(\n" +
-                    "  recipe_id integer not null references recipe(id),\n" +
+                    "  recipe_id integer not null references recipe_toolbar(id),\n" +
                     "  quantity real not null,\n" +
                     "  description text not null,\n" +
-                    "  other_recipe integer null references recipe(id)\n" +
+                    "  other_recipe integer null references recipe_toolbar(id)\n" +
                     ");";
             String create_comment_list = "CREATE TABLE comment_list(\n" +
-                    "  recipe_id integer not null references recipe(id),\n" +
+                    "  recipe_id integer not null references recipe_toolbar(id),\n" +
                     "  comment text not null unique\n" +
                     ");";
 
@@ -119,10 +119,10 @@ public class SqlController extends SQLiteOpenHelper{
                     "  target_description TEXT not null default \"\"\n" +
                     ");\n";
             String create_new_ing_tbl = "CREATE TABLE tmp_ingredient_list(\n" +
-                    "  recipe_id integer not null references recipe(id),\n" +
+                    "  recipe_id integer not null references recipe_toolbar(id),\n" +
                     "  quantity real not null,\n" +
                     "  description text not null,\n" +
-                    "  other_recipe integer null references recipe(id)\n" +
+                    "  other_recipe integer null references recipe_toolbar(id)\n" +
                     ");";
             String move_to_new_recipe
                     = "insert into tmp_recipe(id," +
@@ -136,7 +136,7 @@ public class SqlController extends SQLiteOpenHelper{
                     "long_description," +
                     "cast(target_quantity as real) " +
                     "from " +
-                    "recipe;";
+                    "recipe_toolbar;";
             String move_to_new_ing
                     = "insert into tmp_ingredient_list(recipe_id," +
                     "quantity," +
@@ -148,9 +148,9 @@ public class SqlController extends SQLiteOpenHelper{
                     "other_recipe " +
                     "from " +
                     "ingredient_list;";
-            String drop_recipe_tbl = "drop table recipe";
+            String drop_recipe_tbl = "drop table recipe_toolbar";
             String drop_ing_tbl = "drop table ingredient_list";
-            String rename_recipe_tbl = "alter table tmp_recipe rename to recipe";
+            String rename_recipe_tbl = "alter table tmp_recipe rename to recipe_toolbar";
             String rename_ing_tbl = "alter table tmp_ingredient_list rename to ingredient_list";
             try {
                 db.execSQL(drop_unit_tbl);
@@ -209,7 +209,7 @@ public class SqlController extends SQLiteOpenHelper{
         ArrayList<Long> ret = new ArrayList<>();
         db.beginTransaction();
         try {
-            String q = "SELECT id FROM recipe;";
+            String q = "SELECT id FROM recipe_toolbar;";
             Cursor c = db.rawQuery(q, null);
             if (c.moveToFirst()) {
                 do {
@@ -255,7 +255,7 @@ public class SqlController extends SQLiteOpenHelper{
         db.beginTransaction();
         BasicRecipe ret = null;
         try {
-            Cursor c = db.query("recipe",
+            Cursor c = db.query("recipe_toolbar",
                     new String[] {"name", "short_description"},
                     "id = ?",
                     new String[] {"" + id},
@@ -314,7 +314,7 @@ public class SqlController extends SQLiteOpenHelper{
         return ret;
     }
 
-    public ArrayList<BasicRecipe> getTaggedBasicRecipe(RecipeTag t) {
+    public ArrayList<BasicRecipe> getTaggedBasicRecipe(long tag_id) {
         SQLiteDatabase db = getReadableDatabase();
         db.beginTransaction();
         ArrayList<BasicRecipe> ret = new ArrayList<>();
@@ -322,7 +322,7 @@ public class SqlController extends SQLiteOpenHelper{
             Cursor c = db.query("tag_list",
                     new String[] {"recipe_id"},
                     "tag_id = ?",
-                    new String[] {"" + t.getId()},
+                    new String[] {"" + tag_id},
                     null,
                     null,
                     null);
@@ -493,7 +493,7 @@ public class SqlController extends SQLiteOpenHelper{
             db.delete("tag_list",
                     "recipe_id = ?",
                     new String[] {"" + id});
-            db.delete("recipe",
+            db.delete("recipe_toolbar",
                     "id = ?",
                     new String[] {"" + id});
             db.setTransactionSuccessful();
@@ -553,7 +553,7 @@ public class SqlController extends SQLiteOpenHelper{
 
     private Recipe readRecipe(long id, SQLiteDatabase db) {
         Recipe ret = null;
-        Cursor c = db.query("recipe",
+        Cursor c = db.query("recipe_toolbar",
                 null,
                 "id = ?",
                 new String[] {"" + id},
@@ -678,7 +678,7 @@ public class SqlController extends SQLiteOpenHelper{
         cv.put("long_description", r.getLongDescription());
         cv.put("target_quantity", r.getTargetQuantity());
         cv.put("target_description", r.getTargetDescription());
-        r.setId(db.replaceOrThrow("recipe", null, cv));
+        r.setId(db.replaceOrThrow("recipe_toolbar", null, cv));
         updateIngredients(r,db);
         updateInstructions(r,db);
         updateTags(r,db);

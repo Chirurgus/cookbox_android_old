@@ -1,17 +1,13 @@
 package my.app.cookbox.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import my.app.cookbox.R;
-import my.app.cookbox.activity.TestActivity;
+import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
 
@@ -38,7 +34,7 @@ public class ModifyFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        _root_view = inflater.inflate(R.layout.modify_layout, container, false);
+        _root_view = inflater.inflate(R.layout.modify_recipe, container, false);
 
         Button ing_b = (Button) _root_view.findViewById(R.id.modify_ingredient_button);
         ing_b.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +77,7 @@ public class ModifyFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        _parent = (TestActivity) getActivity();
+        _parent = (MainActivity) getActivity();
 
         Bundle args = getArguments();
         if (args != null && args.getLong("id") != Recipe.NO_ID) {
@@ -257,8 +253,8 @@ public class ModifyFragment extends BaseFragment {
         for (BasicRecipe br : getParent().getAllBasicRecipes()) {
             names.add(br.getName());
         }
-        //unit_spinner_item will do just fine here
-        ArrayAdapter<String> aa = new ArrayAdapter<String>(getContext(), R.layout.unit_spinner_item,names);
+        //modify_recipe_spinner_item will do just fine here
+        ArrayAdapter<String> aa = new ArrayAdapter<String>(getContext(), R.layout.modify_recipe_spinner_item,names);
         spinner.setAdapter(aa);
     }
 
@@ -266,7 +262,7 @@ public class ModifyFragment extends BaseFragment {
         RelativeLayout rl
                 = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
-                        .inflate(R.layout.modify_item_layout, null));
+                        .inflate(R.layout.modify_recipe_item, null));
         getEditTextFromId(R.id.modify_list_item_edit_text2, rl).setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         setupOtherRecipeSpinner((Spinner) rl.getChildAt(3));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -285,7 +281,7 @@ public class ModifyFragment extends BaseFragment {
          RelativeLayout rl
                 = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
-                        .inflate(R.layout.modify_item_layout, null));
+                        .inflate(R.layout.modify_recipe_item, null));
         rl.removeViewAt(3);//remove spinner
         rl.removeViewAt(0);//remove quantity
 
@@ -304,7 +300,7 @@ public class ModifyFragment extends BaseFragment {
         RelativeLayout rl
                 = ((RelativeLayout) getActivity()
                         .getLayoutInflater()
-                        .inflate(R.layout.modify_item_layout, null));
+                        .inflate(R.layout.modify_recipe_item, null));
         rl.removeViewAt(3);//remove spinner
         rl.removeViewAt(0);//remove quantity
 
@@ -342,7 +338,7 @@ public class ModifyFragment extends BaseFragment {
 
     private static String TAG = "ModifyFragment";
 
-    private TestActivity _parent = null;
+    private MainActivity _parent = null;
     private View _root_view = null;
     private Recipe _recipe = new Recipe();
 

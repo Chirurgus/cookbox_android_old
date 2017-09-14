@@ -2,9 +2,7 @@ package my.app.cookbox.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -13,13 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -33,13 +28,13 @@ import my.app.cookbox.sqlite.SqlController;
  */
 
 public class RecipeActivity extends AppCompatActivity {
-
+/*
     @Override
     public void onCreate(Bundle savedInstance) {
         Log.d(TAG, "RecipeActivity started.");
 
         super.onCreate(savedInstance);
-        setContentView(R.layout.recipe_layout);
+        setContentView(R.layout.recipe);
 
         _rl = (RelativeLayout) findViewById(R.id.recipe_relative_layout);
 
@@ -52,7 +47,7 @@ public class RecipeActivity extends AppCompatActivity {
             populateFields(_recipe);
         }
         else {
-            Toast toast = Toast.makeText(this, "Undefined recipe.", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, "Undefined recipe_toolbar.", Toast.LENGTH_SHORT);
             toast.show();
 
             finish();
@@ -95,7 +90,7 @@ public class RecipeActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.recipe_menu,menu);
+        getMenuInflater().inflate(R.menu.recipe_toolbar,menu);
         return true;
     }
 
@@ -373,4 +368,5 @@ public class RecipeActivity extends AppCompatActivity {
     private ArrayList<InstructionIds> _insList = new ArrayList<>();
     private ArrayList<TagIds> _tagList = new ArrayList<>();
     private ArrayList<CommentIds> _cmntList = new ArrayList<>();
+    */
 }

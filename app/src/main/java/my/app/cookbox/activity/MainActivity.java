@@ -35,7 +35,7 @@ import my.app.cookbox.utility.TagSelectionAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class TestActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +97,9 @@ public class TestActivity extends AppCompatActivity {
             ft.addToBackStack(null);
             ft.commit();
 
-            new_frag.setListAdapter(new TagSelectionAdapter(_rlist, this));
+            new_frag.setListAdapter(new TagSelectionAdapter(_rlist,
+                    _sqlctrl.getTaggedBasicRecipe(tag_id),
+                    this));
         }
         return new_frag;
     }
@@ -142,7 +144,7 @@ public class TestActivity extends AppCompatActivity {
             return;
         }
 
-        _rlist = _sqlctrl.getTaggedBasicRecipe(tag);
+        _rlist = _sqlctrl.getTaggedBasicRecipe(tag.getId());
     }
 
     public ArrayList<BasicRecipe> getAllBasicRecipes() {
@@ -168,7 +170,7 @@ public class TestActivity extends AppCompatActivity {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dlist_context_edit:
-                startListFragmentForTag(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
+                startTagSelectionListFragment(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
                 hideToolbar();
                 return true;
             case R.id.dlist_context_delete:
@@ -183,7 +185,7 @@ public class TestActivity extends AppCompatActivity {
                         }
                         catch (SQLiteException e) {
                             Toast toast = Toast.makeText(
-                                    TestActivity.this,
+                                    MainActivity.this,
                                     "Can't delete " + getSqlController().getAllRecipeTags().get(pos).getName() + ".",
                                     Toast.LENGTH_LONG
                             );
@@ -250,10 +252,10 @@ public class TestActivity extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Enter a Tag");
 
-                final EditText tag_name = new EditText(TestActivity.this);
+                final EditText tag_name = new EditText(MainActivity.this);
                 builder.setView(tag_name);
 
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

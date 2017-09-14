@@ -29,7 +29,7 @@ public class TagSelectionActionMode implements AbsListView.MultiChoiceModeListen
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        actionMode.getMenuInflater().inflate(R.menu.main_context_menu, menu);
+        actionMode.getMenuInflater().inflate(R.menu.main_toolbar, menu);
         actionMode.setTitle("Yay it's working");
         return true;
     }

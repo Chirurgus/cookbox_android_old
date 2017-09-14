@@ -35,24 +35,27 @@ import my.app.cookbox.sqlite.SqlController;
  * Created by Alexander on 015,  15 Apr.
  */
 
+/* THIS ACTIVITY IS DEPRICATED
+    Use ModifyRecipeFragment in stead.
+ */
 public class ModifyRecipeActivity extends AppCompatActivity {
-
+/*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "ModifyRecipeActivity stared.");
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.modify_recipe_layout);
+        setContentView(R.layout.modify_recipe);
 
         long rid = getIntent().getLongExtra("id", Recipe.NO_ID);
 
         if (rid != Recipe.NO_ID) {
-            Log.d(TAG, TAG + ".onCreate entered with an existing recipe.");
+            Log.d(TAG, TAG + ".onCreate entered with an existing recipe_toolbar.");
             _recipe = _sqlctrl.getRecipe(rid);
         }
         else {
-            Log.d(TAG, TAG + ".onCreate entered for new recipe.");
+            Log.d(TAG, TAG + ".onCreate entered for new recipe_toolbar.");
             _recipe = new Recipe(rid);
         }
 
@@ -123,7 +126,7 @@ public class ModifyRecipeActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.modify_recipe_menu,menu);
+        getMenuInflater().inflate(R.menu.main_toolbar,menu);
         return true;
     }
 
@@ -290,13 +293,12 @@ public class ModifyRecipeActivity extends AppCompatActivity {
         for (BasicRecipe br : _br_list) {
             names.add(br.getName());
         }
-        //unit_spinner_item will do just fine here
-        ArrayAdapter<String> aa = new ArrayAdapter<String>(this, R.layout.unit_spinner_item,names);
+        ArrayAdapter<String> aa = new ArrayAdapter<String>(this, R.layout.modify_recipe_spinner_item, names);//R.layout.modify_recipe_spinner_item,names);
         spinner.setAdapter(aa);
     }
 
     private void expandIngredientList() {
-        LinearLayout ll = (LinearLayout) ((LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_list_item_layout,null);
+        LinearLayout ll = (LinearLayout) ((LayoutInflater) this.getSystemService(this.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_item,null);
         LinearLayout.LayoutParams ll_lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -321,14 +323,14 @@ public class ModifyRecipeActivity extends AppCompatActivity {
     }
 
     private void expandInstructionList() {
-        LinearLayout ll = (LinearLayout) ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_list_item_layout,null);
+        LinearLayout ll = (LinearLayout) ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_item,null);
         LinearLayout.LayoutParams ll_lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         ll.setLayoutParams(ll_lp);
         //ll weight sum is 20 by default, see res/layout/modify_recipe_list_item_layout.xml
-        //Don't need the quantity EditText nor the other recipe spinner
+        //Don't need the quantity EditText nor the other recipe_toolbar spinner
         ll.removeView(ll.getChildAt(2));
         ll.removeView(ll.getChildAt(0));
         ll.setWeightSum(5);
@@ -346,14 +348,14 @@ public class ModifyRecipeActivity extends AppCompatActivity {
     }
 
     private void expandTagList() {
-         LinearLayout ll = (LinearLayout) ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_list_item_layout,null);
+         LinearLayout ll = (LinearLayout) ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_item,null);
         LinearLayout.LayoutParams ll_lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         ll.setLayoutParams(ll_lp);
         //ll weight sum is 20 by default, see res/layout/modify_recipe_list_item_layout.xml
-        //Don't need the quantity EditText nor the other recipe spinner
+        //Don't need the quantity EditText nor the other recipe_toolbar spinner
         ll.removeView(ll.getChildAt(2));
         ll.removeView(ll.getChildAt(0));
         ll.setWeightSum(5);
@@ -371,14 +373,14 @@ public class ModifyRecipeActivity extends AppCompatActivity {
     }
 
     private void expandCommentList() {
-        LinearLayout ll = (LinearLayout) ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_list_item_layout,null);
+        LinearLayout ll = (LinearLayout) ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.modify_recipe_item,null);
         LinearLayout.LayoutParams ll_lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
         ll.setLayoutParams(ll_lp);
         //ll weight sum is 20 by default, see res/layout/modify_recipe_list_item_layout.xml
-        //Don't need the quantity EditText nor the other recipe spinner
+        //Don't need the quantity EditText nor the other recipe_toolbar spinner
         ll.removeView(ll.getChildAt(2));
         ll.removeView(ll.getChildAt(0));
         ll.setWeightSum(5);
@@ -409,4 +411,5 @@ public class ModifyRecipeActivity extends AppCompatActivity {
     private ArrayList<BasicRecipe> _br_list;
     private SqlController _sqlctrl = new SqlController(this);
     private RelativeLayout _rl = null;
+    */
 }

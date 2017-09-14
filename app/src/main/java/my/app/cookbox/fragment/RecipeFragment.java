@@ -1,8 +1,5 @@
 package my.app.cookbox.fragment;
 
-import android.app.Fragment;
-import android.content.Intent;
-import android.net.LinkAddress;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -22,12 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import my.app.cookbox.R;
-import my.app.cookbox.activity.ModifyRecipeActivity;
-import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Alexander on 011, 11 Jul.
@@ -37,7 +30,7 @@ public class RecipeFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        setRootView(inflater.inflate(R.layout.new_recipe_layout, container, false));
+        setRootView(inflater.inflate(R.layout.recipe, container, false));
 
         populateFields(_recipe);
 
@@ -71,7 +64,7 @@ public class RecipeFragment extends BaseFragment {
             _recipe = getParent().getSqlController().getRecipe(args.getLong("id"));
         }
         else {
-            Toast toast = Toast.makeText(getParent(), "Undefined recipe.", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getParent(), "Undefined recipe_toolbar.", Toast.LENGTH_SHORT);
             toast.show();
             //TODO exit an activity
             _recipe = new Recipe();
@@ -85,7 +78,7 @@ public class RecipeFragment extends BaseFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.recipe_menu, menu);
+        inflater.inflate(R.menu.recipe_toolbar, menu);
     }
 
     @Override
@@ -132,7 +125,7 @@ public class RecipeFragment extends BaseFragment {
                 other_r.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //TODO: Open link to another recipe.
+                        //TODO: Open link to another recipe_toolbar.
                     }
                 });
             }
@@ -171,7 +164,7 @@ public class RecipeFragment extends BaseFragment {
 
         RelativeLayout rl = ((RelativeLayout) getParent()
                         .getLayoutInflater()
-                        .inflate(R.layout.recipe_list_item, null));
+                        .inflate(R.layout.recipe_item, null));
 
         RelativeLayout.LayoutParams rl_lp = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

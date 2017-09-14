@@ -1,33 +1,27 @@
 package my.app.cookbox.fragment;
 
-import android.animation.Animator;
 import android.app.ListFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.view.ActionMode;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import my.app.cookbox.R;
-import my.app.cookbox.activity.TestActivity;
+import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.utility.TagSelectionActionMode;
 
@@ -50,7 +44,7 @@ public class RecipeListFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.main_layout, container, false);
+        return inflater.inflate(R.layout.recipe_list, container, false);
     }
 
     @Override
@@ -70,7 +64,7 @@ public class RecipeListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                ((TestActivity) getActivity()).startRecipeFragment(id);
+                ((MainActivity) getActivity()).startRecipeFragment(id);
             }
         });
 
@@ -78,23 +72,23 @@ public class RecipeListFragment extends ListFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((TestActivity) getActivity()).startModifyFragment(null);//null for new recipe
+                ((MainActivity) getActivity()).startModifyFragment(null);//null for new recipe_toolbar
             }
         });
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.main_toolbar, menu);
     }
 
-    /* ContextMenu is created in TestActivity.onContextMenuCreated */
+    /* ContextMenu is created in MainActivity.onContextMenuCreated */
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.rlist_context_edit:
                 Toast.makeText(getActivity(), "rlist_context_edit", Toast.LENGTH_SHORT).show();
-                ((TestActivity) getActivity()).startModifyFragment(
+                ((MainActivity) getActivity()).startModifyFragment(
                         ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id
                 );
                 return true;
@@ -106,7 +100,7 @@ public class RecipeListFragment extends ListFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         //User clicked YES
                          int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
-                         TestActivity parent = ((TestActivity) getActivity());
+                         MainActivity parent = ((MainActivity) getActivity());
                          try {
                              parent.getSqlController().removeRecipe(parent.getAllBasicRecipes().get(pos).getId());
                              parent.getAllBasicRecipes().remove(pos);
@@ -159,7 +153,7 @@ public class RecipeListFragment extends ListFragment {
 
     private void sortRecipes() {
         sort_order = !sort_order;
-         Collections.sort(((TestActivity) getActivity()).getAllBasicRecipes(), new Comparator<BasicRecipe>() {
+         Collections.sort(((MainActivity) getActivity()).getAllBasicRecipes(), new Comparator<BasicRecipe>() {
                     @Override
                     public int compare(BasicRecipe o1, BasicRecipe o2) {
                         if (sort_order) return o1.getName().compareTo(o2.getName());

@@ -35,13 +35,14 @@ import my.app.cookbox.utility.RecipeAdapter;
 
 public class MainLayoutActivity extends AppCompatActivity {
 
+    /*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.v(TAG, "MainLayoutActivity started.");
 
-        setContentView(R.layout.main_layout);
+        setContentView(R.layout.recipe_list);
 
         //this.deleteDatabase("recipes.db");
 
@@ -87,7 +88,7 @@ public class MainLayoutActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
+        getMenuInflater().inflate(R.menu.main_toolbar,menu);
         return true;
     }
 
@@ -210,7 +211,7 @@ public class MainLayoutActivity extends AppCompatActivity {
 
         File old_db = new File(getApplicationInfo().dataDir + File.separator  +"databases/recipes.db");
         DocumentFile df = DocumentFile.fromTreeUri(this, backaup_dir_uri);
-        DocumentFile backup = df.findFile("recipe.db");
+        DocumentFile backup = df.findFile("recipe_toolbar.db");
         if (backup != null && backup.exists()) {
             ContentResolver cr = getContentResolver();
             try {
@@ -223,15 +224,15 @@ public class MainLayoutActivity extends AppCompatActivity {
                 os.close();
 
 
-                Toast.makeText(this, "recipe.db backed up.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "recipe_toolbar.db backed up.", Toast.LENGTH_SHORT).show();
             }
             catch (Exception e) {
                 Log.e(TAG, TAG + ".backupRecipe: " + e.toString());
-                Toast.makeText(this, "Could not back up the recipe", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Could not back up the recipe_toolbar", Toast.LENGTH_LONG).show();
             }
         }
         else {
-            df.createFile("recipe/database", "recipe.db");
+            df.createFile("recipe_toolbar/database", "recipe_toolbar.db");
             backupRecipes();
         }
     }
@@ -242,7 +243,7 @@ public class MainLayoutActivity extends AppCompatActivity {
     }
 
     private void test() {
-        Intent intent = new Intent(this, TestActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
@@ -270,7 +271,7 @@ public class MainLayoutActivity extends AppCompatActivity {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             Log.v(TAG, TAG + "._amCallback.onCreateActionMode called.");
 
-            getMenuInflater().inflate(R.menu.main_context_menu,menu);
+            getMenuInflater().inflate(R.menu.main_toolbar,menu);
             return true;
         }
 
@@ -299,4 +300,5 @@ public class MainLayoutActivity extends AppCompatActivity {
             _am = null;
         }
     };
+    */
 }
