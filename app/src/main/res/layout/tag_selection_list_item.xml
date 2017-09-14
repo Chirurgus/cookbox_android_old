@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout to display the recipe in the recipe list -->
+<!-- Layout to display the recipe_toolbar in the recipe_toolbar list -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@drawable/select_background"
@@ -7,25 +7,23 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/recipe_list_text1"
+        android:id="@+id/tag_selection_list_item_text1"
         android:layout_marginStart="5sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="text1"
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/recipe_list_text2"
+        android:id="@+id/tag_selection_list_item_text2"
         android:layout_marginTop="2sp"
         android:layout_marginStart="5sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="text2"
-        android:layout_below="@+id/recipe_list_text1"
+        android:layout_below="@+id/tag_selection_list_text1"
         android:layout_alignParentStart="true" />
 
     <CheckBox
-        android:id="@+id/tag_selection_checkbox"
+        android:id="@+id/tag_selection_list_item_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10sp"
