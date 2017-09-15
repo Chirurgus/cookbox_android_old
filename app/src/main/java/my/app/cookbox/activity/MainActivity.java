@@ -1,11 +1,13 @@
 package my.app.cookbox.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ToolbarWidgetWrapper;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.util.ArrayList;
 
@@ -35,12 +38,12 @@ import my.app.cookbox.utility.TagSelectionAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));
+        setActionBar((Toolbar) findViewById(R.id.main_toolbar));
 
         selectCategory(null);
         startListFragment(_rlist);
@@ -221,13 +224,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showToolbar() {
-        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setVisibility(View.INVISIBLE);
 
     }
 
     private void hideToolbar() {
-        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setVisibility(View.VISIBLE);
     }
 
