@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
-import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +28,6 @@ import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeAdapter;
-import my.app.cookbox.utility.TagSelectionActionMode;
 import my.app.cookbox.utility.TagSelectionAdapter;
 
 /**
@@ -47,20 +45,6 @@ public class MainActivity extends Activity {
         startListFragment(_rlist);
 
         setupNavigationDrawer();
-    }
-
-    @Override
-    public void onActionModeStarted(ActionMode mode) {
-        super.onActionModeStarted(mode);
-    }
-
-    @Override
-    public void onActionModeFinished(ActionMode mode) {
-        super.onActionModeFinished(mode);
-
-        TagSelectedRecipes(_tag_id);
-        showToolbar();
-        _tag_id = -1;
     }
 
     public void addToRecipeList(BasicRecipe new_br) {
@@ -214,13 +198,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void TagSelectedRecipes(long tag_id) {
-        long[] checked_ids = _toplistfrag.getListView().getCheckedItemIds();
-        for (long rid : checked_ids) {
-            _sqlctrl.addRecipeToTag(rid, _tagactionmode.getTagId());
-        }
-    }
-
     private void showToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setVisibility(View.INVISIBLE);
@@ -290,5 +267,4 @@ public class MainActivity extends Activity {
     private SqlController _sqlctrl = new SqlController(this);
     private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
     private RecipeListFragment _toplistfrag = null;
-    private TagSelectionActionMode _tagactionmode = null;
 }

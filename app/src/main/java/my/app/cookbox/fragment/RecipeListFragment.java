@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -23,7 +22,6 @@ import java.util.Comparator;
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.utility.TagSelectionActionMode;
 
 /**
  * Created by Alexander on 020, 20 Jun.
@@ -50,14 +48,6 @@ public class RecipeListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        Bundle args = getArguments();
-        long tag_id = args.getLong("tag_id", -1);
-        if (tag_id != -1) {
-            getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-            getListView().startActionMode(new TagSelectionActionMode(tag_id));
-        }
-
 
         registerForContextMenu(getListView());
 
