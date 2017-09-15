@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ToolbarWidgetWrapper;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.MenuItem;
