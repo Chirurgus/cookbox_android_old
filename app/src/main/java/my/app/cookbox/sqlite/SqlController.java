@@ -28,22 +28,11 @@ public class SqlController extends SQLiteOpenHelper{
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
-        db.setForeignKeyConstraintsEnabled(false);
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        /*
-        String create_table = "CREATE TABLE " + SqlRecipe.getTableName() +  "(";
-        for (String s : SqlRecipe.getColumnNames()) {
-            create_table = create_table + " " +  s + " " + SqlRecipe.getColumnType().get(s)
-                                            + " " + SqlRecipe.getColumnOptions().get(s)
-                        + ",";
-        }
-        //pop a char from the back of the string
-        create_table = create_table.substring(0,create_table.length() - 1);
-        create_table = create_table + ");";
-        */
         db.beginTransaction();
         try {
             String create_recipe_table = "CREATE TABLE recipe(\n" +
@@ -54,12 +43,6 @@ public class SqlController extends SQLiteOpenHelper{
                     "  target_quantity real not null,\n" +
                     "  target_description text not null default \"\"\n" +
                     ");";
-            /*
-            String create_unit_table = "CREATE TABLE unit(\n" +
-                    "  id integer primary key,\n" +
-                    "  unit text unique not null\n" +
-                    ");";
-                    */
             String create_tag_table = "CREATE TABLE tag(\n" +
                     "  id integer primary key,\n" +
                     "  tag text non null unique\n" +
@@ -250,7 +233,6 @@ public class SqlController extends SQLiteOpenHelper{
     }
 
     public BasicRecipe getBasicRecipe(long id) {
-
         SQLiteDatabase db = getReadableDatabase();
         db.beginTransaction();
         BasicRecipe ret = null;
@@ -327,7 +309,7 @@ public class SqlController extends SQLiteOpenHelper{
                     null,
                     null);
             if (c.moveToFirst()) {
-                ArrayList<Long> recipe_ids = new ArrayList<>(c.getCount());
+                ArrayList<Long> recipe_ids = new ArrayList<>();
                 do {
                     recipe_ids.add(c.getLong(c.getColumnIndex("recipe_id")));
                 } while (c.moveToNext());
@@ -349,36 +331,6 @@ public class SqlController extends SQLiteOpenHelper{
 
     }
 
-    /*
-    public void updateRecipesTags(long tag_id, long[] recipe_ids) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try {
-            for (long recipe_id : recipe_ids) {
-                ContentValues cv = new ContentValues();
-                cv.put("tag_id", tag_id);
-                cv.put("recipe_id", recipe_id);
-                int u = db.updateWithOnConflict("tag_list",
-                        cv,
-                        null,
-                        null,
-                        SQLiteDatabase.CONFLICT_REPLACE
-                );
-                if (u == 0) {
-                    db.insertOrThrow("tag_list", null, cv);
-                }
-            }
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".updateRecipeTags transaction failed.");
-        }
-        finally {
-            db.endTransaction();
-        }
-    }
-    */
-
     public long insertRecipe(Recipe r) {
         Log.v(TAG, TAG + ".insertRecipe called.");
 
@@ -399,33 +351,6 @@ public class SqlController extends SQLiteOpenHelper{
         return ret;
     }
 
-    private long lastInsertId() {
-        Log.v(TAG, TAG + ".lastInsertId called.");
-
-        SQLiteDatabase db = getReadableDatabase();
-        long ret;
-        db.beginTransaction();
-        try {
-            String q = "SELECT LAST_INSERT_ROWID();";
-            Cursor c = db.rawQuery(q, null);
-            if (c.moveToFirst()) {
-                ret = c.getLong(0);
-            }
-            ret = Recipe.NO_ID;
-
-            c.close();
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".lastInsertId transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
     public void addRecipeToTag(long recipe_id, long tag_id) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -433,11 +358,11 @@ public class SqlController extends SQLiteOpenHelper{
             ContentValues cv = new ContentValues();
             cv.put("recipe_id", recipe_id);
             cv.put("tag_id", tag_id);
-            int u = db.updateWithOnConflict("tag_list",
+            int u = db.update("tag_list",
                     cv,
-                    "recipe_id = ? && tag_id = ?",
-                    new String[] {recipe_id + "", tag_id + ""},
-                    SQLiteDatabase.CONFLICT_REPLACE);
+                    "recipe_id = ? AND tag_id = ?",
+                    new String[] {recipe_id + "", tag_id + ""}
+            );
             if (u == 0) {
                 db.insertOrThrow("tag_list", null, cv);
             }
@@ -458,9 +383,7 @@ public class SqlController extends SQLiteOpenHelper{
 
         db.beginTransaction();
         try {
-            ContentValues cv = new ContentValues();
-            cv.put("tag", tag_name);
-            ret = db.replaceOrThrow("tag", null, cv);
+            ret = lookupTag(tag_name, db);
 
             db.setTransactionSuccessful();
         }
@@ -507,6 +430,25 @@ public class SqlController extends SQLiteOpenHelper{
         }
     }
 
+    public void removeTagFromRecipe(long tag_id, long recipe_tag) {
+         SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+        try {
+            db.delete("tag_list",
+                    "tag_id = ? AND recipe_id = ?",
+                    new String[] {"" + tag_id, "" + recipe_tag});
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".removeTagFromRecipe transaction failed.");
+            throw e;
+        }
+        finally {
+            db.endTransaction();
+        }
+    }
+
     public void removeTag(long id) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -537,9 +479,18 @@ public class SqlController extends SQLiteOpenHelper{
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
+            /*
             for (long id : getAllRecipeIds()) {
                 removeRecipe(id);
             }
+            */
+            db.delete("comment_list", "1 = 1", null);
+            db.delete("ingredient_list", "1 = 1", null);
+            db.delete("instruction_list", "1 = 1", null);
+            db.delete("tag_list", "1 = 1", null);
+            db.delete("tag", "1 = 1", null);
+            db.delete("recipe", "1 = 1", null);
+
             db.setTransactionSuccessful();
         }
         catch (Exception e) {
@@ -672,13 +623,20 @@ public class SqlController extends SQLiteOpenHelper{
 
     private long updateRecipe(Recipe r, SQLiteDatabase db) {
         ContentValues cv = new ContentValues();
-        cv.put("id", r.getId());
+        if (r.getId() != Recipe.NO_ID ) {
+            cv.put("id", r.getId());
+        }
         cv.put("name", r.getName());
         cv.put("short_description", r.getShortDescription());
         cv.put("long_description", r.getLongDescription());
         cv.put("target_quantity", r.getTargetQuantity());
         cv.put("target_description", r.getTargetDescription());
-        r.setId(db.replaceOrThrow("recipe", null, cv));
+        if (r.getId() == Recipe.NO_ID) {
+           r.setId(db.insertOrThrow("recipe", null, cv));
+        }
+        else {
+            r.setId(db.replaceOrThrow("recipe", null, cv));
+        }
         updateIngredients(r,db);
         updateInstructions(r,db);
         updateTags(r,db);
@@ -701,9 +659,12 @@ public class SqlController extends SQLiteOpenHelper{
             else {
                 cv.putNull("other_recipe");
             }
-            db.insertOrThrow("ingredient_list",
-                    null,
-                    cv);
+            if (r.getId() == Recipe.NO_ID) {
+               db.insertOrThrow("ingredient_list", null, cv);
+            }
+            else {
+                db.replaceOrThrow("ingredient_list", null, cv);
+            }
         }
     }
 
@@ -716,7 +677,12 @@ public class SqlController extends SQLiteOpenHelper{
             cv.put("recipe_id",r.getId());
             cv.put("position",i);
             cv.put("instruction",r.getInstructions().get(i));
-            db.insertOrThrow("instruction_list", null, cv);
+            if (r.getId() == Recipe.NO_ID) {
+               db.insertOrThrow("instruction_list", null, cv);
+            }
+            else {
+                db.replaceOrThrow("instruction_list", null, cv);
+            }
         }
     }
 
@@ -728,9 +694,12 @@ public class SqlController extends SQLiteOpenHelper{
             ContentValues cv = new ContentValues();
             cv.put("recipe_id", r.getId());
             cv.put("tag_id", lookupTag(tag,db));
-            db.insertOrThrow("tag_list",
-                    null,
-                    cv);
+            if (r.getId() == Recipe.NO_ID) {
+               db.insertOrThrow("tag_list", null, cv);
+            }
+            else {
+                db.replaceOrThrow("tag_list", null, cv);
+            }
         }
     }
 
@@ -743,9 +712,12 @@ public class SqlController extends SQLiteOpenHelper{
             ContentValues cv = new ContentValues();
             cv.put("recipe_id", r.getId());
             cv.put("comment", comment);
-            db.insertOrThrow("comment_list",
-                    null,
-                    cv);
+            if (r.getId() == Recipe.NO_ID) {
+               db.insertOrThrow("comment_list", null, cv);
+            }
+            else {
+                db.replaceOrThrow("comment_list", null, cv);
+            }
         }
     }
 
@@ -764,7 +736,7 @@ public class SqlController extends SQLiteOpenHelper{
         else {
             ContentValues cv = new ContentValues();
             cv.put("tag", tag);
-            ret = db.insertOrThrow("tag",null,cv);
+            ret = db.replaceOrThrow("tag",null,cv);
         }
         tag_c.close();
         return ret;
@@ -783,7 +755,7 @@ public class SqlController extends SQLiteOpenHelper{
             ret = tag_c.getString(tag_c.getColumnIndex("tag"));
         }
         else {
-            ret = "Tag not found, tag_id = " + tag_id;
+            ret = null;
         }
         tag_c.close();
         return ret;

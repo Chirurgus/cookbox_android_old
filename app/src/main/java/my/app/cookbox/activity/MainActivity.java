@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         setActionBar((Toolbar) findViewById(R.id.main_toolbar));
+
+        Log.d(TAG, TAG + ".onCreate(): ");
 
         selectCategory(null);
         startListFragment(_rlist);
@@ -155,8 +158,10 @@ public class MainActivity extends Activity {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.dlist_context_edit:
-                startTagSelectionListFragment(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
-                hideToolbar();
+                int tag_pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+                RecipeTag tag = ((RecipeTag) ((ListView) findViewById(R.id.drawer_list)).getAdapter().getItem(tag_pos));
+                long tag_id = tag.getId();
+                startTagSelectionListFragment(tag_id);
                 return true;
             case R.id.dlist_context_delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -196,17 +201,6 @@ public class MainActivity extends Activity {
             default:
                 return super.onContextItemSelected(item);
         }
-    }
-
-    private void showToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        toolbar.setVisibility(View.INVISIBLE);
-
-    }
-
-    private void hideToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        toolbar.setVisibility(View.VISIBLE);
     }
 
     private void setupNavigationDrawer() {
@@ -267,4 +261,6 @@ public class MainActivity extends Activity {
     private SqlController _sqlctrl = new SqlController(this);
     private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
     private RecipeListFragment _toplistfrag = null;
+
+    private String TAG = "MainActivity";
 }

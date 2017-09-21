@@ -56,15 +56,12 @@ public class RecipeFragment extends BaseFragment {
 
         super.onCreate(savedInstance);
 
-        //_rl = (RelativeLayout) findViewById(R.id.recipe_relative_layout);
-
-
         Bundle args = getArguments();
         if (args != null && args.getLong("id") != Recipe.NO_ID) {
             _recipe = getParent().getSqlController().getRecipe(args.getLong("id"));
         }
         else {
-            Toast toast = Toast.makeText(getParent(), "Undefined recipe_toolbar.", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getParent(), "Undefined recipe.", Toast.LENGTH_SHORT);
             toast.show();
             //TODO exit an activity
             _recipe = new Recipe();

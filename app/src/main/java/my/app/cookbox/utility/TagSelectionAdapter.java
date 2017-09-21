@@ -1,6 +1,7 @@
 package my.app.cookbox.utility;
 
 import android.content.Context;
+import android.nfc.NfcAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -21,7 +22,7 @@ public class TagSelectionAdapter extends RecipeAdapter{
     public TagSelectionAdapter(ArrayList<BasicRecipe> d, ArrayList<BasicRecipe> tagged_recipes, Context c) {
         super(d,c);
 
-        _tagged = new ArrayList<Boolean>(d.size());
+        _tagged = new ArrayList<>();
         for (int i = 0; i < d.size(); ++i) {
             _tagged.add(false);
         }
@@ -60,7 +61,7 @@ public class TagSelectionAdapter extends RecipeAdapter{
         c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-               _tagged.set(pos, b);
+                _tagged.set(pos, b);
             }
         });
 

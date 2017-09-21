@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
@@ -38,7 +40,7 @@ public class TagSelectionListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.recipe_list, container, false);
+        return inflater.inflate(R.layout.tag_selection_list, container, false);
     }
 
     @Override
@@ -57,12 +59,17 @@ public class TagSelectionListFragment extends ListFragment {
         switch (item.getItemId()) {
             case R.id.tag_selection_confirm:
                 for (int i = 0; i < getListAdapter().getCount(); ++i) {
+                    long recipe_id = ((BasicRecipe)getListAdapter().getItem(i)).getId();
+                    long tag_id = _tag;
                     if (((TagSelectionAdapter) getListAdapter()).isItemChecked(i)) {
-                        long recipe_id = ((BasicRecipe)getListAdapter().getItem(i)).getId();
-                        long tag_id = _tag;
                         ((MainActivity) getActivity())
                                 .getSqlController()
                                 .addRecipeToTag(recipe_id, tag_id);
+                    }
+                    else {
+                        ((MainActivity) getActivity())
+                                .getSqlController()
+                                .removeTagFromRecipe(tag_id, recipe_id);
                     }
                 }
                 Toast.makeText(getContext(), "Recipes tagged.", Toast.LENGTH_SHORT).show();
@@ -77,6 +84,9 @@ public class TagSelectionListFragment extends ListFragment {
     }
 
     private long _tag = Recipe.NO_ID;
-
+    public class TagSelectionTag {
+        long tag;
+        ArrayList<Long> recipes;
+    }
     private String TAG = "TagSelectionListFrag";
 }
