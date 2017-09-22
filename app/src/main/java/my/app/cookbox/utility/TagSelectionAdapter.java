@@ -34,7 +34,6 @@ public class TagSelectionAdapter extends RecipeAdapter{
                 }
             }
         }
-        int i= 1;
     }
 
     public boolean isItemChecked(int pos) {

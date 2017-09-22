@@ -44,95 +44,75 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, TAG + ".onCreate(): ");
 
-        selectCategory(null);
-        startListFragment(_rlist);
+        _rlist = _sqlctrl.getAllBasicRecipes();
+        startListFragment(getAllBasicRecipes());
 
         setupNavigationDrawer();
     }
 
     public void addToRecipeList(BasicRecipe new_br) {
-        for (int i = 0; i < _rlist.size(); ++i) {
-            if (_rlist.get(i).getId() == new_br.getId()) {
-                _rlist.set(i, new_br);
-            }
-        }
-        ((RecipeAdapter) _toplistfrag.getListAdapter()).updateDataset(_rlist);
+        _rlist = _sqlctrl.getAllBasicRecipes();
+        startListFragment(getAllBasicRecipes());
     }
 
     public RecipeListFragment startListFragment(ArrayList<BasicRecipe> rlist) {
         RecipeListFragment new_frag = new RecipeListFragment();
-        if (new_frag != null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.main_fragment_frame, new_frag);
-            // A ListFragment is only added once.
-            //ft.addToBackStack(null);
-            ft.commit();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.main_fragment_frame, new_frag);
+        // A ListFragment is only added once.
+        //ft.addToBackStack(null);
+        ft.commit();
 
-            new_frag.setListAdapter(new RecipeAdapter(rlist, this));
-        }
-        return _toplistfrag = new_frag;
+        new_frag.setListAdapter(new RecipeAdapter(rlist, this));
+        return new_frag;
     }
 
     public TagSelectionListFragment startTagSelectionListFragment(long tag_id) {
-        selectCategory(null);
         TagSelectionListFragment new_frag = new TagSelectionListFragment();
-        if (new_frag != null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            Bundle b = new Bundle();
-            b.putLong("tag_id", tag_id);
-            new_frag.setArguments(b);
-            ft.replace(R.id.main_fragment_frame, new_frag);
-            ft.addToBackStack(null);
-            ft.commit();
 
-            new_frag.setListAdapter(new TagSelectionAdapter(_rlist,
-                    _sqlctrl.getTaggedBasicRecipe(tag_id),
-                    this));
-        }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Bundle b = new Bundle();
+        b.putLong("tag_id", tag_id);
+        new_frag.setArguments(b);
+        ft.replace(R.id.main_fragment_frame, new_frag);
+        ft.addToBackStack(null);
+        ft.commit();
+
+        new_frag.setListAdapter(new TagSelectionAdapter(_rlist,
+                _sqlctrl.getTaggedBasicRecipe(tag_id),
+                this));
+
         return new_frag;
     }
 
     public ModifyFragment startModifyFragment(Long id) {
-       ModifyFragment new_frag = new ModifyFragment();
-        if (new_frag != null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.main_fragment_frame, new_frag);
+        ModifyFragment new_frag = new ModifyFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.main_fragment_frame, new_frag);
 
-            ft.addToBackStack(null);
-            if (id != null) {
-                Bundle args = new Bundle();
-                args.putLong("id", id);
-                new_frag.setArguments(args);
-            }
-            ft.commit();
+        ft.addToBackStack(null);
+        if (id != null) {
+            Bundle args = new Bundle();
+            args.putLong("id", id);
+            new_frag.setArguments(args);
         }
+        ft.commit();
         return new_frag;
     }
 
     public RecipeFragment startRecipeFragment(Long id) {
         RecipeFragment new_frag = new RecipeFragment();
-        if (new_frag != null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.main_fragment_frame, new_frag);
-            ft.addToBackStack(null);
-            if (id != null) {
-                Bundle args = new Bundle();
-                args.putLong("id", id);
-                new_frag.setArguments(args);
-            }
-            ft.commit();
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.main_fragment_frame, new_frag);
+        ft.addToBackStack(null);
+        if (id != null) {
+            Bundle args = new Bundle();
+            args.putLong("id", id);
+            new_frag.setArguments(args);
         }
+        ft.commit();
         return new_frag;
-    }
-
-    public void selectCategory(RecipeTag tag) {
-        if (tag == null) {
-            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show();
-            _rlist = _sqlctrl.getAllBasicRecipes();
-            return;
-        }
-
-        _rlist = _sqlctrl.getTaggedBasicRecipe(tag.getId());
     }
 
     public ArrayList<BasicRecipe> getAllBasicRecipes() {
@@ -212,8 +192,8 @@ public class MainActivity extends Activity {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                        selectCategory((RecipeTag) parent.getAdapter().getItem(pos));
-                        ((RecipeAdapter) _toplistfrag.getListAdapter()).updateDataset(_rlist);
+                        long tag_id = ((RecipeTag) parent.getAdapter().getItem(pos)).getId();
+                        startListFragment(_sqlctrl.getTaggedBasicRecipe(tag_id));
                     }
                 }
         );
@@ -257,10 +237,8 @@ public class MainActivity extends Activity {
         );
     }
 
-    private long _tag_id = -1;
     private SqlController _sqlctrl = new SqlController(this);
     private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
-    private RecipeListFragment _toplistfrag = null;
 
     private String TAG = "MainActivity";
 }
