@@ -148,11 +148,12 @@ public class RecipeFragment extends BaseFragment {
 
         for (int i = 0; i < r.getTags().size(); ++i) {
             expandTagList();
-
+            /*
             LinearLayout parent_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_comment_list);
 
             TextView tag_desc = (TextView) parent_ll.getChildAt((parent_ll.getChildCount() - 1));
             tag_desc.setText(r.getTags().get(i));
+            */
         }
     }
 

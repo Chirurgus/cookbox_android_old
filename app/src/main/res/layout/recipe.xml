@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/recipe_comment_list"
-            android:text="Tag (Not supported):"
+            android:text="Tag (Not here):"
             android:textSize="20sp" />
 
     </RelativeLayout>
