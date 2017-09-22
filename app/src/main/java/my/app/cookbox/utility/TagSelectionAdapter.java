@@ -34,6 +34,7 @@ public class TagSelectionAdapter extends RecipeAdapter{
                 }
             }
         }
+        int i= 1;
     }
 
     public boolean isItemChecked(int pos) {
@@ -57,6 +58,12 @@ public class TagSelectionAdapter extends RecipeAdapter{
         tv_desc.setText(((BasicRecipe) getItem(pos)).getShortDescription());
 
         CheckBox c = (CheckBox) ret.findViewById(R.id.tag_selection_list_item_checkbox);
+        c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                return;//do nothing
+            }
+        });
         c.setChecked(_tagged.get(pos));
         c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -67,6 +74,5 @@ public class TagSelectionAdapter extends RecipeAdapter{
 
         return ret;
     }
-
     ArrayList<Boolean> _tagged;
 }
