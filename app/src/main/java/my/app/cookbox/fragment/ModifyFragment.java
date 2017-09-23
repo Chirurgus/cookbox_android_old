@@ -230,11 +230,14 @@ public class ModifyFragment extends BaseFragment {
 
         for (int i = 0; i < r.getTags().size(); ++i) {
             expandTagList();
+            /*
+            //not sure if I should display categories here, or not.
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
             RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText tag_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             tag_desc.setText(r.getTags().get(i));
+            */
         }
 
         for (int i = 0; i < r.getComments().size(); ++i) {
@@ -316,9 +319,11 @@ public class ModifyFragment extends BaseFragment {
     }
 
     private void expandTagList() {
+        /*
         //TAGS are not implemented as of yet.
         Toast t = Toast.makeText(getContext(), "Tags are not supported, yet.", Toast.LENGTH_SHORT);
         t.show();
+        */
     }
 
 

@@ -77,7 +77,6 @@ public class RecipeListFragment extends ListFragment {
     public boolean onContextItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.rlist_context_edit:
-                Toast.makeText(getActivity(), "rlist_context_edit", Toast.LENGTH_SHORT).show();
                 ((MainActivity) getActivity()).startModifyFragment(
                         ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id
                 );
