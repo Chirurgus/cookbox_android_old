@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -16,9 +18,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import my.app.cookbox.R;
 import my.app.cookbox.fragment.ModifyFragment;
@@ -35,13 +37,15 @@ import my.app.cookbox.utility.TagSelectionAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        setActionBar((Toolbar) findViewById(R.id.main_toolbar));
+        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
 
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setDisplayShowHomeEnabled(true);
         Log.d(TAG, TAG + ".onCreate(): ");
 
         _rlist = _sqlctrl.getAllBasicRecipes();
@@ -136,14 +140,16 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
+
         switch (item.getItemId()) {
-            case R.id.dlist_context_edit:
+            case R.id.dlist_context_edit: {
                 int tag_pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
                 RecipeTag tag = ((RecipeTag) ((ListView) findViewById(R.id.drawer_list)).getAdapter().getItem(tag_pos));
                 long tag_id = tag.getId();
                 startTagSelectionListFragment(tag_id);
                 return true;
-            case R.id.dlist_context_delete:
+            }
+            case R.id.dlist_context_delete: {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Are you sure?");
                 builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -152,8 +158,7 @@ public class MainActivity extends Activity {
                         try {
                             getSqlController().removeTag(getSqlController().getAllRecipeTags().get(pos).getId());
                             populateDrawerTagList((ListView) findViewById(R.id.drawer_list));
-                        }
-                        catch (SQLiteException e) {
+                        } catch (SQLiteException e) {
                             Toast toast = Toast.makeText(
                                     MainActivity.this,
                                     "Can't delete " + getSqlController().getAllRecipeTags().get(pos).getName() + ".",
@@ -173,11 +178,36 @@ public class MainActivity extends Activity {
                 dialog.show();
 
                 return true;
-            /*
-            //handled in RecipeListFragment
-            case R.id.dlist_context_edit:
-            case R.menu.drawer_list_context:
-             */
+            }
+            case R.id.dlist_context_rename: {
+                int tag_pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
+                RecipeTag tag = ((RecipeTag) ((ListView) findViewById(R.id.drawer_list)).getAdapter().getItem(tag_pos));
+                final long tag_id = tag.getId();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Enter new Tag name");
+
+                final EditText tag_name = new EditText(MainActivity.this);
+                builder.setView(tag_name);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String name = tag_name.getText().toString();
+                        getSqlController().renameTag(tag_id, name);
+                        populateDrawerTagList((ListView) findViewById(R.id.drawer_list));
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                builder.show();
+                return true;
+            }
             default:
                 return super.onContextItemSelected(item);
         }

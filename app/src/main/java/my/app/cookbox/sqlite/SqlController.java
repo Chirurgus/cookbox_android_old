@@ -473,6 +473,37 @@ public class SqlController extends SQLiteOpenHelper{
         }
     }
 
+    public boolean renameTag(long id, String name) {
+        SQLiteDatabase db = getWritableDatabase();
+        boolean ret = false;
+        db.beginTransaction();
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put("id", id);
+            cv.put("tag", name);
+            int u = db.update("tag",
+                    cv,
+                    "id = ?",
+                    new String[] {id + ""}
+            );
+            if (u == 0) {
+                ret = false;
+            }
+            else {
+                ret = true;
+            }
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e) {
+            Log.e(TAG, TAG + ".removeTag transaction failed.");
+            throw e;
+        }
+        finally {
+            db.endTransaction();
+        }
+        return ret;
+    }
+
     public void clearOpenedDatabase() {
         Log.v(TAG, TAG + ".clearOpenedDatabase called.");
 

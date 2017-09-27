@@ -17,10 +17,6 @@
         <activity android:name=".activity.MainLayoutActivity">
         </activity>
 
-        <activity android:name=".activity.ModifyRecipeActivity"
-            android:theme="@style/modify_recipe_menu_style">
-        </activity>
-
         <activity android:name=".activity.RecipeActivity" >
         </activity>
 

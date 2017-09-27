@@ -2,7 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/dlist_context_edit"
-        android:title="Edit"
+        android:title="Tag recipes"
+        android:icon="@drawable/ic_mode_edit_black_24dp"
+        />
+
+    <item android:id="@+id/dlist_context_rename"
+        android:title="Rename"
         android:icon="@drawable/ic_mode_edit_black_24dp"
         />
 
