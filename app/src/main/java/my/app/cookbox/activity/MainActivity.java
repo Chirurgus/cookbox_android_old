@@ -44,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main);
         setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
 
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
-        //getActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         Log.d(TAG, TAG + ".onCreate(): ");
 
         _rlist = _sqlctrl.getAllBasicRecipes();

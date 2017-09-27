@@ -3,6 +3,7 @@ package my.app.cookbox.fragment;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,9 +27,14 @@ import my.app.cookbox.utility.TagSelectionAdapter;
 
 public class TagSelectionListFragment extends ListFragment {
     @Override
+    public void onStart() {
+        super.onStart();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Tag recipes");
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Bundle b = getArguments();
         _tag = b.getLong("tag_id", Recipe.NO_ID);
 

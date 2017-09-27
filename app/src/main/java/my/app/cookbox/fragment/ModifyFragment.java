@@ -3,6 +3,7 @@ package my.app.cookbox.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +31,12 @@ import my.app.cookbox.recipe.Recipe;
  */
 
 public class ModifyFragment extends BaseFragment {
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getParent().getSupportActionBar().setTitle("Edit recipe");
+    }
 
     @Nullable
     @Override

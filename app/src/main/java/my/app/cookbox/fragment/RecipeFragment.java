@@ -27,6 +27,13 @@ import my.app.cookbox.recipe.Recipe;
  */
 
 public class RecipeFragment extends BaseFragment {
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getParent().getSupportActionBar().setTitle("Recipe");
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
