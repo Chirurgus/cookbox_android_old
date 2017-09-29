@@ -17,12 +17,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
+import my.app.cookbox.recipe.Recipe;
+import my.app.cookbox.utility.RecipeAdapter;
 
 /**
  * Created by Alexander on 020, 20 Jun.
@@ -37,7 +40,17 @@ public class RecipeListFragment extends ListFragment {
     @Override
     public void onStart() {
         super.onStart();
+
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("All recipes");
+
+        ArrayList<BasicRecipe> recipes = null;
+        if (_tag_id != Recipe.NO_ID) {
+            recipes = ((MainActivity) getActivity()).getSqlController().getTaggedBasicRecipe(_tag_id);
+        }
+        else {
+            recipes = ((MainActivity) getActivity()).getSqlController().getAllBasicRecipes();
+        }
+        setListAdapter(new RecipeAdapter(recipes, getContext()));
     }
 
     @Override
@@ -45,6 +58,9 @@ public class RecipeListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+
+        Bundle b = getArguments();
+        _tag_id = b.getLong("tag_id", Recipe.NO_ID);
     }
 
     @Override
@@ -161,6 +177,6 @@ public class RecipeListFragment extends ListFragment {
         //TODO
     }
     private boolean sort_order = false;
-
+    private long _tag_id = Recipe.NO_ID;
 }
 

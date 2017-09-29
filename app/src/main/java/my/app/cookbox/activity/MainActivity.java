@@ -2,6 +2,7 @@ package my.app.cookbox.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
 import my.app.cookbox.fragment.TagSelectionListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
+import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeAdapter;
@@ -44,34 +46,49 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main);
         setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         Log.d(TAG, TAG + ".onCreate(): ");
 
-        _rlist = _sqlctrl.getAllBasicRecipes();
-        startListFragment(getAllBasicRecipes());
+        startListFragment();
 
         setupNavigationDrawer();
     }
 
     public void addToRecipeList(BasicRecipe new_br) {
-        _rlist = _sqlctrl.getAllBasicRecipes();
-        startListFragment(getAllBasicRecipes());
+        startListFragment();
     }
 
-    public RecipeListFragment startListFragment(ArrayList<BasicRecipe> rlist) {
+    public RecipeListFragment startListFragment() {
+        return startListFragment(Recipe.NO_ID);
+    }
+
+    public RecipeListFragment startListFragment(long tag_id) {
         RecipeListFragment new_frag = new RecipeListFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+        Bundle b = new Bundle();
+        b.putLong("tag_id", tag_id);
+        new_frag.setArguments(b);
+
         ft.replace(R.id.main_fragment_frame, new_frag);
-        // A ListFragment is only added once.
-        //ft.addToBackStack(null);
+        ft.addToBackStack(null);
         ft.commit();
 
-        new_frag.setListAdapter(new RecipeAdapter(rlist, this));
         return new_frag;
     }
 
+    /* shows all recipes, always on the bottom of the fragment stack */
+    public RecipeListFragment startBaseListFragment() {
+        RecipeListFragment frag = _bottom_rlist_frag;
+        if (frag == null) {
+            frag = new RecipeListFragment();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.main_fragment_frame, frag);
+            ft.commit();
+
+        }
+        frag.setListAdapter(new RecipeAdapter(getAllBasicRecipes(), this));
+        return frag;
+    }
     public TagSelectionListFragment startTagSelectionListFragment(long tag_id) {
         TagSelectionListFragment new_frag = new TagSelectionListFragment();
 
@@ -83,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
 
-        new_frag.setListAdapter(new TagSelectionAdapter(_rlist,
+        new_frag.setListAdapter(new TagSelectionAdapter(getAllBasicRecipes(),
                 _sqlctrl.getTaggedBasicRecipe(tag_id),
                 this));
 
@@ -121,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public ArrayList<BasicRecipe> getAllBasicRecipes() {
-        return _rlist;
+        return _sqlctrl.getAllBasicRecipes();
     }
 
     public SqlController getSqlController() {
@@ -224,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                         long tag_id = ((RecipeTag) parent.getAdapter().getItem(pos)).getId();
-                        startListFragment(_sqlctrl.getTaggedBasicRecipe(tag_id));
+                        startListFragment(tag_id);
                     }
                 }
         );
@@ -268,8 +285,8 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    private RecipeListFragment _bottom_rlist_frag = null;
     private SqlController _sqlctrl = new SqlController(this);
-    private ArrayList<BasicRecipe> _rlist = new ArrayList<>();
 
     private String TAG = "MainActivity";
 }
