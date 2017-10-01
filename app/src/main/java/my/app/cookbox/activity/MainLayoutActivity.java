@@ -88,7 +88,7 @@ public class MainLayoutActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_toolbar,menu);
+        getMenuInflater().inflate(R.menu.recipe_list_toolbar,menu);
         return true;
     }
 
@@ -271,7 +271,7 @@ public class MainLayoutActivity extends AppCompatActivity {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             Log.v(TAG, TAG + "._amCallback.onCreateActionMode called.");
 
-            getMenuInflater().inflate(R.menu.main_toolbar,menu);
+            getMenuInflater().inflate(R.menu.recipe_list_toolbar,menu);
             return true;
         }
 

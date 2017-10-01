@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item android:id="@+id/main_search"
         android:title="@string/main_search_title"
         android:icon="@drawable/ic_search_black_24dp"
         app:showAsAction="ifRoom"
         android:orderInCategory="1"
-        />
-
-    <item android:id="@+id/main_refresh"
-        android:title="Refresh"
-        android:icon="@drawable/ic_refresh_black_24dp"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="2"
         />
 
     <item android:id="@+id/main_sort"
@@ -28,12 +22,5 @@
         app:showAsAction="ifRoom"
         android:orderInCategory="4"
         />
-
-    <item android:id="@+id/main_test"
-        android:title="Test function"
-        android:icon="@drawable/ic_add_black_24dp"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="5"
-    />
 
 </menu>

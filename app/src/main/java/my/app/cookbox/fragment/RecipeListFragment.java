@@ -92,7 +92,7 @@ public class RecipeListFragment extends ListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_toolbar, menu);
+        inflater.inflate(R.menu.recipe_list_toolbar, menu);
     }
 
     /* ContextMenu is created in MainActivity.onContextMenuCreated */
@@ -155,9 +155,6 @@ public class RecipeListFragment extends ListFragment {
             case R.id.main_backup:
                 //backupRecipes();
                 return true;
-            case R.id.main_test:
-                Toast.makeText(getContext(),"" + Float.parseFloat("0.5"), Toast.LENGTH_LONG).show();
-                return true;
             default:
                 return false;
         }
@@ -173,8 +170,6 @@ public class RecipeListFragment extends ListFragment {
                     }
                 }
          );
-        //_radapter.notifyDataSetChanged();
-        //TODO
     }
     private boolean sort_order = false;
     private long _tag_id = Recipe.NO_ID;

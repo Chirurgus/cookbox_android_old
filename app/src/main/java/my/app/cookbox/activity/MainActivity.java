@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, TAG + ".onCreate(): ");
 
-        startListFragment();
+        startBaseListFragment();
 
         setupNavigationDrawer();
     }
@@ -82,13 +82,17 @@ public class MainActivity extends AppCompatActivity {
         if (frag == null) {
             frag = new RecipeListFragment();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+            Bundle b = new Bundle();
+            b.putLong("tag_id", Recipe.NO_ID);
+            frag.setArguments(b);
+
             ft.replace(R.id.main_fragment_frame, frag);
             ft.commit();
-
         }
-        frag.setListAdapter(new RecipeAdapter(getAllBasicRecipes(), this));
         return frag;
     }
+
     public TagSelectionListFragment startTagSelectionListFragment(long tag_id) {
         TagSelectionListFragment new_frag = new TagSelectionListFragment();
 
@@ -109,15 +113,14 @@ public class MainActivity extends AppCompatActivity {
 
     public ModifyFragment startModifyFragment(Long id) {
         ModifyFragment new_frag = new ModifyFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.main_fragment_frame, new_frag);
-
-        ft.addToBackStack(null);
-        if (id != null) {
+         if (id != null) {
             Bundle args = new Bundle();
             args.putLong("id", id);
             new_frag.setArguments(args);
         }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.main_fragment_frame, new_frag);
+        ft.addToBackStack(null);
         ft.commit();
         return new_frag;
     }

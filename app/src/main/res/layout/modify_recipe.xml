@@ -142,6 +142,7 @@
 
         </LinearLayout>
 
+        <!--
         <Button
             android:id="@+id/modify_tag_button"
             android:layout_width="match_parent"
@@ -150,6 +151,7 @@
             android:layout_below="@id/modify_tag_list"
             android:text="Add a tag"
             android:background="@null"/>
+            -->
 
     </RelativeLayout>
 

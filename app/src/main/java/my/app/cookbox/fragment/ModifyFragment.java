@@ -1,6 +1,7 @@
 package my.app.cookbox.fragment;
 
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -64,14 +65,6 @@ public class ModifyFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 expandCommentList();
-            }
-        });
-
-        Button tag_b = (Button) _root_view.findViewById(R.id.modify_tag_button);
-        tag_b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              expandTagList();
             }
         });
 
@@ -235,18 +228,6 @@ public class ModifyFragment extends BaseFragment {
             ins_desc.setText(r.getInstructions().get(i));
         }
 
-        for (int i = 0; i < r.getTags().size(); ++i) {
-            expandTagList();
-            /*
-            //not sure if I should display categories here, or not.
-            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
-            RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
-
-            EditText tag_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
-            tag_desc.setText(r.getTags().get(i));
-            */
-        }
-
         for (int i = 0; i < r.getComments().size(); ++i) {
             expandCommentList();
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
@@ -255,6 +236,18 @@ public class ModifyFragment extends BaseFragment {
             EditText cmnt_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
             cmnt_desc.setText(r.getComments().get(i));
         }
+
+        for (int i = 0; i < r.getTags().size(); ++i) {
+            expandTagList();
+
+            LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
+            RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
+
+            EditText tag_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
+            tag_desc.setText(r.getTags().get(i));
+        }
+
+
     }
 
     private void setupOtherRecipeSpinner(Spinner spinner) {
@@ -264,7 +257,7 @@ public class ModifyFragment extends BaseFragment {
             names.add(br.getName());
         }
         //modify_recipe_spinner_item will do just fine here
-        ArrayAdapter<String> aa = new ArrayAdapter<String>(getContext(), R.layout.modify_recipe_spinner_item,names);
+        ArrayAdapter<String> aa = new ArrayAdapter<>(getContext(), R.layout.modify_recipe_spinner_item,names);
         spinner.setAdapter(aa);
     }
 
@@ -326,11 +319,24 @@ public class ModifyFragment extends BaseFragment {
     }
 
     private void expandTagList() {
-        /*
-        //TAGS are not implemented as of yet.
-        Toast t = Toast.makeText(getContext(), "Tags are not supported, yet.", Toast.LENGTH_SHORT);
-        t.show();
-        */
+        RelativeLayout rl
+                = ((RelativeLayout) getActivity()
+                        .getLayoutInflater()
+                        .inflate(R.layout.modify_recipe_item, null));
+        rl.removeViewAt(3);//remove spinner
+        rl.removeViewAt(0);//remove quantity
+
+        rl.findViewById(R.id.modify_list_item_edit_text2).setEnabled(false);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        final LinearLayout parent_ll
+                = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
+        parent_ll.addView(rl,lp);
+        ImageButton b = (ImageButton) rl.findViewById(R.id.modify_list_item_del_button1);
+        b.setOnClickListener(_onClickListener);
     }
 
 

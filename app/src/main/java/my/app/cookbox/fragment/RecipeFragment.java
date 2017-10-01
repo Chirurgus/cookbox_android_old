@@ -32,13 +32,9 @@ public class RecipeFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         getParent().getSupportActionBar().setTitle("Recipe");
-    }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        setRootView(inflater.inflate(R.layout.recipe, container, false));
-
+        _recipe = getParent().getSqlController().getRecipe(_recipe_id);
+        clearFields();
         populateFields(_recipe);
 
         EditText target_qty_et = (EditText) getRootView().findViewById(R.id.recipe_text_qty_tgt);
@@ -53,6 +49,12 @@ public class RecipeFragment extends BaseFragment {
                 return false;
             }
         });
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        setRootView(inflater.inflate(R.layout.recipe, container, false));
 
         return getRootView();
     }
@@ -64,14 +66,18 @@ public class RecipeFragment extends BaseFragment {
         super.onCreate(savedInstance);
 
         Bundle args = getArguments();
-        if (args != null && args.getLong("id") != Recipe.NO_ID) {
-            _recipe = getParent().getSqlController().getRecipe(args.getLong("id"));
+        if (args != null) {
+            _recipe_id = args.getLong("id", Recipe.NO_ID);
+            if (_recipe_id == Recipe.NO_ID) {
+                Toast toast = Toast.makeText(getParent(), "Undefined recipe.", Toast.LENGTH_SHORT);
+                toast.show();
+                getParent().getFragmentManager().popBackStack();
+            }
         }
         else {
             Toast toast = Toast.makeText(getParent(), "Undefined recipe.", Toast.LENGTH_SHORT);
             toast.show();
-            //TODO exit an activity
-            _recipe = new Recipe();
+            getParent().getFragmentManager().popBackStack();
         }
 
         setHasOptionsMenu(true);
@@ -96,6 +102,30 @@ public class RecipeFragment extends BaseFragment {
         }
     }
 
+    private void clearFields() {
+        TextView name = (TextView) getRootView().findViewById(R.id.recipe_text_name);
+        name.setText("");
+
+        TextView long_desc = (TextView) getRootView().findViewById(R.id.recipe_text_desc);
+        long_desc.setText("");
+
+        TextView target_qty = (TextView) getRootView().findViewById(R.id.recipe_text_qty_tgt);
+        target_qty.setText("");
+
+        TextView target_desc = (TextView) getRootView().findViewById(R.id.recipe_text_desc_tgt);
+        target_desc.setText("");
+
+        LinearLayout ingredient_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_ingredient_list);
+        ingredient_ll.removeAllViews();
+
+        LinearLayout instruction_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_instruction_list);
+        instruction_ll.removeAllViews();
+
+        LinearLayout comment_ll = (LinearLayout) getRootView().findViewById(R.id.recipe_comment_list);
+        comment_ll.removeAllViews();
+
+        //Tag handle tag list
+    }
     private void populateFields(final Recipe r) {
         TextView name = (TextView) getRootView().findViewById(R.id.recipe_text_name);
         name.setText(r.getName());
@@ -234,4 +264,5 @@ public class RecipeFragment extends BaseFragment {
 
     private Float _tgt_scale = 1.0f;
     private Recipe _recipe = null;
+    private long _recipe_id = Recipe.NO_ID;
 }

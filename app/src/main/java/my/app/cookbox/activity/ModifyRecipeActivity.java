@@ -126,7 +126,7 @@ public class ModifyRecipeActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_toolbar,menu);
+        getMenuInflater().inflate(R.menu.recipe_list_toolbar,menu);
         return true;
     }
 
