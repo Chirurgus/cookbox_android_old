@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!-- Solorized colors -->
+    <color name="base00">#657b83</color>
+    <color name="base01">#586e75</color>
+    <color name="base02">#073642</color>
+    <color name="base03">#002b36</color>
+    <color name="base0">#839496</color>
+    <color name="base1">#93a1a1</color>
+    <color name="base2">#eee8d5</color>
+    <color name="base3">#fdf6e3</color>
+    <color name="yellow">#b58900</color>
+    <color name="orange">#cb4b16</color>
+    <color name="red">#dc233f</color>
+    <color name="magenta">#d33682</color>
+    <color name="violet">#6c71c4</color>
+    <color name="blue">#268bd2</color>
+    <color name="cyan">#2aa198</color>
+    <color name="green">#859900</color>
+
+    <!-- Aliases -->
+    <color name="primary">@color/orange</color>
+    <color name="primary_dark">@color/yellow</color>
+    <color name="highlight">@color/red</color>
+    <color name="tertiary">@color/base1</color>
+    <color name="background">@color/base3</color>
+    <color name="background_highlight">@color/base2</color>
+    <color name="body">@color/base00</color>
+    <color name="body_highlight">@color/base01</color>
 </resources>

@@ -1,11 +1,25 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="cookbox_style" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Colors -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/highlight</item>
+        <item name="android:textColorPrimary">@color/body</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorAccent">@color/red</item>
+        <item name="android:navigationBarColor">@color/base03</item>
+        <item name="android:statusBarColor">@color/base03</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:colorForeground">@color/cyan</item>
+        <item name="android:textColorSecondary">@color/body_highlight</item>
+        <item name="android:textColorSecondaryInverse">@color/body_highlight</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:textColorPrimaryInverse">@color/body</item>
+
+        <!-- Other -->
+
     </style>
 
 </resources>

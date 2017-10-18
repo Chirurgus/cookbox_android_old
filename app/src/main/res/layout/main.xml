@@ -18,6 +18,7 @@
             android:id="@+id/main_toolbar"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            style="@style/cookbox_style"
             android:minHeight="?attr/actionBarSize"
             android:background="?attr/colorPrimary" />
 
