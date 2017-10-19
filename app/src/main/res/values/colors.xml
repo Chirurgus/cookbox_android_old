@@ -19,9 +19,9 @@
     <color name="green">#859900</color>
 
     <!-- Aliases -->
-    <color name="primary">@color/orange</color>
-    <color name="primary_dark">@color/yellow</color>
-    <color name="highlight">@color/red</color>
+    <color name="primary">@color/base02</color>
+    <color name="primary_dark">@color/base03</color>
+    <color name="highlight">@color/orange</color>
     <color name="tertiary">@color/base1</color>
     <color name="background">@color/base3</color>
     <color name="background_highlight">@color/base2</color>
