@@ -2,6 +2,7 @@ package my.app.cookbox.fragment;
 
 import android.app.ListFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import java.util.Comparator;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
+import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.utility.RecipeAdapter;
@@ -147,17 +149,29 @@ public class RecipeListFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem menu) {
         switch (menu.getItemId()) {
             case R.id.main_search:
+                Toast.makeText(getContext(), "TODO", Toast.LENGTH_SHORT).show();
                 //TODO
                 return true;
             case R.id.main_sort:
                 sortRecipes();
                 return true;
             case R.id.main_backup:
+                //TODO
                 //backupRecipes();
+                Toast.makeText(getContext(), "TODO", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.main_test:
+                startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void startRecipeActivity(long id) {
+        Intent i = new Intent(getContext(), RecipeActivity.class);
+        i.putExtra("id",id);
+        startActivity(i);
     }
 
     private void sortRecipes() {

@@ -3,18 +3,27 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <Toolbar
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/recipe_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:title="@null"
         android:minHeight="50dip">
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_close_black_24dp"
+            android:background="@null"
             />
 
-    </Toolbar>
+    </android.support.v7.widget.Toolbar>
+
+    <FrameLayout
+        android:id="@+id/recipe_fragment_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>
