@@ -13,14 +13,20 @@
         android:title="Sort"
         android:icon="@drawable/ic_sort_black_24dp"
         app:showAsAction="ifRoom"
-        android:orderInCategory="3"
+        android:orderInCategory="2"
         />
 
     <item android:id="@+id/main_backup"
         android:title="Backup database"
         android:icon="@drawable/ic_backup_black_24dp"
         app:showAsAction="ifRoom"
-        android:orderInCategory="4"
+        android:orderInCategory="3"
         />
 
+    <item android:id="@+id/main_test"
+        android:title="Test"
+        android:icon="@drawable/ic_adb_black_24dp"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="4"
+        />
 </menu>
