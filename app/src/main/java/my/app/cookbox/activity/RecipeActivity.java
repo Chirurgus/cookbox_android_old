@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import my.app.cookbox.R;
+import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
 import my.app.cookbox.recipe.Recipe;
@@ -17,7 +18,7 @@ import my.app.cookbox.recipe.Recipe;
  * Created by Alexander on 023, 23 Oct.
  */
 
-public class RecipeActivity extends AppCompatActivity {
+public class RecipeActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +28,7 @@ public class RecipeActivity extends AppCompatActivity {
         //getSupportActionBar().setDisplayShowTitleEnabled(false);
         Bundle b = getIntent().getExtras();
         if (b != null && b.getLong("id", Recipe.NO_ID) != Recipe.NO_ID) {
-            startRecipeFragment(b.getLong("id"));
+            startRecipeFragment(b.getLong("id"),false);
         }
         else {
             Toast.makeText(this, "RecipeActiivty started witout a recipe id.", Toast.LENGTH_SHORT).show();
@@ -35,15 +36,23 @@ public class RecipeActivity extends AppCompatActivity {
         }
     }
 
-    private void startRecipeFragment(long id) {
-        RecipeFragment new_frag = new RecipeFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+    @Override
+    public ModifyFragment startModifyFragment(Long id, boolean addToBackStack) {
+        return super.startModifyFragment(id, R.id.recipe_fragment_frame, addToBackStack);
+    }
 
-        Bundle b = new Bundle();
-        b.putLong("id", id);
-        new_frag.setArguments(b);
+    @Override
+    public ModifyFragment startModifyFragment(Long id) {
+        return this.startModifyFragment(id, true);
+    }
 
-        ft.replace(R.id.recipe_fragment_frame, new_frag);
-        ft.commit();
+    @Override
+    public RecipeFragment startRecipeFragment(Long id, boolean addToBackStack) {
+        return super.startRecipeFragment(id, R.id.recipe_fragment_frame, addToBackStack);
+    }
+
+    @Override
+    public RecipeFragment startRecipeFragment(Long id) {
+        return this.startRecipeFragment(id, true);
     }
 }

@@ -119,22 +119,24 @@ public class MainActivity extends BaseActivity {
         return new_frag;
     }
 
-    public ModifyFragment startModifyFragment(Long id) {
-        ModifyFragment new_frag = new ModifyFragment();
-         if (id != null) {
-            Bundle args = new Bundle();
-            args.putLong("id", id);
-            new_frag.setArguments(args);
-        }
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.main_fragment_frame, new_frag);
-        ft.addToBackStack(null);
-        ft.commit();
-        return new_frag;
+    @Override
+    public ModifyFragment startModifyFragment(Long id, boolean addToBackStack) {
+        return super.startModifyFragment(id, R.id.main_fragment_frame, addToBackStack);
     }
 
+    @Override
+    public ModifyFragment startModifyFragment(Long id) {
+        return this.startModifyFragment(id, true);
+    }
+
+    @Override
+    public RecipeFragment startRecipeFragment(Long id, boolean addToBackStack) {
+        return super.startRecipeFragment(id, R.id.main_fragment_frame, addToBackStack);
+    }
+
+    @Override
     public RecipeFragment startRecipeFragment(Long id) {
-        return super.startRecipeFragment(id, R.id.main_fragment_frame, true);
+        return this.startRecipeFragment(id, true);
     }
 
     @Override
