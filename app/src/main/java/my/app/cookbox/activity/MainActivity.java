@@ -47,7 +47,7 @@ import my.app.cookbox.utility.TagSelectionAdapter;
  * Created by Alexander on 016, 16 Jun.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,22 +69,7 @@ public class MainActivity extends AppCompatActivity {
         return startListFragment(Recipe.NO_ID);
     }
 
-    public RecipeListFragment startListFragment(long tag_id) {
-        RecipeListFragment new_frag = new RecipeListFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-
-        Bundle b = new Bundle();
-        b.putLong("tag_id", tag_id);
-        new_frag.setArguments(b);
-
-        ft.replace(R.id.main_fragment_frame, new_frag);
-        ft.addToBackStack(null);
-        ft.commit();
-
-        return new_frag;
-    }
-
-    /* shows all recipes, always on the bottom of the fragment stack */
+     /* shows all recipes, always on the bottom of the fragment stack */
     public RecipeListFragment startBaseListFragment() {
         RecipeListFragment frag = _bottom_rlist_frag;
         if (frag == null) {
@@ -101,6 +86,21 @@ public class MainActivity extends AppCompatActivity {
         return frag;
     }
 
+    public RecipeListFragment startListFragment(long tag_id) {
+        RecipeListFragment new_frag = new RecipeListFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+        Bundle b = new Bundle();
+        b.putLong("tag_id", tag_id);
+        new_frag.setArguments(b);
+
+        ft.replace(R.id.main_fragment_frame, new_frag);
+        ft.addToBackStack(null);
+        ft.commit();
+
+        return new_frag;
+    }
+
     public TagSelectionListFragment startTagSelectionListFragment(long tag_id) {
         TagSelectionListFragment new_frag = new TagSelectionListFragment();
 
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
 
         new_frag.setListAdapter(new TagSelectionAdapter(getAllBasicRecipes(),
-                _sqlctrl.getTaggedBasicRecipe(tag_id),
+                getSqlController().getTaggedBasicRecipe(tag_id),
                 this));
 
         return new_frag;
@@ -134,26 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public RecipeFragment startRecipeFragment(Long id) {
-        RecipeFragment new_frag = new RecipeFragment();
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.main_fragment_frame, new_frag);
-        ft.addToBackStack(null);
-        if (id != null) {
-            Bundle args = new Bundle();
-            args.putLong("id", id);
-            new_frag.setArguments(args);
-        }
-        ft.commit();
-        return new_frag;
-    }
-
-    public ArrayList<BasicRecipe> getAllBasicRecipes() {
-        return _sqlctrl.getAllBasicRecipes();
-    }
-
-    public SqlController getSqlController() {
-        return _sqlctrl;
+        return super.startRecipeFragment(id, R.id.main_fragment_frame, true);
     }
 
     @Override
@@ -342,14 +323,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateDrawerTagList(ListView drawer_list) {
-        ArrayList<RecipeTag> tags = _sqlctrl.getAllRecipeTags();
+        ArrayList<RecipeTag> tags = getSqlController().getAllRecipeTags();
         drawer_list.setAdapter(
                 new ArrayAdapter<RecipeTag>(this, R.layout.tag_list_item,tags)
         );
     }
 
     private RecipeListFragment _bottom_rlist_frag = null;
-    private SqlController _sqlctrl = new SqlController(this);
 
     private Uri _db_backup_dir = null;
     private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;
