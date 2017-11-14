@@ -8,6 +8,8 @@
         android:id="@+id/recipe_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/cookbox_style"
+        android:background="?attr/colorPrimary"
         android:title="@null"
         android:minHeight="50dip">
 

@@ -11,6 +11,7 @@ import android.widget.Toast;
 import my.app.cookbox.R;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
+import my.app.cookbox.recipe.Recipe;
 
 /**
  * Created by Alexander on 023, 23 Oct.
@@ -23,13 +24,14 @@ public class RecipeActivity extends AppCompatActivity {
         Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show();
         setContentView(R.layout.recipe_test);
         setSupportActionBar((Toolbar) findViewById(R.id.recipe_toolbar));
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //getSupportActionBar().setDisplayShowTitleEnabled(false);
         Bundle b = getIntent().getExtras();
-        if (b != null) {
-            //startRecipeFragment(b.getLong("id", -1));
+        if (b != null && b.getLong("id", Recipe.NO_ID) != Recipe.NO_ID) {
+            startRecipeFragment(b.getLong("id"));
         }
         else {
-           // startRecipeFragment(-1);
+            Toast.makeText(this, "RecipeActiivty started witout a recipe id.", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
