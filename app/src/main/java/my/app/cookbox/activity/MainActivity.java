@@ -3,10 +3,14 @@ package my.app.cookbox.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,6 +24,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,6 +157,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onActivityResult(int request_code, int result_code, Intent intent) {
+        Log.v(TAG, TAG + ".onActivityResult called.");
+
+        if (request_code == PROMPT_FOR_BACKUP_DIR_REQUEST_CODE  && result_code == RESULT_OK) {
+            if (intent != null) {
+                _db_backup_dir = intent.getData();
+                backupRecipes();
+            }
+        }
+        else {
+            Log.v(TAG, TAG + ".onActivityResult with RESULT_CANCELED called.");
+        }
+
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         if (v.getId() == R.id.drawer_list) {
@@ -234,6 +258,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void backupRecipes() {
+
+        if (_db_backup_dir == null) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
+            return;
+        }
+
+        File old_db = new File(getApplicationInfo().dataDir + File.separator  +"databases/recipes.db");
+        DocumentFile df = DocumentFile.fromTreeUri(this, _db_backup_dir);
+        DocumentFile backup = df.findFile("recipe.db");
+        if (backup != null && backup.exists()) {
+            ContentResolver cr = getContentResolver();
+            try {
+                OutputStream os = cr.openOutputStream(backup.getUri());
+                InputStream is = new FileInputStream(old_db);
+                byte[] data = new byte[is.available()];
+                is.read(data);
+                os.write(data);
+                is.close();
+                os.close();
+
+
+                Toast.makeText(this, "recipe.db backed up.", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e) {
+                Log.e(TAG, TAG + ".backupRecipe: " + e.toString());
+                Toast.makeText(this, "Could not back up the recipe", Toast.LENGTH_LONG).show();
+            }
+        }
+        else {
+            df.createFile("recipe/database", "recipe.db");
+            backupRecipes();
+        }
+    }
+
     private void setupNavigationDrawer() {
         final ListView drawer_list = (ListView) findViewById(R.id.drawer_list);
 
@@ -290,6 +350,9 @@ public class MainActivity extends AppCompatActivity {
 
     private RecipeListFragment _bottom_rlist_frag = null;
     private SqlController _sqlctrl = new SqlController(this);
+
+    private Uri _db_backup_dir = null;
+    private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;
 
     private String TAG = "MainActivity";
 }

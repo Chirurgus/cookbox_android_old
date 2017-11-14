@@ -156,9 +156,7 @@ public class RecipeListFragment extends ListFragment {
                 sortRecipes();
                 return true;
             case R.id.main_backup:
-                //TODO
-                //backupRecipes();
-                Toast.makeText(getContext(), "TODO", Toast.LENGTH_SHORT).show();
+                ((MainActivity) getActivity()).backupRecipes();
                 return true;
             case R.id.main_test:
                 startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
