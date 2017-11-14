@@ -3,6 +3,7 @@ package my.app.cookbox.fragment;
 import android.app.Fragment;
 import android.view.View;
 
+import my.app.cookbox.activity.BaseActivity;
 import my.app.cookbox.activity.MainActivity;
 
 /**
@@ -13,8 +14,8 @@ abstract public class BaseFragment extends Fragment {
     public BaseFragment() {
     }
 
-    public MainActivity getParent() {
-        return (MainActivity) super.getActivity();
+    public BaseActivity getParent() {
+        return (BaseActivity) super.getActivity();
     }
 
     public View getRootView() {
