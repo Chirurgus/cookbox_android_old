@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import java.util.List;
 
 import my.app.cookbox.R;
+import my.app.cookbox.fragment.SettingsFragment;
 
 /**
  * Created by Alexander on 020, 20 Nov.
@@ -25,11 +26,9 @@ public class SettingsActivity extends PreferenceActivity {
         loadHeadersFromResource(R.xml.preference_headers,target);
     }
 
-    /*
     @Override
     protected boolean isValidFragment(String fragmentName)
     {
         return SettingsFragment.class.getName().equals(fragmentName);
     }
-    */
 }
