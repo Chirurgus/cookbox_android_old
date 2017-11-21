@@ -3,6 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditTextPreference
-        android:key="pref_database"/>
+    <CheckBoxPreference
+        android:key="test_prop"
+        android:title="test_prop"
+        android:summary="A test property"
+        android:defaultValue="true" />
+
+    <!--
+    <ListPreference
+        android:key="pref_syncConnectionType"
+        android:title="test_prop_2"
+        android:entries="@array/pref_syncConnectionTypes_entries"
+        android:entryValues="@array/pref_syncConnectionTypes_values"
+        android:defaultValue="@string/pref_syncConnectionTypes_default" />
+        -->
+
 </PreferenceScreen>
