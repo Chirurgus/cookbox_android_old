@@ -23,10 +23,17 @@
         android:orderInCategory="3"
         />
 
-    <item android:id="@+id/main_test"
-        android:title="Test"
+    <item android:id="@+id/main_test_recipe"
+        android:title="Test recipe actiivty"
         android:icon="@drawable/ic_adb_black_24dp"
         app:showAsAction="ifRoom"
         android:orderInCategory="4"
+        />
+
+    <item android:id="@+id/main_test_settings"
+        android:title="Test settings actiivty"
+        android:icon="@drawable/ic_adb_black_24dp"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="5"
         />
 </menu>

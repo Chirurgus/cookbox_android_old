@@ -24,6 +24,7 @@ import java.util.Comparator;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
+import my.app.cookbox.activity.SettingsActivity;
 import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
@@ -158,21 +159,25 @@ public class RecipeListFragment extends ListFragment {
             case R.id.main_backup:
                 ((MainActivity) getActivity()).backupRecipes();
                 return true;
-            case R.id.main_test:
+            case R.id.main_test_recipe:
                 startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
+                return true;
+            case R.id.main_test_settings:
+                startPreferenceActivity();
                 return true;
             default:
                 return false;
         }
     }
 
-    private void backupRecies() {
-
-    }
-
     private void startRecipeActivity(long id) {
         Intent i = new Intent(getContext(), RecipeActivity.class);
         i.putExtra("id",id);
+        startActivity(i);
+    }
+
+    private void startPreferenceActivity() {
+        Intent i = new Intent(getContext(),my.app.cookbox.activity.SettingsActivity.class);
         startActivity(i);
     }
 
