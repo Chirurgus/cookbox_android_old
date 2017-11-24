@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import my.app.cookbox.R;
 import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
+import my.app.cookbox.fragment.SettingsFragment;
 import my.app.cookbox.fragment.TagSelectionListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
@@ -145,7 +147,10 @@ public class MainActivity extends BaseActivity {
 
         if (request_code == PROMPT_FOR_BACKUP_DIR_REQUEST_CODE  && result_code == RESULT_OK) {
             if (intent != null) {
-                _db_backup_dir = intent.getData();
+                SharedPreferences.Editor edit =
+                        getSharedPreferences(SettingsFragment.PREFERENCE_FILE_NAME, MODE_PRIVATE).edit();
+                edit.putString(SettingsFragment.PREFERENCE_DB_BACKUP_FILE_LOCATION_KEY, intent.getData().toString());
+                edit.apply();
                 backupRecipes();
             }
         }
@@ -243,14 +248,27 @@ public class MainActivity extends BaseActivity {
 
     public void backupRecipes() {
 
+        SharedPreferences sp = getSharedPreferences(SettingsFragment.PREFERENCE_FILE_NAME, MODE_PRIVATE);
+        String db_uri_str = sp.getString(SettingsFragment.PREFERENCE_DB_BACKUP_FILE_LOCATION_KEY, null);
+        if (db_uri_str == null) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
+        }
+        Uri db_file_location = Uri.parse(db_uri_str);
+        if (db_file_location != null) {
+            Toast.makeText(this, "URI Is null(from string)", Toast.LENGTH_SHORT).show();
+        }
+
+        /*
         if (_db_backup_dir == null) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
             startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
             return;
         }
+        */
 
         File old_db = new File(getApplicationInfo().dataDir + File.separator  +"databases/recipes.db");
-        DocumentFile df = DocumentFile.fromTreeUri(this, _db_backup_dir);
+        DocumentFile df = DocumentFile.fromTreeUri(this, db_file_location);
         DocumentFile backup = df.findFile("recipe.db");
         if (backup != null && backup.exists()) {
             ContentResolver cr = getContentResolver();
