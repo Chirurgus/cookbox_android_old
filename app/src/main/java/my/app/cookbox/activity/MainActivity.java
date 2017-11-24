@@ -253,10 +253,12 @@ public class MainActivity extends BaseActivity {
         if (db_uri_str == null) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
             startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
+            return;
         }
         Uri db_file_location = Uri.parse(db_uri_str);
-        if (db_file_location != null) {
+        if (db_file_location == null) {
             Toast.makeText(this, "URI Is null(from string)", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         /*
