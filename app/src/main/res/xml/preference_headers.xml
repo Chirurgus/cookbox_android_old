@@ -1,5 +1,6 @@
 <preference-headers
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- For now a too few options to need headers -->
 
     <header android:fragment="my.app.cookbox.fragment.SettingsFragment"
         android:title="Prefs 1"

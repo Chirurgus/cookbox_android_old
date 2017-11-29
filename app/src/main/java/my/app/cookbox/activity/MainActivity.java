@@ -261,14 +261,6 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
-        /*
-        if (_db_backup_dir == null) {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
-            return;
-        }
-        */
-
         File old_db = new File(getApplicationInfo().dataDir + File.separator  +"databases/recipes.db");
         DocumentFile df = DocumentFile.fromTreeUri(this, db_file_location);
         DocumentFile backup = df.findFile("recipe.db");
@@ -353,7 +345,6 @@ public class MainActivity extends BaseActivity {
 
     private RecipeListFragment _bottom_rlist_frag = null;
 
-    private Uri _db_backup_dir = null;
     private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;
 
     private String TAG = "MainActivity";
