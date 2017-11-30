@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
+import android.provider.Settings;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -148,8 +149,8 @@ public class MainActivity extends BaseActivity {
         if (request_code == PROMPT_FOR_BACKUP_DIR_REQUEST_CODE  && result_code == RESULT_OK) {
             if (intent != null) {
                 SharedPreferences.Editor edit =
-                        getSharedPreferences(SettingsFragment.PREFERENCE_FILE_NAME, MODE_PRIVATE).edit();
-                edit.putString(SettingsFragment.PREFERENCE_DB_BACKUP_FILE_LOCATION_KEY, intent.getData().toString());
+                        getSharedPreferences(getString(R.string.preference_file_name), MODE_PRIVATE).edit();
+                edit.putString(getString(R.string.preference_db_backup_file_location_key), intent.getData().toString());
                 edit.apply();
                 backupRecipes();
             }
@@ -248,8 +249,8 @@ public class MainActivity extends BaseActivity {
 
     public void backupRecipes() {
 
-        SharedPreferences sp = getSharedPreferences(SettingsFragment.PREFERENCE_FILE_NAME, MODE_PRIVATE);
-        String db_uri_str = sp.getString(SettingsFragment.PREFERENCE_DB_BACKUP_FILE_LOCATION_KEY, null);
+        SharedPreferences sp = getSharedPreferences(getString(R.string.preference_file_name), MODE_PRIVATE);
+        String db_uri_str = sp.getString(getString(R.string.preference_db_backup_file_location_key), null);
         if (db_uri_str == null) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
             startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
@@ -290,6 +291,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setupNavigationDrawer() {
+        ((Button) findViewById(R.id.drawer_settings_button))
+                .setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            startSettingsActivity();
+                                        }
+                                    }
+                );
         final ListView drawer_list = (ListView) findViewById(R.id.drawer_list);
 
         populateDrawerTagList(drawer_list);
@@ -343,6 +352,10 @@ public class MainActivity extends BaseActivity {
         );
     }
 
+    private void startSettingsActivity() {
+        Intent i = new Intent(this, SettingsActivity.class);
+        startActivity(i);
+    }
     private RecipeListFragment _bottom_rlist_frag = null;
 
     private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;

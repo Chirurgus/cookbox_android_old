@@ -3,26 +3,8 @@
     <!-- For now a too few options to need headers -->
 
     <header android:fragment="my.app.cookbox.fragment.SettingsFragment"
-        android:title="Prefs 1"
+        android:title="Cookbox main settings"
         android:icon="@drawable/ic_adb_black_24dp"
-        android:summary="An example of some preferences." />
-
-    <!--
-    <header android:fragment="com.example.android.apis.preference.PreferenceWithHeaders$Prefs2Fragment"
-        android:icon="@drawable/ic_settings_display"
-        android:title="Prefs 2"
-        android:summary="Some other preferences you can see.">
-         Arbitrary key/value pairs can be included with a header as
-             arguments to its fragment.
-        <extra android:name="someKey" android:value="someHeaderValue" />
-    </header>
-
-    <header android:icon="@drawable/ic_settings_display"
-        android:title="Intent"
-        android:summary="Launches an Intent.">
-        <intent android:action="android.intent.action.VIEW"
-            android:data="http://www.android.com" />
-    </header>
-    -->
+        android:summary="Settings for this app" />
 
 </preference-headers>

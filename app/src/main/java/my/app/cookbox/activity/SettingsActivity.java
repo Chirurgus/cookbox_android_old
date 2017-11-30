@@ -19,11 +19,18 @@ public class SettingsActivity extends PreferenceActivity {
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
 
+        /*
         getFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+                */
 
+    }
+
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.preference_headers,target);
     }
 
     @Override

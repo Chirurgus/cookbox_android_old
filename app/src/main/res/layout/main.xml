@@ -57,6 +57,13 @@
             android:layout_height="wrap_content"
             android:text="Add a Tag"
             android:background="@null"/>
+        <Button
+            android:id="@+id/drawer_settings_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Settings"
+            android:background="@null"/>
 
     </LinearLayout>
 
