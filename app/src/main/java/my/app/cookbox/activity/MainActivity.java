@@ -148,17 +148,13 @@ public class MainActivity extends BaseActivity {
 
         if (request_code == PROMPT_FOR_BACKUP_DIR_REQUEST_CODE  && result_code == RESULT_OK) {
             if (intent != null) {
-                SharedPreferences.Editor edit =
-                        getSharedPreferences(getString(R.string.preference_file_name), MODE_PRIVATE).edit();
-                edit.putString(getString(R.string.preference_db_backup_file_location_key), intent.getData().toString());
-                edit.apply();
+                _db_backup_location = intent.getData();
                 backupRecipes();
             }
         }
         else {
             Log.v(TAG, TAG + ".onActivityResult with RESULT_CANCELED called.");
         }
-
     }
 
     @Override
@@ -248,22 +244,14 @@ public class MainActivity extends BaseActivity {
     }
 
     public void backupRecipes() {
-
-        SharedPreferences sp = getSharedPreferences(getString(R.string.preference_file_name), MODE_PRIVATE);
-        String db_uri_str = sp.getString(getString(R.string.preference_db_backup_file_location_key), null);
-        if (db_uri_str == null) {
+        if (_db_backup_location == null) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
             startActivityForResult(intent, PROMPT_FOR_BACKUP_DIR_REQUEST_CODE);
             return;
         }
-        Uri db_file_location = Uri.parse(db_uri_str);
-        if (db_file_location == null) {
-            Toast.makeText(this, "URI Is null(from string)", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         File old_db = new File(getApplicationInfo().dataDir + File.separator  +"databases/recipes.db");
-        DocumentFile df = DocumentFile.fromTreeUri(this, db_file_location);
+        DocumentFile df = DocumentFile.fromTreeUri(this, _db_backup_location);
         DocumentFile backup = df.findFile("recipe.db");
         if (backup != null && backup.exists()) {
             ContentResolver cr = getContentResolver();
@@ -358,6 +346,7 @@ public class MainActivity extends BaseActivity {
     }
     private RecipeListFragment _bottom_rlist_frag = null;
 
+    private Uri _db_backup_location = null;
     private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;
 
     private String TAG = "MainActivity";
