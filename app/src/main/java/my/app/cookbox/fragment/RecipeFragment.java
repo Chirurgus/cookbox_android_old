@@ -49,6 +49,14 @@ public class RecipeFragment extends BaseFragment {
                 return false;
             }
         });
+
+        getRootView().setKeepScreenOn(true);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getRootView().setKeepScreenOn(false);
     }
 
     @Nullable
@@ -81,8 +89,6 @@ public class RecipeFragment extends BaseFragment {
         }
 
         setHasOptionsMenu(true);
-        //Keep screen on
-        getParent().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
