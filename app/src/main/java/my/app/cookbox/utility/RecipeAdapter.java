@@ -57,8 +57,6 @@ public class RecipeAdapter extends BaseAdapter {
     public View getView(int pos, View convertView, ViewGroup parent) {
         View ret;
 
-        Log.d(TAG, "Entered RecipeAdapter.getView with pos = " + pos);
-
         if (convertView != null && convertView instanceof RelativeLayout) {
             ret = convertView;
         }

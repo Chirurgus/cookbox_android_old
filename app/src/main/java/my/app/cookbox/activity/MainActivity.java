@@ -59,7 +59,10 @@ public class MainActivity extends BaseActivity {
 
         Log.d(TAG, TAG + ".onCreate(): ");
 
-        startBaseListFragment();
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() == 0) {
+            startListFragment();
+        }
 
         setupNavigationDrawer();
     }

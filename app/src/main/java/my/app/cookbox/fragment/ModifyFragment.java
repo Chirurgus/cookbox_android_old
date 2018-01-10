@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -86,6 +89,10 @@ public class ModifyFragment extends BaseFragment {
         else {
             _recipe = new Recipe();
         }
+
+        setHasOptionsMenu(true);
+
+        setRetainInstance(true);
     }
 
     @Override
@@ -93,15 +100,36 @@ public class ModifyFragment extends BaseFragment {
         super.onPause();
         Log.d(TAG, TAG + ".onPause called.");
 
-        updateRecipeList();
+        updateRecipe();
 
-        Toast toast = Toast.makeText(getContext(), "Recipe was saved.",Toast.LENGTH_SHORT);
-        toast.show();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.edit_recipe_toolbar, menu);
+    }
 
-    private void updateRecipeList() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit_recipe_save :
+                updateRecipe();
+                saveRecipe();
+                Toast toast = Toast.makeText(getContext(), "Recipe was saved.",Toast.LENGTH_SHORT);
+                toast.show();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateRecipe() {
         _recipe = readRecipe(_recipe.getId());
+    }
+
+    private void saveRecipe() {
         _recipe.setId(_parent.getSqlController().insertRecipe(_recipe));
         _parent.addToRecipeList(_recipe.getBasicRecipe());
     }

@@ -33,7 +33,9 @@ public class RecipeFragment extends BaseFragment {
         super.onStart();
         getParent().getSupportActionBar().setTitle("Recipe");
 
-        _recipe = getParent().getSqlController().getRecipe(_recipe_id);
+        if (_recipe == null) {
+            _recipe = getParent().getSqlController().getRecipe(_recipe_id);
+        }
         clearFields();
         populateFields(_recipe);
 
@@ -49,6 +51,14 @@ public class RecipeFragment extends BaseFragment {
                 return false;
             }
         });
+        if (_recipe.getTargetQuantity() <= 0) {
+            target_qty_et.setText(Float.toString(1));
+        }
+        else {
+            target_qty_et.setText(Float.toString(_tgt_scale * _recipe.getTargetQuantity()));
+        }
+        updateIngredientScale(Float.parseFloat(target_qty_et.getText().toString()));
+        scaleIngredientQty();
 
         getRootView().setKeepScreenOn(true);
     }
@@ -89,6 +99,8 @@ public class RecipeFragment extends BaseFragment {
         }
 
         setHasOptionsMenu(true);
+
+        setRetainInstance(true);
     }
 
     @Override

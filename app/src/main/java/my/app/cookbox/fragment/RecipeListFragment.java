@@ -64,6 +64,8 @@ public class RecipeListFragment extends ListFragment {
 
         Bundle b = getArguments();
         _tag_id = b.getLong("tag_id", Recipe.NO_ID);
+
+        setRetainInstance(true);
     }
 
     @Override
