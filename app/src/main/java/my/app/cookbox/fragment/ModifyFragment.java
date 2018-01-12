@@ -213,7 +213,12 @@ public class ModifyFragment extends BaseFragment {
         tgt_desc.setText(r.getTargetDescription());
 
         EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view);
-        target_qty.setText(r.getTargetQuantity().toString());
+        if (r.getTargetQuantity() <= 0) {
+            target_qty.setText(Float.toString(1));
+        }
+        else {
+            target_qty.setText(r.getTargetQuantity().toString());
+        }
 
         for (int i = 0; i < r.getIngredientDescriptions().size(); ++i) {
             expandIngredientList();
