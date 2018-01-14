@@ -28,6 +28,7 @@ public class SqlController extends SQLiteOpenHelper{
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
+        //needs to be disabled if db needs Upgrade
         db.setForeignKeyConstraintsEnabled(true);
     }
 
@@ -151,7 +152,38 @@ public class SqlController extends SQLiteOpenHelper{
             }
         }
         if (new_ver == 3) {
-            //TODO: remove the unique constraint on comments
+            String create_new_recipe_tbl = "CREATE TABLE new_recipe(\n" +
+                    "  id integer primary key,\n" +
+                    "  name text not null default \"\",\n" +
+                    "  short_description text not null default \"\",\n" +
+                    "  long_description text not null default \"\",\n" +
+                    "  target_quantity real not null default 1,\n" +
+                    "  target_description TEXT not null default \"\",\n" +
+                    "  source text not null default \"\"\n" +
+                    ");";
+            String create_new_comment_tbl = "CREATE TABLE new_comment_list(\n" +
+                    "  recipe_id integer not null references recipe(id),\n" +
+                    "  comment text not null\n" +
+                    ");";
+            String move_to_new_recipe = "insert into new_recipe(id,name,short_description,long_description,target_quantity,target_description) select id,name,short_description,long_description,target_quantity,target_description from recipe;";
+            String move_to_new_comment = "insert into new_comment_list(recipe_id,comment) select recipe_id,comment from comment_list;";
+            String drop_recipe_tbl = "drop table recipe";
+            String drop_comment_tbl = "drop table comment_list";
+            String rename_recipe_tbl = "alter table new_recipe rename to recipe;";
+            String rename_comment_tbl = "alter table new_comment_list rename to comment_list;";
+            try {
+                db.execSQL(create_new_recipe_tbl);
+                db.execSQL(create_new_comment_tbl);
+                db.execSQL(move_to_new_recipe);
+                db.execSQL(move_to_new_comment);
+                db.execSQL(drop_recipe_tbl);
+                db.execSQL(drop_comment_tbl);
+                db.execSQL(rename_recipe_tbl);
+                db.execSQL(rename_comment_tbl);
+            } catch (Exception e) {
+                Log.e(TAG, TAG + ".onUpgrade transaction failed.");
+                throw e;
+            }
         }
     }
 
@@ -800,6 +832,6 @@ public class SqlController extends SQLiteOpenHelper{
 
     private static String TAG = "SqlController";
 
-    private static int DB_VERSION = 2;
+    private static int DB_VERSION = 3;
     private static String DB_NAME = "recipes.db";
 }
