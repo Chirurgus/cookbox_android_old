@@ -19,8 +19,8 @@ import my.app.cookbox.recipe.RecipeTag;
  */
 
 public class SqlController extends SQLiteOpenHelper{
-    public SqlController(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+    public SqlController(Context context, String db_name) {
+        super(context, db_name, null, DB_VERSION);
 
         Log.d(TAG, "SqlController started.");
     }
@@ -833,5 +833,7 @@ public class SqlController extends SQLiteOpenHelper{
     private static String TAG = "SqlController";
 
     private static int DB_VERSION = 3;
-    private static String DB_NAME = "recipes.db";
+
+    public static String defaultDbName = "recipes.db";
+    public static String defaultDbDir = "";
 }

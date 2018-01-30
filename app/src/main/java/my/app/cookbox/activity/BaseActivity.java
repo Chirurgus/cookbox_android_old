@@ -70,5 +70,5 @@ abstract public class BaseActivity extends AppCompatActivity {
         return new_frag;
     }
 
-    private SqlController _sqlctrl = new SqlController(this);
+    private SqlController _sqlctrl = new SqlController(this, SqlController.defaultDbDir + SqlController.defaultDbName);
 }
