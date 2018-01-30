@@ -155,6 +155,12 @@ public class MainActivity extends BaseActivity {
                 backupRecipes();
             }
         }
+        else if (request_code == PROMPT_FOR_DB_DIR_REQUEST_CODE  && result_code == RESULT_OK) {
+            if (intent != null) {
+                _db_location = intent.getData();
+                openDb();
+            }
+        }
         else {
             Log.v(TAG, TAG + ".onActivityResult with RESULT_CANCELED called.");
         }
@@ -281,6 +287,16 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+     public void openDb() {
+        if (_db_location == null) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            startActivityForResult(intent, PROMPT_FOR_DB_DIR_REQUEST_CODE);
+            return;
+        }
+
+        super.setSqlDbName(_db_location.getPath());
+    }
+
     private void setupNavigationDrawer() {
         ((Button) findViewById(R.id.drawer_settings_button))
                 .setOnClickListener(new View.OnClickListener() {
@@ -350,7 +366,9 @@ public class MainActivity extends BaseActivity {
     private RecipeListFragment _bottom_rlist_frag = null;
 
     private Uri _db_backup_location = null;
+    private Uri _db_location = null;//if not default db
     private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;
+    private int PROMPT_FOR_DB_DIR_REQUEST_CODE = 2;
 
     private String TAG = "MainActivity";
 }

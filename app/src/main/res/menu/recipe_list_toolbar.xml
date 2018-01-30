@@ -8,32 +8,37 @@
         app:showAsAction="ifRoom"
         android:orderInCategory="1"
         />
-
+    <item android:id="@+id/main_open_db"
+        android:title="Test settings actiivty"
+        android:icon="@drawable/ic_add_black_24dp"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="2"
+        />
     <item android:id="@+id/main_sort"
         android:title="Sort"
         android:icon="@drawable/ic_sort_black_24dp"
         app:showAsAction="ifRoom"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         />
 
     <item android:id="@+id/main_backup"
         android:title="Backup database"
         android:icon="@drawable/ic_backup_black_24dp"
         app:showAsAction="ifRoom"
-        android:orderInCategory="3"
+        android:orderInCategory="4"
         />
 
     <item android:id="@+id/main_test_recipe"
         android:title="Test recipe actiivty"
         android:icon="@drawable/ic_adb_black_24dp"
         app:showAsAction="ifRoom"
-        android:orderInCategory="4"
+        android:orderInCategory="5"
         />
 
     <item android:id="@+id/main_test_settings"
         android:title="Test settings actiivty"
         android:icon="@drawable/ic_adb_black_24dp"
         app:showAsAction="ifRoom"
-        android:orderInCategory="5"
+        android:orderInCategory="6"
         />
 </menu>

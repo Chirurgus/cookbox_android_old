@@ -158,6 +158,9 @@ public class RecipeListFragment extends ListFragment {
             case R.id.main_sort:
                 sortRecipes();
                 return true;
+            case R.id.main_open_db:
+                ((MainActivity) getActivity()).openDb();
+                return true;
             case R.id.main_backup:
                 ((MainActivity) getActivity()).backupRecipes();
                 return true;
@@ -194,6 +197,7 @@ public class RecipeListFragment extends ListFragment {
                 }
          );
     }
+
     private boolean sort_order = false;
     private long _tag_id = Recipe.NO_ID;
 }

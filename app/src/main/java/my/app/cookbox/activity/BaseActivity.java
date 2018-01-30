@@ -70,5 +70,10 @@ abstract public class BaseActivity extends AppCompatActivity {
         return new_frag;
     }
 
+    protected void setSqlDbName(String db_name) {
+        _sqlctrl.close();
+        _sqlctrl = new SqlController(this, db_name);
+    }
+
     private SqlController _sqlctrl = new SqlController(this, SqlController.defaultDbDir + SqlController.defaultDbName);
 }
