@@ -22,6 +22,10 @@
         <activity android:name=".activity.RecipeActivity"/>
         <activity android:name=".activity.SettingsActivity"/>
 
+        <provider android:name=".sqlite.RecipeProvider"
+                  android:authorities="my.app.cookbox.recipe_provider"
+            />
+
     </application>
 
 </manifest>

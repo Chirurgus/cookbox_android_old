@@ -3,11 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Jsch/Jsch.iml" filepath="$PROJECT_DIR$/Jsch/Jsch.iml" />
-      <module fileurl="file://C:\Documents\Projects\cookbox\Jsch\Jsch.iml" filepath="C:\Documents\Projects\cookbox\Jsch\Jsch.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/cookbox.iml" filepath="$PROJECT_DIR$/cookbox.iml" />
       <module fileurl="file://$PROJECT_DIR$/jzlib/jzlib.iml" filepath="$PROJECT_DIR$/jzlib/jzlib.iml" />
-      <module fileurl="file://C:\Documents\Projects\cookbox\jzlib\jzlib.iml" filepath="C:\Documents\Projects\cookbox\jzlib\jzlib.iml" />
     </modules>
   </component>
 </project>
