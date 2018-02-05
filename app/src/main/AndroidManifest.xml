@@ -24,7 +24,9 @@
 
         <provider android:name=".sqlite.RecipeProvider"
                   android:authorities="my.app.cookbox.recipe_provider"
-            />
+                  android:exported="false"
+                  android:enabled="true">
+        </provider>
 
     </application>
 
