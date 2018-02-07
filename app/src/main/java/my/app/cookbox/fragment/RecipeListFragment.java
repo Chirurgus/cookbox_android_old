@@ -1,8 +1,12 @@
 package my.app.cookbox.fragment;
 
 import android.app.ListFragment;
+import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,7 +32,9 @@ import my.app.cookbox.activity.SettingsActivity;
 import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
+import my.app.cookbox.sqlite.RecipeProvider;
 import my.app.cookbox.utility.RecipeAdapter;
+import my.app.cookbox.utility.RecipeCursorAdapter;
 
 /**
  * Created by Alexander on 020, 20 Jun.
@@ -53,7 +59,15 @@ public class RecipeListFragment extends ListFragment {
         else {
             recipes = ((MainActivity) getActivity()).getSqlController().getAllBasicRecipes();
         }
-        setListAdapter(new RecipeAdapter(recipes, getContext()));
+        Cursor list_cursor = getContext()
+                .getContentResolver()
+                .query(RecipeProvider.recipe_list_uri,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        setListAdapter(new RecipeCursorAdapter(getContext(),list_cursor,R.layout.recipe_list_item,true));
     }
 
     @Override
@@ -159,7 +173,21 @@ public class RecipeListFragment extends ListFragment {
                 sortRecipes();
                 return true;
             case R.id.main_open_db:
-                ((MainActivity) getActivity()).openDb();
+                Cursor c = getContext().getContentResolver().query(// Select short_description from recipe
+                        RecipeProvider.recipe_uri,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+                if (c.moveToFirst()) {
+                    do {
+                        if (!c.isNull(0)) {
+                            String s = DatabaseUtils.dumpCursorToString(c);
+                            Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
+                        }
+                    } while (c.moveToNext());
+                }
                 return true;
             case R.id.main_backup:
                 ((MainActivity) getActivity()).backupRecipes();
