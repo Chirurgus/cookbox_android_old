@@ -1,0 +1,21 @@
+CREATE TABLE new_comment_list(                            
+  recipe_id integer not null references recipe(id),   
+  comment text not null
+);  
+
+CREATE TABLE new_recipe(                                
+  id integer primary key,                             
+  name text not null default "",                      
+  short_description text not null default "",         
+  long_description text not null default "",          
+  target_quantity real not null default 1,                      
+  target_description TEXT not null default "",
+  source text not null default ""
+); 
+           
+insert into new_comment_list(recipe_id,comment) select recipe_id,comment from comment_list;
+insert into new_recipe(id,name,short_description,long_description,target_quantity,target_description) select id,name,short_description,long_description,target_quantity,target_description from recipe;
+drop table recipe
+drop table comment_list
+alter table new_recipe rename to recipe;
+alter table new_comment_list rename to comment_list;

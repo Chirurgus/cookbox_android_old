@@ -1,0 +1,40 @@
+CREATE TABLE tmp_recipe(
+  id integer primary key,
+  name text not null default "",
+  short_description text not null default "",
+  long_description text not null default "",
+  target_quantity real not null,
+  target_description TEXT not null default ""
+);
+
+CREATE TABLE tmp_tag(
+  id integer primary key,
+  tag text non null unique
+);
+CREATE TABLE tmp_tag_list(
+  tag_id integer not null references tag(id),
+  recipe_id integer not null references recipe(id)
+);
+CREATE TABLE tmp_instruction_list(
+  recipe_id integer references recipe(id),
+  position integer not null,
+  instruction text not null
+);
+CREATE TABLE tmp_ingredient_list(
+  recipe_id integer not null references recipe(id),
+  quantity real not null,
+  description text not null,
+  other_recipe integer null references recipe(id)
+);
+CREATE TABLE tmp_comment_list(
+  recipe_id integer not null references recipe(id),
+  comment text not null unique
+);
+
+insert into tmp_recipe(id,name,short_description,long_description,
+target_quantity) select id,name,short_description,
+long_description,cast(target_quantity as real) from recipe;
+
+insert into tmp_ingredient_list(recipe_id, quantity, description, other_recipe)
+select recipe_id, cast(quantity as real), description, other_recipe from
+ingredient_list;
