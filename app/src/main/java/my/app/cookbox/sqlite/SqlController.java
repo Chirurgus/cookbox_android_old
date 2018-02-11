@@ -835,5 +835,6 @@ public class SqlController extends SQLiteOpenHelper{
     private static int DB_VERSION = 3;
 
     public static String defaultDbName = "recipes.db";
+    public static String testDbName = "test.db";
     public static String defaultDbDir = "";
 }

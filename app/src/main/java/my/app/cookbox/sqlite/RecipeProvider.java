@@ -6,9 +6,11 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 /**
  * Created by Alexander on 003, 3 Feb.
@@ -25,12 +27,13 @@ import android.support.annotation.Nullable;
 public class RecipeProvider extends ContentProvider {
     public static final String authority = "my.app.cookbox.recipe_provider";
 
-    private static final String recipe_table = "recipe";
-    private static final String instruction_table = "instruction_list";
-    private static final String ingredient_table = "ingredient_list";
-    private static final String comment_table = "comment_list";
-    private static final String tag_table = "tag_list";
-    private static final String tag_list_table = "tag";
+    public static final String recipe_table = "recipe";
+    public static final String instruction_table = "instruction_list";
+    public static final String ingredient_table = "ingredient_list";
+    public static final String comment_table = "comment_list";
+    public static final String tag_table = "tag_list";
+    public static final String tag_list_table = "tag";
+
     private static final String content_uri = "content://" + authority;
 
     public static final Uri recipe_uri = Uri.parse(content_uri + "/" + recipe_table);
@@ -43,6 +46,10 @@ public class RecipeProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        if (getContext() == null) {
+            return false;
+        }
+        initSqlCtrl();
         return true;
     }
 
@@ -76,7 +83,8 @@ public class RecipeProvider extends ContentProvider {
             default:
                 return null;
         }
-        SQLiteDatabase db = _sql_ctrl.getReadableDatabase();
+        initSqlCtrl();
+        SQLiteDatabase db = getReadableDatabase();
         return db.query(table,projection,selection,selection_arg,null,null,sort_order);
     }
 
@@ -107,7 +115,7 @@ public class RecipeProvider extends ContentProvider {
             default:
                 return null;
         }
-        SQLiteDatabase db = _sql_ctrl.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         long id = db.insertWithOnConflict(table,null, contentValues,SQLiteDatabase.CONFLICT_REPLACE);
         return ContentUris.withAppendedId(uri, id);
     }
@@ -140,7 +148,7 @@ public class RecipeProvider extends ContentProvider {
             default:
                 return 0;
         }
-        SQLiteDatabase db = _sql_ctrl.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         return db.updateWithOnConflict(
                 table,
                 contentValues,
@@ -186,7 +194,7 @@ public class RecipeProvider extends ContentProvider {
             default:
                 return 0;
         }
-        SQLiteDatabase db = _sql_ctrl.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         return db.delete(table, selection, selectionArgs);
     }
 
@@ -212,7 +220,24 @@ public class RecipeProvider extends ContentProvider {
         }
     }
 
-    private SqlController _sql_ctrl = new SqlController(getContext(), SqlController.defaultDbDir);
+    private SQLiteDatabase getReadableDatabase() {
+         if (_sql_ctrl == null) {
+            initSqlCtrl();
+        }
+        return _sql_ctrl.getReadableDatabase();
+    }
+    private SQLiteDatabase getWritableDatabase() {
+        if (_sql_ctrl == null) {
+            initSqlCtrl();
+        }
+        return _sql_ctrl.getWritableDatabase();
+    }
+
+    private void initSqlCtrl() {
+        _sql_ctrl = new SqlController(getContext(),SqlController.defaultDbName);
+    }
+
+    private SqlController _sql_ctrl = null;
     private static final UriMatcher _uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private static final int recipe = 1;
@@ -227,7 +252,7 @@ public class RecipeProvider extends ContentProvider {
        _uriMatcher.addURI(authority, ingredient_table,ingredient);
        _uriMatcher.addURI(authority, instruction_table,instruction);
        _uriMatcher.addURI(authority, comment_table,comments);
-       _uriMatcher.addURI(authority,tag_table,tag);
-       _uriMatcher.addURI(authority,tag_list_table,tag_list);
+       _uriMatcher.addURI(authority, tag_table,tag);
+       _uriMatcher.addURI(authority, tag_list_table,tag_list);
     }
 }
