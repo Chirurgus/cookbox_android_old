@@ -18,7 +18,8 @@ import my.app.cookbox.recipe.BasicRecipe;
  * Created by Alexander on 012, 12 Sep.
  */
 
-public class TagSelectionAdapter extends RecipeAdapter{
+public class TagSelectionAdapter { /*extends RecipeAdapter{
+    /*
     public TagSelectionAdapter(ArrayList<BasicRecipe> d, ArrayList<BasicRecipe> tagged_recipes, Context c) {
         super(d,c);
 
@@ -74,4 +75,5 @@ public class TagSelectionAdapter extends RecipeAdapter{
         return ret;
     }
     ArrayList<Boolean> _tagged;
+    */
 }

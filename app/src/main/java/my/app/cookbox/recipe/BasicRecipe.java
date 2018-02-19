@@ -8,24 +8,26 @@ import java.util.ArrayList;
 
 public  class BasicRecipe {
 
-    public BasicRecipe(long id,
-                  String name,
-                  String short_desc,
-                  ArrayList<String> tags) {
-        _id = id; _name = name; _short_desc = short_desc; _tags = tags;
+    public static final long NO_ID = -1;
+
+    public Long id = null;
+    public String name = "";
+    public String short_desc = "";
+    public String long_desc = "";
+    public Float target_quantity = 1f;
+    public String target_description = "";
+    public String source = "";
+
+    public ArrayList<RecipeIngredient> ingredients = new ArrayList<>();
+    public ArrayList<String> instructions = new ArrayList<>();
+    public ArrayList<String> comments = new ArrayList<>();
+    public ArrayList<Long> tags = new ArrayList<>();
+
+    public static class RecipeIngredient {
+        public RecipeIngredient() {}
+
+        public Float quantity = 1f;
+        public String description = "";
+        public Long other_recipe_id = null;
     }
-    public long getId() { return _id; }
-    public String getName() { return _name; }
-    public String getShortDescription() { return _short_desc; }
-
-    public ArrayList<String> getTags() { return _tags; }
-
-
-    public static long NO_ID = -1;
-
-    private long _id = NO_ID;
-    private String _name = "";
-    private String _short_desc = "";
-
-    private ArrayList<String> _tags = new ArrayList<>();
 }

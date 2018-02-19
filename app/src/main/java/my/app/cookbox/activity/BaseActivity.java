@@ -22,15 +22,6 @@ import my.app.cookbox.utility.TagSelectionAdapter;
 
 abstract public class BaseActivity extends AppCompatActivity {
 
-
-    public ArrayList<BasicRecipe> getAllBasicRecipes() {
-        return getSqlController().getAllBasicRecipes();
-    }
-
-    public SqlController getSqlController() {
-        return _sqlctrl;
-    }
-
     abstract public RecipeFragment startRecipeFragment(Long id);
     abstract public ModifyFragment startModifyFragment(Long id);
     abstract public RecipeFragment startRecipeFragment(Long id, boolean addToBackStack);
@@ -69,11 +60,4 @@ abstract public class BaseActivity extends AppCompatActivity {
         ft.commit();
         return new_frag;
     }
-
-    protected void setSqlDbName(String db_name) {
-        _sqlctrl.close();
-        _sqlctrl = new SqlController(this, db_name);
-    }
-
-    private SqlController _sqlctrl = new SqlController(this, SqlController.defaultDbDir + SqlController.defaultDbName);
 }

@@ -34,6 +34,10 @@ public class RecipeProvider extends ContentProvider {
     public static final String tag_table = "tag_list";
     public static final String tag_list_table = "tag";
 
+    // Uri for cursor, returns a cursor with '_id' column
+    // Selection must contain 'id'
+    public static final String recipe_list_table = "recipe_list";
+
     private static final String content_uri = "content://" + authority;
 
     public static final Uri recipe_uri = Uri.parse(content_uri + "/" + recipe_table);
@@ -42,6 +46,7 @@ public class RecipeProvider extends ContentProvider {
     public static final Uri comment_uri = Uri.parse(content_uri + "/" + comment_table);
     public static final Uri tag_uri = Uri.parse(content_uri + "/" + tag_table);
     public static final Uri tag_list_uri = Uri.parse(content_uri + "/" + tag_list_table);
+    public static final Uri recipe_list_uri = Uri.parse(content_uri + "/" + recipe_list_table);
 
 
     @Override
@@ -80,10 +85,15 @@ public class RecipeProvider extends ContentProvider {
             case tag_list:
                 table = tag_list_table;
                 break;
+            case recipe_list:
+                return getReadableDatabase()
+                        .rawQuery(
+                                "SELECT id AS _id,name,short_description FROM recipe",
+                                null
+                        );
             default:
                 return null;
         }
-        initSqlCtrl();
         SQLiteDatabase db = getReadableDatabase();
         return db.query(table,projection,selection,selection_arg,null,null,sort_order);
     }
@@ -116,7 +126,7 @@ public class RecipeProvider extends ContentProvider {
                 return null;
         }
         SQLiteDatabase db = getWritableDatabase();
-        long id = db.insertWithOnConflict(table,null, contentValues,SQLiteDatabase.CONFLICT_REPLACE);
+        long id = db.insertWithOnConflict(table,null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -179,18 +189,6 @@ public class RecipeProvider extends ContentProvider {
             case tag:
                 table = tag_table;
                 break;
-/*
-            case all_tags:
-                table = "tag";
-            case all_recipes:
-                table = "recipe";
-            case all_ingredients:
-                table = "ingredient";
-            case all_instructions:
-                table = "instruction";
-            case all_comments:
-                table = "comment";
-                */
             default:
                 return 0;
         }
@@ -246,6 +244,7 @@ public class RecipeProvider extends ContentProvider {
     private static final int comments = 7;
     private static final int tag = 9;
     private static final int tag_list = 11;
+    private static final int recipe_list = 13;
 
     static {
        _uriMatcher.addURI(authority, recipe_table,recipe);
@@ -254,5 +253,6 @@ public class RecipeProvider extends ContentProvider {
        _uriMatcher.addURI(authority, comment_table,comments);
        _uriMatcher.addURI(authority, tag_table,tag);
        _uriMatcher.addURI(authority, tag_list_table,tag_list);
+       _uriMatcher.addURI(authority, recipe_list_table,recipe_list);
     }
 }

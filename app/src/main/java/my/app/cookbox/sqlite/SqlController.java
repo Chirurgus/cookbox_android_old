@@ -19,6 +19,15 @@ import my.app.cookbox.recipe.RecipeTag;
  */
 
 public class SqlController extends SQLiteOpenHelper{
+
+    public Cursor rawQuery(String table,
+                           String[] columns,
+                           String selection,
+                           String[] selectionArgs) {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.query(table,columns,selection,selectionArgs,null,null,null);
+    }
+
     public SqlController(Context context, String db_name) {
         super(context, db_name, null, DB_VERSION);
 
@@ -36,45 +45,40 @@ public class SqlController extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
-            String create_recipe_table = "CREATE TABLE recipe(\n" +
-                    "  id integer primary key,\n" +
-                    "  name text not null default \"\",\n" +
-                    "  short_description text not null default \"\",\n" +
-                    "  long_description text not null default \"\",\n" +
-                    "  target_quantity real not null,\n" +
-                    "  target_description text not null default \"\"\n" +
-                    ");";
-            String create_tag_table = "CREATE TABLE tag(\n" +
-                    "  id integer primary key,\n" +
-                    "  tag text non null unique\n" +
-                    ");";
-            String create_tag_list_table = "CREATE TABLE tag_list(\n" +
-                    "  tag_id integer not null references tag(id),\n" +
-                    "  recipe_id integer not null references recipe(id)\n" +
-                    ");";
-            String create_instruction_list = "CREATE TABLE instruction_list(\n" +
-                    "  recipe_id integer references recipe(id),\n" +
-                    "  position integer not null,\n" +
-                    "  instruction text not null\n" +
-                    ");";
-            String create_ingredient_list = "CREATE TABLE ingredient_list(\n" +
-                    "  recipe_id integer not null references recipe(id),\n" +
-                    "  quantity real not null,\n" +
-                    "  description text not null,\n" +
-                    "  other_recipe integer null references recipe(id)\n" +
-                    ");";
-            String create_comment_list = "CREATE TABLE comment_list(\n" +
-                    "  recipe_id integer not null references recipe(id),\n" +
-                    "  comment text not null unique\n" +
-                    ");";
+            String create_tag = "CREATE TABLE tag("
+                    +"id integer primary key,"
+                    +"tag text unique not null);";
+            String create_tag_list = "CREATE TABLE tag_list("
+                    +"tag_id integer not null references tag(id),"
+                    +"recipe_id integer not null references recipe(id));";
+            String create_instruction_list = "CREATE TABLE instruction_list("
+                    + "recipe_id integer not null references recipe(id),"
+                    + "position integer not null,"
+                    + "instruction text not null default \"\");";
+            String create_comment_list = "CREATE TABLE comment_list("
+                    +"recipe_id integer not null references recipe(id),"
+                    +"comment text not null default \"\");";
+            String create_recipe = "CREATE TABLE recipe("
+                    +"id integer primary key,"
+                    +"name text not null default \"\","
+                    +"short_description text not null default \"\","
+                    +"long_description text not null default \"\","
+                    +"target_quantity real not null default 1,"
+                    +"target_description text not null default \"\","
+                    +"preparation_time real not null default 0,"
+                    +"source text not null default \"\");";
+            String create_ingredient_list = "CREATE TABLE ingredient_list("
+                    +"recipe_id integer not null references recipe(id),"
+                    +"quantity real not null default 1,"
+                    +"description text not null default \"\","
+                    +"other_recipe integer null references recipe(id));";
 
-            db.execSQL(create_tag_table);
-            db.execSQL(create_recipe_table);
-            db.execSQL(create_tag_list_table);
+            db.execSQL(create_tag);
+            db.execSQL(create_recipe);
+            db.execSQL(create_tag_list);
             db.execSQL(create_ingredient_list);
             db.execSQL(create_instruction_list);
             db.execSQL(create_comment_list);
-
 
             db.setTransactionSuccessful();
         }
@@ -92,7 +96,7 @@ public class SqlController extends SQLiteOpenHelper{
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int old_ver, int new_ver) {
-        if (new_ver == 2) {
+        if (old_ver < 2) {
             String drop_unit_tbl = "DROP TABLE unit";
             String create_new_recipe_tbl = "CREATE TABLE tmp_recipe(\n" +
                     "  id integer primary key,\n" +
@@ -151,7 +155,7 @@ public class SqlController extends SQLiteOpenHelper{
                 throw e;
             }
         }
-        if (new_ver == 3) {
+        if (old_ver < 3) {
             String create_new_recipe_tbl = "CREATE TABLE new_recipe(\n" +
                     "  id integer primary key,\n" +
                     "  name text not null default \"\",\n" +
@@ -185,656 +189,67 @@ public class SqlController extends SQLiteOpenHelper{
                 throw e;
             }
         }
-    }
+        if (old_ver < 4) {
+            String create_new_tag = "CREATE TABLE new_tag("
+                    +"id integer primary key,"
+                    +"tag text unique not null);";
+            String move_to_new_tag = "INSERT INTO new_tag SELECT * FROM tag;";
 
-    @Override
-    public String getDatabaseName() {
-        return "recipes.db";
-    }
-
-    public ArrayList<BasicRecipe> getAllBasicRecipes() {
-        Log.v(TAG, TAG + ".getAllRecipes called.");
-
-        SQLiteDatabase db = getReadableDatabase();
-        ArrayList<BasicRecipe> ret = new ArrayList<>();
-        try
-        {
-            db.beginTransaction();
-
-            for (long id : getAllRecipeIds()) {
-                ret.add(getBasicRecipe(id));
-            }
-
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".getAllBasicRecipes transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public ArrayList<Long> getAllRecipeIds() {
-        Log.v(TAG, TAG + ".getAllRecipeNames called.");
-
-        SQLiteDatabase db = getReadableDatabase();
-        ArrayList<Long> ret = new ArrayList<>();
-        db.beginTransaction();
-        try {
-            String q = "SELECT id FROM recipe;";
-            Cursor c = db.rawQuery(q, null);
-            if (c.moveToFirst()) {
-                do {
-                    ret.add(c.getLong(c.getColumnIndex("id")));
-                } while (c.moveToNext());
-            }
-            c.close();
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".getALlRecipeIds transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public Recipe getRecipe(long id) {
-        Log.v(TAG, TAG + ".getRecipe called.");
-
-        SQLiteDatabase db = getReadableDatabase();
-        db.beginTransaction();
-        Recipe ret = null;
-        try {
-            ret = readRecipe(id,db);
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".getRecipe transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public BasicRecipe getBasicRecipe(long id) {
-        SQLiteDatabase db = getReadableDatabase();
-        db.beginTransaction();
-        BasicRecipe ret = null;
-        try {
-            Cursor c = db.query("recipe",
-                    new String[] {"name", "short_description"},
-                    "id = ?",
-                    new String[] {"" + id},
-                    null,
-                    null,
-                    null);
-            if (c.moveToFirst()) {
-                String name = c.getString(c.getColumnIndex("name"));
-                String short_desc = c.getString(c.getColumnIndex("short_description"));
-                ArrayList<String> tags = readTags(id, db);
-
-                ret = new BasicRecipe(id, name, short_desc, tags);
-            }
-            c.close();
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".getBasicRecipe transaction failed.");
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public ArrayList<RecipeTag> getAllRecipeTags() {
-        SQLiteDatabase db = getReadableDatabase();
-        db.beginTransaction();
-        ArrayList<RecipeTag> ret = new ArrayList<>();
-        try {
-            Cursor c = db.query("tag",
-                    new String[] {"id", "tag"},
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
-            if (c.moveToFirst()) {
-                do {
-                    long id = c.getLong(c.getColumnIndex("id"));
-                    String name = c.getString(c.getColumnIndex("tag"));
-                    RecipeTag category = new RecipeTag(id, name);
-
-                    ret.add(category);
-                } while (c.moveToNext());
-            }
-            c.close();
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".getAllRecipeTags transaction failed.");
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public ArrayList<BasicRecipe> getTaggedBasicRecipe(long tag_id) {
-        SQLiteDatabase db = getReadableDatabase();
-        db.beginTransaction();
-        ArrayList<BasicRecipe> ret = new ArrayList<>();
-        try {
-            Cursor c = db.query("tag_list",
-                    new String[] {"recipe_id"},
-                    "tag_id = ?",
-                    new String[] {"" + tag_id},
-                    null,
-                    null,
-                    null);
-            if (c.moveToFirst()) {
-                ArrayList<Long> recipe_ids = new ArrayList<>();
-                do {
-                    recipe_ids.add(c.getLong(c.getColumnIndex("recipe_id")));
-                } while (c.moveToNext());
-
-                for (Long id : recipe_ids) {
-                    ret.add(getBasicRecipe(id));
-                }
-            }
-            c.close();
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".getAllTaggedBasicRecipe transaction failed.");
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-
-    }
-
-    public long insertRecipe(Recipe r) {
-        Log.v(TAG, TAG + ".insertRecipe called.");
-
-        SQLiteDatabase db = getWritableDatabase();
-        long ret = Recipe.NO_ID;
-        db.beginTransaction();
-        try {
-            ret = updateRecipe(r,db);
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".insertRecipe Transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public void addRecipeToTag(long recipe_id, long tag_id) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try {
-            ContentValues cv = new ContentValues();
-            cv.put("recipe_id", recipe_id);
-            cv.put("tag_id", tag_id);
-            int u = db.update("tag_list",
-                    cv,
-                    "recipe_id = ? AND tag_id = ?",
-                    new String[] {recipe_id + "", tag_id + ""}
-            );
-            if (u == 0) {
-                db.insertOrThrow("tag_list", null, cv);
-            }
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".addRecipeToTag transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-    }
-
-    public long insertNewTag(String tag_name) {
-        long ret = Recipe.NO_ID;
-        SQLiteDatabase db = getWritableDatabase();
-
-        db.beginTransaction();
-        try {
-            ret = lookupTag(tag_name, db);
-
-            db.setTransactionSuccessful();
-        }
-        catch(Exception e) {
-            Log.e(TAG, TAG + ".insertTag transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public void removeRecipe(long id) {
-        Log.v(TAG, TAG + ".removeRecipe called.");
-
-        SQLiteDatabase db = getWritableDatabase();
-
-        db.beginTransaction();
-        try {
-            db.delete("comment_list",
-                    "recipe_id =?",
-                    new String[] {""+id});
-            db.delete("ingredient_list",
-                    "recipe_id = ?",
-                    new String[] {"" + id});
-            db.delete("instruction_list",
-                    "recipe_id = ?",
-                    new String[] {"" + id});
-            db.delete("tag_list",
-                    "recipe_id = ?",
-                    new String[] {"" + id});
-            db.delete("recipe",
-                    "id = ?",
-                    new String[] {"" + id});
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".removeRecipe transaction failed.");
-            throw e;
-        }
-        finally {
-           db.endTransaction();
-        }
-    }
-
-    public void removeTagFromRecipe(long tag_id, long recipe_tag) {
-         SQLiteDatabase db = getWritableDatabase();
-
-        db.beginTransaction();
-        try {
-            db.delete("tag_list",
-                    "tag_id = ? AND recipe_id = ?",
-                    new String[] {"" + tag_id, "" + recipe_tag});
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".removeTagFromRecipe transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-    }
-
-    public void removeTag(long id) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        db.beginTransaction();
-        try {
-            db.delete("tag_list",
-                    "tag_id = ?",
-                    new String[] {"" + id}
-            );
-            db.delete("tag",
-                    "id = ?",
-                    new String[] {"" + id}
-            );
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".removeTag transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-    }
-
-    public boolean renameTag(long id, String name) {
-        SQLiteDatabase db = getWritableDatabase();
-        boolean ret = false;
-        db.beginTransaction();
-        try {
-            ContentValues cv = new ContentValues();
-            cv.put("id", id);
-            cv.put("tag", name);
-            int u = db.update("tag",
-                    cv,
-                    "id = ?",
-                    new String[] {id + ""}
-            );
-            if (u == 0) {
-                ret = false;
-            }
-            else {
-                ret = true;
-            }
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".removeTag transaction failed.");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-        return ret;
-    }
-
-    public void clearOpenedDatabase() {
-        Log.v(TAG, TAG + ".clearOpenedDatabase called.");
-
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try {
-            /*
-            for (long id : getAllRecipeIds()) {
-                removeRecipe(id);
-            }
-            */
-            db.delete("comment_list", "1 = 1", null);
-            db.delete("ingredient_list", "1 = 1", null);
-            db.delete("instruction_list", "1 = 1", null);
-            db.delete("tag_list", "1 = 1", null);
-            db.delete("tag", "1 = 1", null);
-            db.delete("recipe", "1 = 1", null);
-
-            db.setTransactionSuccessful();
-        }
-        catch (Exception e) {
-            Log.e(TAG, TAG + ".clearOpenedDatabase transaction failed");
-            throw e;
-        }
-        finally {
-            db.endTransaction();
-        }
-    }
-
-    private Recipe readRecipe(long id, SQLiteDatabase db) {
-        Recipe ret = null;
-        Cursor c = db.query("recipe",
-                null,
-                "id = ?",
-                new String[] {"" + id},
-                null,
-                null,
-                null);
-        if (c.moveToFirst()) {
-            String name = c.getString(c.getColumnIndex("name"));
-            String short_desc = c.getString(c.getColumnIndex("short_description"));
-            String long_desc = c.getString(c.getColumnIndex("long_description"));
-            String target_desc = c.getString(c.getColumnIndex("target_description"));
-            float target_qty = c.getFloat(c.getColumnIndex("target_quantity"));
-
-            ArrayList<Ingredient> ing_list = readIngredients(id, db);
-            ArrayList<Float> ing_qty = new ArrayList<>();
-            ArrayList<String> ing_desc = new ArrayList<>();
-            ArrayList<Long> ing_other_rec = new ArrayList<>();
-            for (Ingredient i : ing_list) {
-                ing_qty.add(i.quantity);
-                ing_desc.add(i.desc);
-                ing_other_rec.add(i.other_recipe);
-            }
-
-            ArrayList<String> instruction_list = readInstructions(id,db);
-
-            ArrayList<String> tag_list = readTags(id, db);
-            ArrayList<String> comment_list = readComments(id, db);
-
-            ret = new Recipe(id, name, short_desc, long_desc, target_desc, target_qty,
-                                ing_qty, ing_desc, ing_other_rec, instruction_list, tag_list,
-                                comment_list);
-        }
-
-        c.close();
-        return ret;
-    }
-
-    private ArrayList<Ingredient> readIngredients(long recipe_id, SQLiteDatabase db) {
-        ArrayList<Ingredient> ret = new ArrayList<>();
-        Cursor c = db.query("ingredient_list",
-                null,
-                "recipe_id = ?",
-                new String[] {"" + recipe_id},
-                null,
-                null,
-                null);
-        if (c.moveToFirst()) {
-            do {
-                Ingredient ing = new Ingredient();
-
-                ing.quantity = c.getFloat(c.getColumnIndex("quantity"));
-                ing.desc = c.getString(c.getColumnIndex("description"));
-                if (!c.isNull(c.getColumnIndex("other_recipe"))) {
-                    ing.other_recipe = c.getLong(c.getColumnIndex("other_recipe"));
-                }
-                ret.add(ing);
-            } while (c.moveToNext());
-        }
-        c.close();
-        return ret;
-    }
-
-     private ArrayList<String> readInstructions(long recipe_id, SQLiteDatabase db) {
-        ArrayList<String> ret = new ArrayList<>();
-        Cursor c = db.query("instruction_list",
-                 null,
-                 "recipe_id = ?",
-                 new String[] {""+recipe_id},
-                 null,
-                 null,
-                 "position ASC");
-        if (c.moveToFirst()) {
-            do {
-                ret.add(c.getString(c.getColumnIndex("instruction")));
-            } while (c.moveToNext());
-        }
-        c.close();
-        return ret;
-    }
-
-     private ArrayList<String> readTags(long recipe_id, SQLiteDatabase db) {
-        ArrayList<String> ret = new ArrayList<>();
-        Cursor c = db.query("tag_list",
-                new String[] {"tag_id"},
-                "recipe_id = ?",
-                new String[] {"" + recipe_id},
-                null,
-                null,
-                null);
-        if (c.moveToFirst()) {
-            do {
-                ret.add(lookupTag(c.getLong(c.getColumnIndex("tag_id")),db));
-            } while (c.moveToNext());
-        }
-        c.close();
-        return ret;
-     }
-
-    private ArrayList<String> readComments(long recipe_id, SQLiteDatabase db) {
-        ArrayList<String> ret = new ArrayList<>();
-        Cursor c = db.query("comment_list",
-                new String[] {"comment"},
-                "recipe_id = ?",
-                new String[] {""+ recipe_id},
-                null,
-                null,
-                null);
-        if (c.moveToFirst()) {
-            do {
-                ret.add(c.getString(c.getColumnIndex("comment")));
-            } while (c.moveToNext());
-        }
-        c.close();
-        return ret;
-    }
-
-    private long updateRecipe(Recipe r, SQLiteDatabase db) {
-        ContentValues cv = new ContentValues();
-        if (r.getId() != Recipe.NO_ID ) {
-            cv.put("id", r.getId());
-        }
-        cv.put("name", r.getName());
-        cv.put("short_description", r.getShortDescription());
-        cv.put("long_description", r.getLongDescription());
-        cv.put("target_quantity", r.getTargetQuantity());
-        cv.put("target_description", r.getTargetDescription());
-        if (r.getId() == Recipe.NO_ID) {
-           r.setId(db.insertOrThrow("recipe", null, cv));
-        }
-        else {
-            r.setId(db.replaceOrThrow("recipe", null, cv));
-        }
-        updateIngredients(r,db);
-        updateInstructions(r,db);
-        updateTags(r,db);
-        updateComments(r,db);
-        return r.getId();
-    }
-
-    private void updateIngredients(Recipe r, SQLiteDatabase db) {
-        db.delete("ingredient_list",
-                "recipe_id = ?",
-                new String[] {"" + r.getId()});
-        for (int i = 0; i < r.getIngredientDescriptions().size(); ++i) {
-            ContentValues cv = new ContentValues();
-            cv.put("recipe_id", r.getId());
-            cv.put("quantity", r.getIngredientQuantity().get(i));
-            cv.put("description", r.getIngredientDescriptions().get(i));
-            if (r.getOtherRecipeIds().get(i) != Recipe.NO_ID) {
-                cv.put("other_recipe", r.getOtherRecipeIds().get(i));
-            }
-            else {
-                cv.putNull("other_recipe");
-            }
-            if (r.getId() == Recipe.NO_ID) {
-               db.insertOrThrow("ingredient_list", null, cv);
-            }
-            else {
-                db.replaceOrThrow("ingredient_list", null, cv);
+            String create_new_instruction_list = "CREATE TABLE new_instruction_list("
+                    +"recipe_id integer not null references recipe(id),"
+                    +"position integer not null,"
+                    +"instruction text not null default \"\");";
+            String move_to_new_instruction_list = "INSERT INTO new_instruction_list select * from instruction_list;";
+            String create_new_comment_list = "CREATE TABLE new_comment_list("
+                        +"recipe_id integer not null references recipe(id),"
+                        +"comment text not null default \"\");";
+            String move_to_new_comment_list = "INSERT INTO new_comment_list select * from comment_list;";
+            String add_recipe_column = "ALTER TABLE recipe ADD COLUMN preperation_time real not null default 0;";
+            String create_new_ingredient_list =  "CREATE TABLE new_ingredient_list("
+                        +"recipe_id integer not null references recipe(id),"
+                        +"quantity real not null default 1,"
+                        +"description text not null default \"\","
+                        +"other_recipe integer null references recipe(id));";
+            String move_to_new_ingredient_list = "INSERT INTO new_ingredient_list select * from ingredient_list;";
+            String drop_tag = "DROP TABLE tag;";
+            String rename_new_tag = "ALTER TABLE new_tag RENAME TO tag;";
+            String drop_instruction_list = "DROP TABLE instruction_list;";
+            String rename_new_instruction_list = "ALTER TABLE new_instruction_list RENAME TO instruction_list;";
+            String drop_comment_list = "DROP TABLE comment_list;";
+            String rename_new_comment_list = "ALTER TABLE new_comment_list RENAME TO comment_list;";
+            String drop_ingredient_list = "DROP TABLE ingredient_list;";
+            String rename_new_ingredient_list = "ALTER TABLE new_ingredient_list RENAME TO ingredient_list;";
+            try {
+                db.execSQL(create_new_tag);
+                db.execSQL(move_to_new_tag);
+                db.execSQL(create_new_instruction_list);
+                db.execSQL(move_to_new_instruction_list);
+                db.execSQL(create_new_comment_list);
+                db.execSQL(move_to_new_comment_list);
+                db.execSQL(add_recipe_column);
+                db.execSQL(create_new_ingredient_list);
+                db.execSQL(move_to_new_ingredient_list);
+                db.execSQL(drop_tag);
+                db.execSQL(rename_new_tag);
+                db.execSQL(drop_instruction_list);
+                db.execSQL(rename_new_instruction_list);
+                db.execSQL(drop_comment_list);
+                db.execSQL(rename_new_comment_list);
+                db.execSQL(drop_ingredient_list);
+                db.execSQL(rename_new_ingredient_list);
+            } catch (Exception e) {
+                Log.e(TAG, TAG + ".onUpgrade transaction failed.");
+                throw e;
             }
         }
     }
 
-    private void updateInstructions(Recipe r, SQLiteDatabase db) {
-        db.delete("instruction_list",
-                "recipe_id = ?",
-                new String[] {"" + r.getId()});
-        for (int i = 0; i < r.getInstructions().size(); ++i) {
-           ContentValues cv = new ContentValues(3);
-            cv.put("recipe_id",r.getId());
-            cv.put("position",i);
-            cv.put("instruction",r.getInstructions().get(i));
-            if (r.getId() == Recipe.NO_ID) {
-               db.insertOrThrow("instruction_list", null, cv);
-            }
-            else {
-                db.replaceOrThrow("instruction_list", null, cv);
-            }
-        }
-    }
+    private static int DB_VERSION = 4;
 
-    private void updateTags(Recipe r, SQLiteDatabase db) {
-        db.delete("tag_list",
-                "recipe_id = ?",
-                new String[] {"" + r.getId()});
-        for (String tag : r.getTags()) {
-            ContentValues cv = new ContentValues();
-            cv.put("recipe_id", r.getId());
-            cv.put("tag_id", lookupTag(tag,db));
-            if (r.getId() == Recipe.NO_ID) {
-               db.insertOrThrow("tag_list", null, cv);
-            }
-            else {
-                db.replaceOrThrow("tag_list", null, cv);
-            }
-        }
-    }
+    public static final String defaultDbName = "recipes.db";
+    public static final String testDbName = "test.db";
+    public static final String defaultDbDir = "";
 
-    private void updateComments(Recipe r, SQLiteDatabase db) {
-        db.delete("comment_list",
-                "recipe_id = ?",
-                new String[] {"" + r.getId()});
-
-        for (String comment : r.getComments()) {
-            ContentValues cv = new ContentValues();
-            cv.put("recipe_id", r.getId());
-            cv.put("comment", comment);
-            if (r.getId() == Recipe.NO_ID) {
-               db.insertOrThrow("comment_list", null, cv);
-            }
-            else {
-                db.replaceOrThrow("comment_list", null, cv);
-            }
-        }
-    }
-
-    private long lookupTag(String tag, SQLiteDatabase db) {
-        long ret;
-        Cursor tag_c = db.query("tag",
-                new String[] {"id"},
-                "tag = ?",
-                new String[] {tag},
-                null,
-                null,
-                null);
-        if (tag_c.moveToFirst()) {
-            ret = tag_c.getLong(tag_c.getColumnIndex("id"));
-        }
-        else {
-            ContentValues cv = new ContentValues();
-            cv.put("tag", tag);
-            ret = db.replaceOrThrow("tag",null,cv);
-        }
-        tag_c.close();
-        return ret;
-    }
-
-    private String lookupTag(long tag_id, SQLiteDatabase db) {
-        String ret = null;
-        Cursor tag_c = db.query("tag",
-                new String[] {"tag"},
-                "id = ?",
-                new String[] {"" + tag_id},
-                null,
-                null,
-                null);
-        if (tag_c.moveToFirst()) {
-            ret = tag_c.getString(tag_c.getColumnIndex("tag"));
-        }
-        else {
-            ret = null;
-        }
-        tag_c.close();
-        return ret;
-    }
-
-    private class Ingredient {
-        float quantity;
-        String desc;
-        Long other_recipe = Recipe.NO_ID;
-    }
 
     private static String TAG = "SqlController";
-
-    private static int DB_VERSION = 3;
-
-    public static String defaultDbName = "recipes.db";
-    public static String testDbName = "test.db";
-    public static String defaultDbDir = "";
 }

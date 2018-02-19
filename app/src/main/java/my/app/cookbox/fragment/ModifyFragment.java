@@ -1,10 +1,11 @@
 package my.app.cookbox.fragment;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
+import my.app.cookbox.sqlite.RecipeProvider;
 
 /**
  * Created by Alexander on 015, 15 Jun.
@@ -71,7 +73,7 @@ public class ModifyFragment extends BaseFragment {
             }
         });
 
-        populateFields(_recipe);
+        populateFields(_brecipe);
 
         return _root_view;
     }
@@ -84,10 +86,89 @@ public class ModifyFragment extends BaseFragment {
 
         Bundle args = getArguments();
         if (args != null && args.getLong("id") != Recipe.NO_ID) {
-            _recipe = _parent.getSqlController().getRecipe(args.getLong("id"));
+            long id = args.getLong("id");
+            Cursor recipe = getContext()
+                    .getContentResolver()
+                    .query(RecipeProvider.recipe_uri,
+                            new String[] {"name", "short_description","long_description","target_quantity", "target_description"},
+                            "id = ?",
+                            new String[] {Long.toString(id)},
+                            null
+                    );
+            if (recipe != null && recipe.moveToFirst()) {
+                _brecipe.id = id;
+                _brecipe.name = recipe.getString(recipe.getColumnIndex("name"));
+                _brecipe.short_desc = recipe.getString(recipe.getColumnIndex("short_description"));
+                _brecipe.long_desc = recipe.getString(recipe.getColumnIndex("long_description"));
+                _brecipe.target_quantity = recipe.getFloat(recipe.getColumnIndex("target_quantity"));
+                _brecipe.target_description = recipe.getString(recipe.getColumnIndex("target_description"));
+            }
+            else {
+                // no such recipe => finish
+                getFragmentManager().popBackStack();
+            }
+            recipe.close();
+
+            Cursor ingredients = getContext()
+                    .getContentResolver()
+                    .query(
+                            RecipeProvider.ingredient_uri,
+                            new String[] {"quantity", "description", "other_recipe"},
+                            "recipe_id = ?",
+                            new String[] {Long.toString(_brecipe.id)},
+                            null);
+            if (ingredients != null && ingredients.moveToFirst()) {
+                do {
+                    BasicRecipe.RecipeIngredient ingredient = new BasicRecipe.RecipeIngredient();
+                    ingredient.quantity = ingredients.getFloat(ingredients.getColumnIndex("quantity"));
+                    ingredient.description = ingredients.getString(ingredients.getColumnIndex("description"));
+                    ingredient.other_recipe_id
+                            = ingredients.isNull(ingredients.getColumnIndex("other_recipe")) ?
+                                ingredients.getLong(ingredients.getColumnIndex("other_recipe")) : null;
+
+                    _brecipe.ingredients.add(ingredient);
+                } while (ingredients.moveToNext());
+            }
+            ingredients.close();
+
+            Cursor instructions = getContext()
+                    .getContentResolver()
+                    .query(
+                            RecipeProvider.instruction_uri,
+                            new String[] {"instruction"},
+                            "recipe_id = ?",
+                            new String[] {Long.toString(_brecipe.id)},
+                            "position ASC");
+            if (instructions != null && instructions.moveToFirst()) {
+                do {
+                    String instruction = instructions.getString(instructions.getColumnIndex("description"));
+
+                    _brecipe.instructions.add(instruction);
+                } while (ingredients.moveToNext());
+            }
+            instructions.close();
+
+            Cursor comments = getContext()
+                    .getContentResolver()
+                    .query(
+                            RecipeProvider.comment_uri,
+                            new String[] {"comment"},
+                            "recipe_id = ?",
+                            new String[] {Long.toString(_brecipe.id)},
+                            null);
+            if (comments != null && comments.moveToFirst()) {
+                do {
+                    String comment = comments.getString(comments.getColumnIndex("comment"));
+
+                    _brecipe.comments.add(comment);
+                } while (comments.moveToNext());
+            }
+            comments.close();
+
+            // TODO: tags
         }
         else {
-            _recipe = new Recipe();
+            _brecipe = new BasicRecipe();
         }
 
         setHasOptionsMenu(true);
@@ -126,57 +207,147 @@ public class ModifyFragment extends BaseFragment {
     }
 
     private void updateRecipe() {
-        _recipe = readRecipe(_recipe.getId());
+        _brecipe = readRecipe(_brecipe.id);
     }
 
     private void saveRecipe() {
-        _recipe.setId(_parent.getSqlController().insertRecipe(_recipe));
-        _parent.addToRecipeList(_recipe.getBasicRecipe());
+        ContentValues recipe = new ContentValues();
+        recipe.put("name", _brecipe.name);
+        recipe.put("short_description", _brecipe.short_desc);
+        recipe.put("long_description", _brecipe.long_desc);
+        recipe.put("target_quantity", _brecipe.target_quantity);
+        recipe.put("target_description", _brecipe.target_description);
+
+        /* update */
+        if (_brecipe.id != null) {
+            recipe.put("id",_brecipe.id);
+            getContext()
+                .getContentResolver()
+                .update(RecipeProvider.recipe_uri,
+                        recipe,
+                        "id = ?",
+                        new String[] {_brecipe.id.toString()});
+        }
+        /* insert */
+        else {
+            long id = ContentUris.parseId(getContext()
+                .getContentResolver()
+                .insert(RecipeProvider.recipe_uri, recipe));
+            _brecipe.id = id;
+        }
+
+        getContext().getContentResolver()
+                .delete(RecipeProvider.ingredient_uri,
+                        "recipe_id = ?",
+                        new String[] {_brecipe.id.toString()});
+
+        for (BasicRecipe.RecipeIngredient ing : _brecipe.ingredients) {
+            ContentValues ingredient = new ContentValues();
+
+            ingredient.put("quantity", ing.quantity);
+            ingredient.put("description", ing.description);
+            ingredient.put("other_recipe", ing.other_recipe_id);
+            ingredient.put("recipe_id", _brecipe.id);
+
+            getContext().getContentResolver().insert(RecipeProvider.ingredient_uri,ingredient);
+        }
+
+        getContext().getContentResolver()
+                .delete(RecipeProvider.instruction_uri,
+                        "recipe_id = ?",
+                        new String[] {_brecipe.id.toString()});
+
+        for (int i = 0; i < _brecipe.instructions.size(); ++i)  {
+            ContentValues instruction = new ContentValues();
+            instruction.put("instruction", _brecipe.instructions.get(i));
+            instruction.put("position", i);
+            instruction.put("recipe_id",_brecipe.id);
+
+            getContext()
+                    .getContentResolver()
+                    .insert(RecipeProvider.instruction_uri,instruction);
+        }
+
+        getContext().getContentResolver()
+                .delete(RecipeProvider.comment_uri,
+                        "recipe_id = ?",
+                        new String[] {_brecipe.id.toString()});
+
+        for (String com : _brecipe.comments) {
+            ContentValues comment = new ContentValues();
+            comment.put("comment", com);
+            comment.put("recipe_id", _brecipe.id);
+
+            getContext()
+                    .getContentResolver()
+                    .insert(RecipeProvider.comment_uri, comment);
+        }
     }
 
-    private Recipe readRecipe(long id) {
-        String name = getEditTextFromId(R.id.modify_edit_text_name, _root_view).getText().toString();
-        String short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, _root_view).getText().toString();
-        String long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view).getText().toString();
-        String tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, _root_view).getText().toString();
-        float tgt_qty = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view).getText().toString());
+    private BasicRecipe readRecipe(Long id) {
+        BasicRecipe ret = new BasicRecipe();
 
-        ArrayList<String> ing_list = new ArrayList<>();
-        ArrayList<Float> ing_qty_list = new ArrayList<>();
-        ArrayList<Long> ing_other_rec = new ArrayList<>();
+        ret.id = id;
+        ret.name = getEditTextFromId(R.id.modify_edit_text_name, _root_view).getText().toString();
+        ret.short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, _root_view).getText().toString();
+        ret.long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view).getText().toString();
+        ret.target_description = getEditTextFromId(R.id.modify_edit_text_tgt_desc, _root_view).getText().toString();
+        ret.target_quantity = Float.parseFloat(getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view).getText().toString());
 
         LinearLayout ing_ll = (LinearLayout) _root_view.findViewById(R.id.modify_ingredient_list);
         for (int i = 0; i < ing_ll.getChildCount(); ++i) {
+            BasicRecipe.RecipeIngredient ingredient = new BasicRecipe.RecipeIngredient();
+
             RelativeLayout rl = (RelativeLayout) ing_ll.getChildAt(i);
             String qty = getEditTextFromId(R.id.modify_list_item_edit_text1, rl).getText().toString();
             try {
-                ing_qty_list.add(Float.parseFloat(qty));
+                ingredient.quantity = Float.parseFloat(qty);
             }
             catch (Exception e) {
-                ing_qty_list.add((float) -1);
+                ingredient.quantity = 1f;
             }
-            ing_list.add(getEditTextFromId(R.id.modify_list_item_edit_text2, rl).getText().toString());
+            ingredient.description = getEditTextFromId(R.id.modify_list_item_edit_text2, rl).getText().toString();
             Spinner sp = (Spinner) rl.findViewById(R.id.modify_list_item_spinner);
             if (sp.getSelectedItemPosition() != 0) {
-                ing_other_rec.add(_parent.getAllBasicRecipes().get(sp.getSelectedItemPosition() - 1).getId());
+                Cursor other_r = getContext()
+                        .getContentResolver()
+                        .query(RecipeProvider.recipe_uri,
+                            new String[] {"id"},
+                            null,
+                            null,
+                            null);
+                int pos = sp.getSelectedItemPosition() - 1;
+                if (other_r.getCount() < pos) {
+                    ingredient.other_recipe_id = null;
+                }
+                other_r.moveToPosition(pos);
+                ingredient.other_recipe_id = other_r.getLong(other_r.getColumnIndex("id"));
+                other_r.close();
             }
             else {
-                ing_other_rec.add(Recipe.NO_ID);
+                ingredient.other_recipe_id = null;
             }
+            ret.ingredients.add(ingredient);
         }
-
-        ArrayList<String> ins_list = new ArrayList<>();
 
         LinearLayout ins_ll = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
         for (int i = 0; i < ins_ll.getChildCount(); ++i) {
             RelativeLayout rl = (RelativeLayout) ins_ll.getChildAt(i);
             TextView desc_tv = ((TextInputLayout) rl.getChildAt(0)).getEditText();
 
-            ins_list.add(desc_tv.getText().toString());
+            ret.instructions.add(desc_tv.getText().toString());
         }
 
-        ArrayList<String> tag_list = new ArrayList<>();
+        LinearLayout comment_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
+        for (int i = 0; i < comment_ll.getChildCount(); ++i) {
+            RelativeLayout rl = (RelativeLayout) comment_ll.getChildAt(i);
+            TextView cmnt_tv = ((TextInputLayout) rl.getChildAt(0)).getEditText();
 
+            ret.comments.add(cmnt_tv.getText().toString());
+        }
+
+        // tags dont' work form here
+        /*
         LinearLayout tag_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
         for (int i = 0; i < tag_ll.getChildCount(); ++i) {
             RelativeLayout rl = (RelativeLayout) tag_ll.getChildAt(i);
@@ -184,100 +355,102 @@ public class ModifyFragment extends BaseFragment {
 
             tag_list.add(tag_tv.getText().toString());
         }
+        */
 
-        ArrayList<String> cmnt_list = new ArrayList<>();
-
-        LinearLayout comment_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
-        for (int i = 0; i < comment_ll.getChildCount(); ++i) {
-            RelativeLayout rl = (RelativeLayout) comment_ll.getChildAt(i);
-            TextView cmnt_tv = ((TextInputLayout) rl.getChildAt(0)).getEditText();
-
-            cmnt_list.add(cmnt_tv.getText().toString());
-        }
-
-        return new Recipe(id, name, short_desc, long_desc, tgt_desc, tgt_qty, ing_qty_list,
-                ing_list, ing_other_rec,ins_list,tag_list,cmnt_list);
+        return ret;
     }
 
-    private void populateFields(Recipe r) {
+    private void populateFields(BasicRecipe r) {
         EditText name = getEditTextFromId(R.id.modify_edit_text_name, _root_view);
-        name.setText(r.getName());
+        name.setText(r.name == null ? "" : r.name);
 
         EditText short_desc = getEditTextFromId(R.id.modify_edit_text_short_desc, _root_view);
-        short_desc.setText(r.getShortDescription());
+        short_desc.setText(r.short_desc == null ? "" : r.short_desc);
 
         EditText long_desc = getEditTextFromId(R.id.modify_edit_text_long_desc, _root_view);
-        long_desc.setText(r.getLongDescription());
+        long_desc.setText(r.long_desc == null ? "" : r.long_desc);
 
         EditText tgt_desc = getEditTextFromId(R.id.modify_edit_text_tgt_desc, _root_view);
-        tgt_desc.setText(r.getTargetDescription());
+        tgt_desc.setText(r.target_description == null ? "" : r.target_description);
 
         EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view);
-        if (r.getTargetQuantity() <= 0) {
-            target_qty.setText(Float.toString(1));
+        if (r.target_quantity == null || r.target_quantity <= 0) {
+            target_qty.setText("1");
         }
         else {
-            target_qty.setText(r.getTargetQuantity().toString());
+            target_qty.setText(r.target_quantity.toString());
         }
 
-        for (int i = 0; i < r.getIngredientDescriptions().size(); ++i) {
+        for (int i = 0; i < r.ingredients.size(); ++i) {
             expandIngredientList();
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_ingredient_list);
             RelativeLayout rl = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText ing_qty = getEditTextFromId(R.id.modify_list_item_edit_text1, rl);
-            ing_qty.setText(r.getIngredientQuantity().get(i).toString());
+            ing_qty.setText(r.ingredients.get(i).quantity.toString());
 
             EditText ing_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, rl);
-            ing_desc.setText(r.getIngredientDescriptions().get(i));
+            ing_desc.setText(r.ingredients.get(i).description);
 
             Spinner other_r_sp = (Spinner) rl.findViewById(R.id.modify_list_item_spinner);
-            long other_r_id = r.getOtherRecipeIds().get(i);
-            if (other_r_id == Recipe.NO_ID) {
+            Long other_r_id = r.ingredients.get(i).other_recipe_id;
+            if (other_r_id == null) {
                 other_r_sp.setSelection(0);
             }
             else {
-                int br_pos = 0;
-                for (; br_pos < _parent.getAllBasicRecipes().size(); ++br_pos) {
-                    if (_parent.getAllBasicRecipes().get(br_pos).getId() == other_r_id) {
-                        break;
+                Cursor other_r = getContext()
+                        .getContentResolver()
+                        .query(RecipeProvider.recipe_uri,
+                                new String[] {"id"},
+                                null,
+                                null,
+                                null);
+                if (other_r.moveToFirst()) {
+                    int br_pos = 0;
+                    do {
+                        if (br_pos < other_r.getCount() ||
+                                other_r.getLong(other_r.getColumnIndex("id")) == r.ingredients.get(i).other_recipe_id) {
+                            break;
+                        }
+                    } while (other_r.moveToNext());
+                    if (other_r.getLong(other_r.getColumnIndex("id")) == r.ingredients.get(i).other_recipe_id) {
+                        other_r_sp.setSelection(br_pos + 1);
+                    } else {
+                        other_r_sp.setSelection(0);
                     }
-                }
-                if (other_r_id == _parent.getAllBasicRecipes().get(br_pos).getId()) {
-                    other_r_sp.setSelection(br_pos + 1);
-                }
-                else {
-                    other_r_sp.setSelection(0);
+                    other_r.close();
                 }
             }
         }
 
-        for (int i = 0; i < r.getInstructions().size(); ++i) {
+        for (int i = 0; i < r.instructions.size(); ++i) {
             expandInstructionList();
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_instruction_list);
             RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText ins_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
-            ins_desc.setText(r.getInstructions().get(i));
+            ins_desc.setText(r.instructions.get(i));
         }
 
-        for (int i = 0; i < r.getComments().size(); ++i) {
+        for (int i = 0; i < r.comments.size(); ++i) {
             expandCommentList();
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_comment_list);
             RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText cmnt_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
-            cmnt_desc.setText(r.getComments().get(i));
+            cmnt_desc.setText(r.comments.get(i));
         }
 
-        for (int i = 0; i < r.getTags().size(); ++i) {
+        for (int i = 0; i < r.tags.size(); ++i) {
+            /* tags not implemented with ContentProvier (yet)
             expandTagList();
 
             LinearLayout parent_ll = (LinearLayout) _root_view.findViewById(R.id.modify_tag_list);
             RelativeLayout ll = (RelativeLayout) parent_ll.getChildAt(parent_ll.getChildCount() - 1);
 
             EditText tag_desc = getEditTextFromId(R.id.modify_list_item_edit_text2, ll);
-            tag_desc.setText(r.getTags().get(i));
+            tag_desc.setText(r.tags.get(i));
+            */
         }
 
 
@@ -286,9 +459,19 @@ public class ModifyFragment extends BaseFragment {
     private void setupOtherRecipeSpinner(Spinner spinner) {
         ArrayList<String> names = new ArrayList<>();
         names.add("None");
-        for (BasicRecipe br : getParent().getAllBasicRecipes()) {
-            names.add(br.getName());
+        Cursor r_names = getContext()
+                .getContentResolver()
+                .query(RecipeProvider.recipe_uri,
+                        new String[] {"name"},
+                        null,
+                        null,
+                        null);
+        if (r_names.moveToFirst()) {
+            do {
+                names.add(r_names.getString(r_names.getColumnIndex("name")));
+            } while (r_names.moveToNext());
         }
+        r_names.close();
         //modify_recipe_spinner_item will do just fine here
         ArrayAdapter<String> aa = new ArrayAdapter<>(getContext(), R.layout.modify_recipe_spinner_item,names);
         spinner.setAdapter(aa);
@@ -391,7 +574,7 @@ public class ModifyFragment extends BaseFragment {
 
     private MainActivity _parent = null;
     private View _root_view = null;
-    private Recipe _recipe = new Recipe();
+    private BasicRecipe _brecipe = new BasicRecipe();
 
     private View.OnClickListener _onClickListener = new View.OnClickListener() {
         @Override

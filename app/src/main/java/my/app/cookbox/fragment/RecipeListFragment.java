@@ -33,7 +33,7 @@ import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.sqlite.RecipeProvider;
-import my.app.cookbox.utility.RecipeAdapter;
+import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeCursorAdapter;
 
 /**
@@ -54,10 +54,10 @@ public class RecipeListFragment extends ListFragment {
 
         ArrayList<BasicRecipe> recipes = null;
         if (_tag_id != Recipe.NO_ID) {
-            recipes = ((MainActivity) getActivity()).getSqlController().getTaggedBasicRecipe(_tag_id);
+            //recipes = ((MainActivity) getActivity()).getSqlController().getTaggedBasicRecipe(_tag_id);
         }
         else {
-            recipes = ((MainActivity) getActivity()).getSqlController().getAllBasicRecipes();
+            //recipes = ((MainActivity) getActivity()).getSqlController().getAllBasicRecipes();
         }
         Cursor list_cursor = getContext()
                 .getContentResolver()
@@ -133,16 +133,20 @@ public class RecipeListFragment extends ListFragment {
                          int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
                          MainActivity parent = ((MainActivity) getActivity());
                          try {
+                             /*
                              parent.getSqlController().removeRecipe(parent.getAllBasicRecipes().get(pos).getId());
                              parent.getAllBasicRecipes().remove(pos);
+                             */
                          }
                         catch (SQLiteException e) {
+                             /*
                             Toast toast = Toast.makeText(
                                     parent,
                                     "Can't delete " + parent.getAllBasicRecipes().get(pos).getName() + ".",
                                     Toast.LENGTH_LONG
                             );
                             toast.show();
+                            */
                         }
                         dialog.dismiss();
                     }
@@ -180,20 +184,35 @@ public class RecipeListFragment extends ListFragment {
                         null,
                         null
                 );
-                if (c.moveToFirst()) {
-                    do {
-                        if (!c.isNull(0)) {
-                            String s = DatabaseUtils.dumpCursorToString(c);
-                            Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
-                        }
-                    } while (c.moveToNext());
+                if (c == null) {
+                    Toast.makeText(getContext(), "cursor is null!", Toast.LENGTH_SHORT).show();
                 }
+                if (c.moveToFirst()) {
+                    Toast.makeText(getContext(), "first:", Toast.LENGTH_SHORT).show();
+                    String s = DatabaseUtils.dumpCursorToString(c);
+                    Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
+                    /*
+                    for (int i = 0; i < c.getColumnCount(); ++i) {
+                        if (!c.isNull(i)) {
+                            Toast.makeText(getContext(), c.getString(i), Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(getContext(), c.getColumnName(i) + "is null", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    */
+                }
+                else {
+                    Toast.makeText(getContext(), "first is emtpy", Toast.LENGTH_SHORT).show();
+                }
+                c.close();
                 return true;
+
             case R.id.main_backup:
                 ((MainActivity) getActivity()).backupRecipes();
                 return true;
             case R.id.main_test_recipe:
-                startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
+                //startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
                 return true;
             case R.id.main_test_settings:
                 startPreferenceActivity();
@@ -215,6 +234,7 @@ public class RecipeListFragment extends ListFragment {
     }
 
     private void sortRecipes() {
+        /*
         sort_order = !sort_order;
          Collections.sort(((MainActivity) getActivity()).getAllBasicRecipes(), new Comparator<BasicRecipe>() {
                     @Override
@@ -224,6 +244,7 @@ public class RecipeListFragment extends ListFragment {
                     }
                 }
          );
+         */
     }
 
     private boolean sort_order = false;

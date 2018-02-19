@@ -1,26 +1,21 @@
 package my.app.cookbox.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentTransaction;
-import android.provider.Settings;
 import android.support.v4.provider.DocumentFile;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -30,21 +25,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import my.app.cookbox.R;
 import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
-import my.app.cookbox.fragment.SettingsFragment;
 import my.app.cookbox.fragment.TagSelectionListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
-import my.app.cookbox.sqlite.SqlController;
-import my.app.cookbox.utility.RecipeAdapter;
-import my.app.cookbox.utility.TagSelectionAdapter;
 
 /**
  * Created by Alexander on 016, 16 Jun.
@@ -118,9 +107,11 @@ public class MainActivity extends BaseActivity {
         ft.addToBackStack(null);
         ft.commit();
 
+        /*
         new_frag.setListAdapter(new TagSelectionAdapter(getAllBasicRecipes(),
                 getSqlController().getTaggedBasicRecipe(tag_id),
                 this));
+                */
 
         return new_frag;
     }
@@ -153,12 +144,6 @@ public class MainActivity extends BaseActivity {
             if (intent != null) {
                 _db_backup_location = intent.getData();
                 backupRecipes();
-            }
-        }
-        else if (request_code == PROMPT_FOR_DB_DIR_REQUEST_CODE  && result_code == RESULT_OK) {
-            if (intent != null) {
-                _db_location = intent.getData();
-                openDb();
             }
         }
         else {
@@ -195,15 +180,17 @@ public class MainActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         int pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
                         try {
-                            getSqlController().removeTag(getSqlController().getAllRecipeTags().get(pos).getId());
+                            //getSqlController().removeTag(getSqlController().getAllRecipeTags().get(pos).getId());
                             populateDrawerTagList((ListView) findViewById(R.id.drawer_list));
                         } catch (SQLiteException e) {
+                            /*
                             Toast toast = Toast.makeText(
                                     MainActivity.this,
                                     "Can't delete " + getSqlController().getAllRecipeTags().get(pos).getName() + ".",
                                     Toast.LENGTH_LONG
                             );
                             toast.show();
+                            */
                         }
                         dialog.dismiss();
                     }
@@ -233,7 +220,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String name = tag_name.getText().toString();
-                        getSqlController().renameTag(tag_id, name);
+                        //getSqlController().renameTag(tag_id, name);
                         populateDrawerTagList((ListView) findViewById(R.id.drawer_list));
                     }
                 });
@@ -287,16 +274,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-     public void openDb() {
-        if (_db_location == null) {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            startActivityForResult(intent, PROMPT_FOR_DB_DIR_REQUEST_CODE);
-            return;
-        }
-
-        super.setSqlDbName(_db_location.getPath());
-    }
-
     private void setupNavigationDrawer() {
         ((Button) findViewById(R.id.drawer_settings_button))
                 .setOnClickListener(new View.OnClickListener() {
@@ -336,7 +313,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String tag = tag_name.getText().toString();
-                        getSqlController().insertNewTag(tag);
+                        //getSqlController().insertNewTag(tag);
                         populateDrawerTagList(drawer_list);
                     }
                 });
@@ -353,10 +330,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void populateDrawerTagList(ListView drawer_list) {
+        /*
         ArrayList<RecipeTag> tags = getSqlController().getAllRecipeTags();
         drawer_list.setAdapter(
                 new ArrayAdapter<RecipeTag>(this, R.layout.tag_list_item,tags)
         );
+        */
     }
 
     private void startSettingsActivity() {
@@ -366,9 +345,7 @@ public class MainActivity extends BaseActivity {
     private RecipeListFragment _bottom_rlist_frag = null;
 
     private Uri _db_backup_location = null;
-    private Uri _db_location = null;//if not default db
     private int PROMPT_FOR_BACKUP_DIR_REQUEST_CODE = 1;
-    private int PROMPT_FOR_DB_DIR_REQUEST_CODE = 2;
 
     private String TAG = "MainActivity";
 }

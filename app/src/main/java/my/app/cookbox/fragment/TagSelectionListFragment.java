@@ -26,6 +26,7 @@ import my.app.cookbox.utility.TagSelectionAdapter;
  */
 
 public class TagSelectionListFragment extends ListFragment {
+    /*
     @Override
     public void onStart() {
         super.onStart();
@@ -68,14 +69,8 @@ public class TagSelectionListFragment extends ListFragment {
                     long recipe_id = ((BasicRecipe)getListAdapter().getItem(i)).getId();
                     long tag_id = _tag;
                     if (((TagSelectionAdapter) getListAdapter()).isItemChecked(i)) {
-                        ((MainActivity) getActivity())
-                                .getSqlController()
-                                .addRecipeToTag(recipe_id, tag_id);
                     }
                     else {
-                        ((MainActivity) getActivity())
-                                .getSqlController()
-                                .removeTagFromRecipe(tag_id, recipe_id);
                     }
                 }
                 Toast.makeText(getContext(), "Recipes tagged.", Toast.LENGTH_SHORT).show();
@@ -95,4 +90,5 @@ public class TagSelectionListFragment extends ListFragment {
         ArrayList<Long> recipes;
     }
     private String TAG = "TagSelectionListFrag";
+    */
 }
