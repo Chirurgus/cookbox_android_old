@@ -1,0 +1,44 @@
+CREATE TABLE new_tag(                                     
+  id integer primary key,                             
+  tag text unique not null
+);
+INSERT INTO new_tag SELECT * FROM tag;
+
+CREATE TABLE new_instruction_list(                        
+  recipe_id integer not null references recipe(id),            
+  position integer not null,                          
+  instruction text not null default ""                           
+);
+INSERT INTO new_instruction_list select * from instruction_list;
+
+CREATE TABLE new_comment_list(                            
+  recipe_id integer not null references recipe(id),   
+  comment text not null default ""
+);
+INSERT INTO new_comment_list select * from comment_list;
+
+ALTER TABLE recipe ADD COLUMN preperation_time real not null default 0;
+
+CREATE TABLE new_ingredient_list(
+  recipe_id integer not null references recipe(id),   
+  quantity real not null default 1,                             
+  description text not null default "",                          
+  other_recipe integer null references recipe(id)     
+);
+INSERT INTO new_ingredient_list select * from ingredient_list;
+
+DROP TABLE tag;
+ALTER TABLE new_tag RENAME TO tag;
+DROP TABLE instruction_list;
+ALTER TABLE new_instruction_list RENAME TO instruction_list;
+DROP TABLE comment_list;
+ALTER TABLE new_comment_list RENAME TO comment_list;
+DROP TABLE ingredient_list;
+ALTER TABLE new_ingredient_list RENAME TO ingredient_list;
+
+
+
+
+
+
+

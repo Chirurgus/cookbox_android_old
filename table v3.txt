@@ -29,4 +29,4 @@ CREATE TABLE ingredient_list(
   quantity real not null,                             
   description text not null,                          
   other_recipe integer null references recipe(id)     
-);                                                    
+);                   
