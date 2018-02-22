@@ -42,6 +42,8 @@ public class ModifyFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         getParent().getSupportActionBar().setTitle("Edit recipe");
+
+        populateFields(_brecipe);
     }
 
     @Nullable
@@ -72,8 +74,6 @@ public class ModifyFragment extends BaseFragment {
                 expandCommentList();
             }
         });
-
-        populateFields(_brecipe);
 
         return _root_view;
     }
@@ -164,8 +164,6 @@ public class ModifyFragment extends BaseFragment {
                 } while (comments.moveToNext());
             }
             comments.close();
-
-            // TODO: tags
         }
         else {
             _brecipe = new BasicRecipe();
@@ -182,7 +180,6 @@ public class ModifyFragment extends BaseFragment {
         Log.d(TAG, TAG + ".onPause called.");
 
         updateRecipe();
-
     }
 
     @Override
@@ -206,10 +203,12 @@ public class ModifyFragment extends BaseFragment {
         }
     }
 
+    // Updates _brecipe with data from the user
     private void updateRecipe() {
         _brecipe = readRecipe(_brecipe.id);
     }
 
+    //  write _brecipe to RecipeProvider
     private void saveRecipe() {
         ContentValues recipe = new ContentValues();
         recipe.put("name", _brecipe.name);
@@ -284,6 +283,7 @@ public class ModifyFragment extends BaseFragment {
         }
     }
 
+    // Read recipe from data provided by the user
     private BasicRecipe readRecipe(Long id) {
         BasicRecipe ret = new BasicRecipe();
 
@@ -555,31 +555,21 @@ public class ModifyFragment extends BaseFragment {
         b.setOnClickListener(_onClickListener);
     }
 
-
-
-    private void popViewFromLinearLayout(LinearLayout parent) {
-            if (parent.getChildCount() == 0) {
-                return;
-            }
-            LinearLayout ll = (LinearLayout) parent.getChildAt(parent.getChildCount()-1);
-            parent.removeView(ll);
-    }
-
-    private EditText getEditTextFromId(int view_id, View parent) {
+    private static EditText getEditTextFromId(int view_id, View parent) {
             return ((TextInputLayout) parent.findViewById(view_id)).getEditText();
     }
-
-
-    private static String TAG = "ModifyFragment";
 
     private MainActivity _parent = null;
     private View _root_view = null;
     private BasicRecipe _brecipe = new BasicRecipe();
 
-    private View.OnClickListener _onClickListener = new View.OnClickListener() {
+    /* Remove item from list onClickListener */
+    private static final View.OnClickListener _onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             ((ViewGroup) v.getParent().getParent()).removeView((ViewGroup) v.getParent());
         }
     };
+
+    private static String TAG = "ModifyFragment";
 }
