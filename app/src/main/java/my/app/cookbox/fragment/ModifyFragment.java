@@ -141,7 +141,7 @@ public class ModifyFragment extends BaseFragment {
                             "position ASC");
             if (instructions != null && instructions.moveToFirst()) {
                 do {
-                    String instruction = instructions.getString(instructions.getColumnIndex("description"));
+                    String instruction = instructions.getString(instructions.getColumnIndex("instruction"));
 
                     _brecipe.instructions.add(instruction);
                 } while (ingredients.moveToNext());
