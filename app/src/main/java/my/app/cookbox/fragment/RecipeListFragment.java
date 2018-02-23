@@ -234,17 +234,7 @@ public class RecipeListFragment extends ListFragment {
     }
 
     private void sortRecipes() {
-        /*
-        sort_order = !sort_order;
-         Collections.sort(((MainActivity) getActivity()).getAllBasicRecipes(), new Comparator<BasicRecipe>() {
-                    @Override
-                    public int compare(BasicRecipe o1, BasicRecipe o2) {
-                        if (sort_order) return o1.getName().compareTo(o2.getName());
-                        else return o1.getName().compareTo(o2.getName()) * -1;
-                    }
-                }
-         );
-         */
+
     }
 
     private boolean sort_order = false;
