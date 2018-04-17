@@ -52,14 +52,19 @@ public class RecipeListFragment extends ListFragment {
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("All recipes");
 
-        ArrayList<BasicRecipe> recipes = null;
+        Cursor list_cursor = null;
         if (_tag_id != Recipe.NO_ID) {
-            //recipes = ((MainActivity) getActivity()).getSqlController().getTaggedBasicRecipe(_tag_id);
+           list_cursor = getContext()
+                .getContentResolver()
+                .query(RecipeProvider.recipe_list_uri,
+                        null,
+                        "id in (select recipe_id from tag_list where tag_id = ?)",
+                        new String[] {Float.toString(_tag_id)},
+                        null
+                );
         }
         else {
-            //recipes = ((MainActivity) getActivity()).getSqlController().getAllBasicRecipes();
-        }
-        Cursor list_cursor = getContext()
+           list_cursor = getContext()
                 .getContentResolver()
                 .query(RecipeProvider.recipe_list_uri,
                         null,
@@ -67,6 +72,8 @@ public class RecipeListFragment extends ListFragment {
                         null,
                         null
                 );
+        }
+
         setListAdapter(new RecipeCursorAdapter(getContext(),list_cursor,R.layout.recipe_list_item,true));
     }
 

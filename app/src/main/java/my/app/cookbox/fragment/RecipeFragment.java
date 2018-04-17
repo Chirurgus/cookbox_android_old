@@ -345,7 +345,7 @@ public class RecipeFragment extends BaseFragment {
                 TextView tv = (TextView) rl.findViewById(R.id.recipe_list_text1);
                 tv.setText(new_qty.toString());
 
-                if (ingredient_qty_c.moveToNext()) {
+                if (!ingredient_qty_c.moveToNext()) {
                     break;
                 }
             }
