@@ -1,0 +1,29 @@
+BEGIN TRANSACTION;
+
+CREATE TABLE new_recipe(
+  id integer primary key,                             
+  name text not null default "",                      
+  short_description text not null default "",         
+  long_description text not null default "",          
+  target_quantity real not null default 1,                      
+  target_description text not null default "",
+  preparation_time real not null default 0,
+  source text not null default "",
+  time_modified text not null default CURRENT_TIMESTAMP
+); 
+CREATE TABLE IF NOT EXISTS new_tag(id integer primary key,
+				   tag text unique not null,
+				   time_modified text not null default CURRENT_TIMESTAMP
+				   );
+
+INSERT into new_recipe(id,name,short_description,long_description,target_quantity,target_description,preparation_time,source)
+	SELECT id,name,short_description,long_description,target_quantity,target_description,preperation_time AS preparation_time,source FROM recipe;
+INSERT INTO new_tag(id,tag) SELECT * FROM tag;
+
+DROP TABLE tag;
+DROP TABLE recipe;
+
+ALTER TABLE new_recipe RENAME TO recipe;
+ALTER TABLE new_tag RENAME TO tag;
+
+COMMIT;

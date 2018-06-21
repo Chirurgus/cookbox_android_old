@@ -1,7 +1,8 @@
-CREATE TABLE tag(                                     
-  id integer primary key,                             
-  tag text unique not null
-);                                                    
+CREATE TABLE tag(
+  id integer primary key,
+  tag text unique not null,
+  time_modified text not null default CURRENT_TIMESTAMP
+);                                               
 CREATE TABLE tag_list(                                
   tag_id integer not null references tag(id),         
   recipe_id integer not null references recipe(id)    
@@ -15,19 +16,21 @@ CREATE TABLE comment_list(
   recipe_id integer not null references recipe(id),   
   comment text not null default ""
 );                                                    
-CREATE TABLE recipe(                                
+CREATE TABLE recipe(
   id integer primary key,                             
   name text not null default "",                      
   short_description text not null default "",         
   long_description text not null default "",          
   target_quantity real not null default 1,                      
   target_description text not null default "",
-  preperation_time real not null default 0,
-  source text not null default ""      
-);                                                    
+  preparation_time real not null default 0,
+  source text not null default "",
+  deleted boolean not null default false,
+  time_modified text not null default CURRENT_TIMESTAMP
+);                                           
 CREATE TABLE ingredient_list(
   recipe_id integer not null references recipe(id),   
   quantity real not null default 1,                             
   description text not null default "",                          
   other_recipe integer null references recipe(id)     
-);                                                                            
+);                                                                          

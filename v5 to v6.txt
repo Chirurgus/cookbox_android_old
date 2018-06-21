@@ -1,0 +1,4 @@
+ALTER TABLE recipe
+ADD COLUMN deleted boolean not null default false;
+ALTER TABLE tag
+ADD COLUMN deleted boolean not null default false;
