@@ -8,11 +8,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +41,8 @@ import my.app.cookbox.sqlite.RecipeProvider;
 import my.app.cookbox.sqlite.RecipeSyncAdapter;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeCursorAdapter;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by Alexander on 020, 20 Jun.
@@ -221,9 +227,8 @@ public class RecipeListFragment extends ListFragment {
                 ((MainActivity) getActivity()).backupRecipes();
                 return true;
             case R.id.main_test_recipe:
-                //startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
-                CookboxServerAPIHelper ch = new CookboxServerAPIHelper("http://localhost:3000");
-                ch.sync(null);
+                TestHTTPRequest httpRequest = new TestHTTPRequest();
+                httpRequest.execute();
                 return true;
             case R.id.main_test_settings:
                 startPreferenceActivity();
@@ -250,5 +255,35 @@ public class RecipeListFragment extends ListFragment {
 
     private boolean sort_order = false;
     private long _tag_id = Recipe.NO_ID;
+
+
+    class TestHTTPRequest extends AsyncTask<Void, Void, JSONObject> {
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected JSONObject doInBackground(Void... arg0)
+        {
+            CookboxServerAPIHelper ch = new CookboxServerAPIHelper("http://10.0.2.2:3000");
+            return ch.sync(null);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject result)
+        {
+            super.onPostExecute(result);
+            if (result != null) {
+                Log.d(TAG, "onOptionsItemSelected: Recived\n" + result.toString());
+            }
+            else {
+                Log.d(TAG, "onOptionsItemSelected: null response");
+            }
+
+        }
+    }
 }
 

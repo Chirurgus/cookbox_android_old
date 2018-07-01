@@ -2,9 +2,14 @@ package my.app.cookbox.sqlite;
 
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -39,12 +44,13 @@ public class CookboxServerAPIHelper {
 
         try {
             URL url = new URL(mURL + uri);
+
             mConnection = (HttpURLConnection) url.openConnection();
 
             mConnection.setRequestMethod("GET");
             mConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
             mConnection.setRequestProperty("Accept", "application/json");
-            mConnection.setDoOutput(true);
+            //mConnection.setDoOutput(true);
             mConnection.setDoInput(true);
 
 
@@ -64,9 +70,8 @@ public class CookboxServerAPIHelper {
             if (response_code != 200) {
                 throw new Exception("Recieved a non sucess code:" + response_code);
             }
-            String response = mConnection.getResponseMessage();
-            Log.d(TAG, response);
-            return new JSONObject(response);
+            InputStream is = mConnection.getInputStream();
+            return makeJson(is);
         }
         catch (Exception err) {
             Log.e(TAG, "sync: " + err.getMessage());
@@ -76,6 +81,18 @@ public class CookboxServerAPIHelper {
 
     String mURL;
     HttpURLConnection mConnection = null;
+
+    private JSONObject makeJson(InputStream is) throws JSONException, IOException {
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+
+        return new JSONObject(sb.toString());
+    }
 }
 
 /*
