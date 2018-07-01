@@ -32,7 +32,9 @@ import my.app.cookbox.activity.SettingsActivity;
 import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
+import my.app.cookbox.sqlite.CookboxServerAPIHelper;
 import my.app.cookbox.sqlite.RecipeProvider;
+import my.app.cookbox.sqlite.RecipeSyncAdapter;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeCursorAdapter;
 
@@ -220,6 +222,8 @@ public class RecipeListFragment extends ListFragment {
                 return true;
             case R.id.main_test_recipe:
                 //startRecipeActivity(((MainActivity)getActivity()).getAllBasicRecipes().get(0).getId());
+                CookboxServerAPIHelper ch = new CookboxServerAPIHelper("http://localhost:3000");
+                ch.sync(null);
                 return true;
             case R.id.main_test_settings:
                 startPreferenceActivity();
