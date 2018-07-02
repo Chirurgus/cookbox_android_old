@@ -1,6 +1,9 @@
 package my.app.cookbox.sqlite;
 
 import android.util.Log;
+import android.util.Pair;
+
+import com.jcraft.jsch.HASH;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
@@ -24,7 +30,8 @@ public class CookboxServerAPIHelper {
     }
 
     public JSONObject get(long id) {
-        return null;
+        final String uri = "/recipe/" + id;
+        return getJson(uri, null);
     }
 
     public void put(Recipe recipe) {
@@ -32,7 +39,8 @@ public class CookboxServerAPIHelper {
     }
 
     public JSONObject get_tag(long id) {
-        return null;
+        final String uri = "/recipe/tag/" + id;
+        return getJson(uri, null);
     }
 
     public JSONObject  put_tag(RecipeTag tag) {
@@ -41,29 +49,29 @@ public class CookboxServerAPIHelper {
 
     public  JSONObject sync(String sync_token) {
         final String uri = "/recipe/sync";
+        Set<Pair<String,String>> headders = new HashSet<>();
+        if (sync_token != null) {
+            headders.add(new Pair<>("Cookbox-synctoken", sync_token));
+        }
+        return getJson(uri, headders);
+    }
 
+    String mURL;
+    HttpURLConnection mConnection = null;
+
+    private JSONObject getJson(String uri, Set<Pair<String, String>> headders) {
         try {
             URL url = new URL(mURL + uri);
 
             mConnection = (HttpURLConnection) url.openConnection();
 
-            mConnection.setRequestMethod("GET");
-            mConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            mConnection.setRequestProperty("Accept", "application/json");
-            //mConnection.setDoOutput(true);
             mConnection.setDoInput(true);
-
-
-            if (sync_token != null) {
-                JSONObject token = new JSONObject();
-                token.put("token", sync_token);
-
-                DataOutputStream os = new DataOutputStream(mConnection.getOutputStream());
-
-                os.writeBytes(token.toString());
-
-                os.flush();
-                os.close();
+            mConnection.setRequestMethod("GET");
+            mConnection.setRequestProperty("Accept", "application/json");
+            if (headders != null) {
+                for (Pair<String, String> x : headders) {
+                    mConnection.setRequestProperty(x.first, x.second);
+                }
             }
 
             int response_code = mConnection.getResponseCode();
@@ -78,9 +86,6 @@ public class CookboxServerAPIHelper {
         }
         return null;
     }
-
-    String mURL;
-    HttpURLConnection mConnection = null;
 
     private JSONObject makeJson(InputStream is) throws JSONException, IOException {
         StringBuilder sb = new StringBuilder();

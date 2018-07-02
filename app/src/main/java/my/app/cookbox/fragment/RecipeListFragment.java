@@ -269,7 +269,8 @@ public class RecipeListFragment extends ListFragment {
         protected JSONObject doInBackground(Void... arg0)
         {
             CookboxServerAPIHelper ch = new CookboxServerAPIHelper("http://10.0.2.2:3000");
-            return ch.sync(null);
+            //return ch.sync(null);
+            return ch.get(1);
         }
 
         @Override
