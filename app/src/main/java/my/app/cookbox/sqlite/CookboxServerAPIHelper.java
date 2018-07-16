@@ -3,20 +3,17 @@ package my.app.cookbox.sqlite;
 import android.util.Log;
 import android.util.Pair;
 
-import com.jcraft.jsch.HASH;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import my.app.cookbox.recipe.Recipe;
@@ -29,37 +26,124 @@ public class CookboxServerAPIHelper {
         this.mURL = url;
     }
 
-    public JSONObject get(long id) {
+    public JSONObject get_recipe(long id) {
         final String uri = "/recipe/" + id;
-        return getJson(uri, null);
+        return getJson(uri);
     }
 
-    public void put(Recipe recipe) {
-
+    public void put_recipe(JSONObject recipe) {
+        final String uri = "/recipe";
+        putJson(uri, recipe);
     }
 
     public JSONObject get_tag(long id) {
         final String uri = "/recipe/tag/" + id;
-        return getJson(uri, null);
+        return getJson(uri);
     }
 
-    public JSONObject  put_tag(RecipeTag tag) {
-        return null;
+    public void put_tag(RecipeTag tag) {
+        final String uri = "/recipe/tag";
+        putJson(uri, new JSONObject());
+    }
+
+    public JSONObject get_schema(long db_version) {
+        final String uri = "/recipe/schema/schema/" + db_version;
+        return getJson(uri);
+    }
+
+    public JSONObject get_migration(long db_version) {
+        final String uri = "/recipe/schema/migration/" + db_version;
+        return getJson(uri);
     }
 
     public  JSONObject sync(String sync_token) {
-        final String uri = "/recipe/sync";
-        Set<Pair<String,String>> headders = new HashSet<>();
+        String uri = "/recipe/sync";
         if (sync_token != null) {
-            headders.add(new Pair<>("Cookbox-synctoken", sync_token));
+            uri = uri + "/" + sync_token;
         }
-        return getJson(uri, headders);
+        return getJson(uri);
     }
 
     String mURL;
     HttpURLConnection mConnection = null;
 
-    private JSONObject getJson(String uri, Set<Pair<String, String>> headders) {
+    private void deleteJSON(String uri) {
+         try {
+            URL url = new URL(mURL + uri);
+
+            mConnection = (HttpURLConnection) url.openConnection();
+
+            mConnection.setDoOutput(false);
+            mConnection.setDoInput(false);
+            mConnection.setRequestMethod("DELETE");
+
+            int response_code = mConnection.getResponseCode();
+            if (response_code != 200) {
+                throw new Exception("Recieved a non sucess code:" + response_code);
+            }
+        }
+        catch (Exception err) {
+            Log.e(TAG, "delete: " + err.getMessage());
+        }
+    }
+
+    private JSONObject  postJSON(String uri, JSONObject json) {
+         try {
+            URL url = new URL(mURL + uri);
+
+            mConnection = (HttpURLConnection) url.openConnection();
+
+            mConnection.setDoOutput(true);
+            mConnection.setRequestMethod("POST");
+
+            OutputStreamWriter os = new OutputStreamWriter(
+                   mConnection.getOutputStream()
+            );
+            os.write(json.toString());
+            os.close();
+
+            int response_code = mConnection.getResponseCode();
+            if (response_code != 200) {
+                throw new Exception("Recieved a non sucess code:" + response_code);
+            }
+            InputStream is = mConnection.getInputStream();
+            return makeJson(is);
+        }
+        catch (Exception err) {
+            Log.e(TAG, "sync: " + err.getMessage());
+        }
+        return null;
+    }
+
+    private JSONObject putJson(String uri, JSONObject json) {
+         try {
+            URL url = new URL(mURL + uri);
+
+            mConnection = (HttpURLConnection) url.openConnection();
+
+            mConnection.setDoOutput(true);
+            mConnection.setRequestMethod("PUT");
+
+            OutputStreamWriter os = new OutputStreamWriter(
+                   mConnection.getOutputStream()
+            );
+            os.write(json.toString());
+            os.close();
+
+            int response_code = mConnection.getResponseCode();
+            if (response_code != 200) {
+                throw new Exception("Recieved a non sucess code:" + response_code);
+            }
+            InputStream is = mConnection.getInputStream();
+            return makeJson(is);
+        }
+        catch (Exception err) {
+            Log.e(TAG, "sync: " + err.getMessage());
+        }
+        return null;
+    }
+
+    private JSONObject getJson(String uri) {
         try {
             URL url = new URL(mURL + uri);
 
@@ -68,11 +152,6 @@ public class CookboxServerAPIHelper {
             mConnection.setDoInput(true);
             mConnection.setRequestMethod("GET");
             mConnection.setRequestProperty("Accept", "application/json");
-            if (headders != null) {
-                for (Pair<String, String> x : headders) {
-                    mConnection.setRequestProperty(x.first, x.second);
-                }
-            }
 
             int response_code = mConnection.getResponseCode();
             if (response_code != 200) {
