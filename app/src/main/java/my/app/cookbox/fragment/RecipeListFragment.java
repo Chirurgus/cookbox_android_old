@@ -3,6 +3,7 @@ package my.app.cookbox.fragment;
 import android.app.ListFragment;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -227,7 +229,7 @@ public class RecipeListFragment extends ListFragment {
                 ((MainActivity) getActivity()).backupRecipes();
                 return true;
             case R.id.main_test_recipe:
-                TestHTTPRequest httpRequest = new TestHTTPRequest();
+                TestHTTPRequest httpRequest = new TestHTTPRequest(getContext().getContentResolver());
                 httpRequest.execute();
                 return true;
             case R.id.main_test_settings:
@@ -257,7 +259,12 @@ public class RecipeListFragment extends ListFragment {
     private long _tag_id = Recipe.NO_ID;
 
 
-    class TestHTTPRequest extends AsyncTask<Void, Void, JSONObject> {
+    class TestHTTPRequest extends AsyncTask<Void, Void, Boolean> {
+        ContentResolver cr = null;
+
+        TestHTTPRequest(ContentResolver cr) {
+            this.cr = cr;
+        }
 
         @Override
         protected void onPreExecute()
@@ -266,18 +273,87 @@ public class RecipeListFragment extends ListFragment {
         }
 
         @Override
-        protected JSONObject doInBackground(Void... arg0)
+        protected Boolean doInBackground(Void... arg0)
         {
-            CookboxServerAPIHelper ch = new CookboxServerAPIHelper("http://10.0.2.2:3000");
-            //return ch.sync(null);
-            return ch.get(1);
+            try {
+                final CookboxServerAPIHelper cookboxApi = new CookboxServerAPIHelper("http://10.0.2.2:3000");
+                // For now just grab all recipes
+                final String time_token = null;
+                final JSONObject sync = cookboxApi.sync(time_token);
+                Log.d(TAG, "doInBackground: Got sync data.");
+
+                /*
+                // Compare recipes updated
+                final Cursor ids = contentProviderClient.query(
+                        RecipeProvider.recipe_uri,
+                        new String[] {"id"},
+                        "time_modified > ?",
+                        new String[] {"2018"},
+                        null
+                );
+                */
+
+                /*
+                // Update db if necessairy
+                final SqlController sqlDb = new SqlController(getContext(), "recipe.db");
+                if (sync.getInt("schema_version") > sqlDb.getDbVersion()) {
+                    final int ver = sync.getInt("schema_version");
+                    final String migration = cookboxApi.get_migration(ver).getString("migration");
+                    sqlDb.execSQL(migration);
+                }
+                */
+
+                // First fetch updates from server
+
+                // First fetch the tags
+                JSONArray tagIds = sync.getJSONArray("tag_ids");
+                for (int i = 0; i <= tagIds.length(); ++i) {
+                    final long id = tagIds.getLong(i);
+                    final JSONObject tag = cookboxApi.get_tag(id);
+                    final ContentValues cv = new ContentValues();
+                    cv.put("tag", tag.getString("tag"));
+                    cv.put("id", tag.getLong("id"));
+                    cv.put("time_modified", tag.getString("time_modified"));
+
+                    cr.insert(RecipeProvider.tag_uri, cv);
+                }
+                Log.d(TAG, "doInBackground: inserted tags.");
+
+                // Then the recipes
+                JSONArray recipeIds = sync.getJSONArray("recipe_ids");
+                for (int i = 0; i <= recipeIds.length(); ++i) {
+                    //long id = recipeIds.getJSONObject(i).getLong("id");
+                    final long id = recipeIds.getLong(i);
+                    final JSONObject recipe = cookboxApi.get_recipe(id);
+                    final ContentValues cv = new ContentValues();
+                    cv.put("id", recipe.getLong("id"));
+                    cv.put("name", recipe.getString("name"));
+                    cv.put("short_description", recipe.getString("short_description"));
+                    cv.put("long_description", recipe.getString("long_description"));
+                    cv.put("target_quantity", recipe.getString("target_quantity"));
+                    cv.put("target_description", recipe.getString("target_description"));
+                    cv.put("preparation_time", recipe.getDouble("preparation_time"));
+                    cv.put("source", recipe.getString("source"));
+                    cv.put("time_modified", recipe.getString("time_modified"));
+                    cv.put("deleted", recipe.getBoolean("deleted"));
+
+                    cr.insert(RecipeProvider.recipe_uri, cv);
+                    //TODO: Insert all the lists
+                }
+                Log.d(TAG, "doInBackground: Inserted recipes.");
+                return true;
+            }
+            catch (Exception err) {
+                Log.e(TAG, "onPerformSync: Could not sync ", err);
+                return false;
+            }
         }
 
         @Override
-        protected void onPostExecute(JSONObject result)
+        protected void onPostExecute(Boolean result)
         {
             super.onPostExecute(result);
-            if (result != null) {
+            if (result) {
                 Log.d(TAG, "onOptionsItemSelected: Recived\n" + result.toString());
             }
             else {

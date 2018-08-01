@@ -8,6 +8,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -40,28 +41,41 @@ public class RecipeSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             final CookboxServerAPIHelper cookboxApi = new CookboxServerAPIHelper("http://10.0.2.2:3000");
 
-            final JSONObject sync = cookboxApi.sync(null);
+            // For now just grab all recipes
+            final String time_token = null;
+            final JSONObject sync = cookboxApi.sync(time_token);
 
-        /*
-        // Update db if necessairy
-        final SqlController sqlDb = new SqlController(getContext(), "recipe.db");
-        if (sync.getInt("schema_version") > sqlDb.getDbVersion()) {
-            final int ver = sync.getInt("schema_version");
-            final String migration = cookboxApi.get_migration(ver).getString("migration");
-            sqlDb.execSQL(migration);
-        }
-        */
+            /*
+            // Compare recipes updated
+            final Cursor ids = contentProviderClient.query(
+                    RecipeProvider.recipe_uri,
+                    new String[] {"id"},
+                    "time_modified > ?",
+                    new String[] {"2018"},
+                    null
+            );
+            */
+
+            /*
+            // Update db if necessairy
+            final SqlController sqlDb = new SqlController(getContext(), "recipe.db");
+            if (sync.getInt("schema_version") > sqlDb.getDbVersion()) {
+                final int ver = sync.getInt("schema_version");
+                final String migration = cookboxApi.get_migration(ver).getString("migration");
+                sqlDb.execSQL(migration);
+            }
+            */
 
             // First fetch updates from server
 
             // First fetch the tags
             JSONArray tagIds = sync.getJSONArray("tag_ids");
             for (int i = 0; i <= tagIds.length(); ++i) {
-                long id = tagIds.getJSONObject(i).getLong();
+                long id = tagIds.getJSONObject(i).getLong("id");
                 final JSONObject tag = cookboxApi.get_tag(id);
                 final ContentValues cv = new ContentValues();
                 cv.put("tag", tag.getString("tag"));
-                cv.put("id", tag.getString("id"));
+                cv.put("id", tag.getLong("id"));
                 cv.put("time_modified", tag.getString("time_modified"));
 
                 contentProviderClient.insert(RecipeProvider.tag_uri, cv);
@@ -70,7 +84,7 @@ public class RecipeSyncAdapter extends AbstractThreadedSyncAdapter {
             // Then the recipes
             JSONArray recipeIds = sync.getJSONArray("recipe_ids");
             for (int i = 0; i <= recipeIds.length(); ++i) {
-                long id = recipeIds.getJSONObject(i).getLong();
+                long id = recipeIds.getJSONObject(i).getLong("id");
                 final JSONObject recipe = cookboxApi.get_recipe(id);
                 final ContentValues cv = new ContentValues();
                 cv.put("id", recipe.getLong("id"));
@@ -86,7 +100,8 @@ public class RecipeSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 contentProviderClient.insert(RecipeProvider.recipe_uri, cv);
             }
-        } catch (Exception err) {
+        }
+        catch (Exception err) {
             Log.e(TAG, "onPerformSync: Could not sync ", err);
         }
     }

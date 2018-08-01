@@ -28,27 +28,28 @@ public class SqlController extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d(TAG, "onCreate: onCreate called.");
         db.beginTransaction();
         try {
-            final String create_table = "CREATE TABLE tag(\n" +
+            final String s1 = "CREATE TABLE tag(\n" +
                     "  id integer primary key,\n" +
                     "  tag text unique not null,\n" +
                     "  time_modified text not null default CURRENT_TIMESTAMP\n" +
-                    ");                                               \n" +
-                    "CREATE TABLE tag_list(                                \n" +
+                    ");";
+            final String s2 = "CREATE TABLE tag_list(                                \n" +
                     "  tag_id integer not null references tag(id) ON DELETE CASCADE,         \n" +
                     "  recipe_id integer not null references recipe(id) ON DELETE CASCADE    \n" +
-                    ");                                                    \n" +
-                    "CREATE TABLE instruction_list(                        \n" +
+                    ");";
+            final String s3 = "CREATE TABLE instruction_list(                        \n" +
                     "  recipe_id integer not null references recipe(id) ON DELETE CASCADE,            \n" +
                     "  position integer not null,                          \n" +
                     "  instruction text not null default \"\"                           \n" +
-                    ");                                                    \n" +
-                    "CREATE TABLE comment_list(                            \n" +
+                    ");";
+            final String s4 = "CREATE TABLE comment_list(                            \n" +
                     "  recipe_id integer not null references recipe(id) ON DELETE CASCADE,   \n" +
                     "  comment text not null default \"\"\n" +
-                    ");                                                    \n" +
-                    "CREATE TABLE recipe(\n" +
+                    ");";
+            final String s5 = "CREATE TABLE recipe(\n" +
                     "  id integer primary key,                             \n" +
                     "  name text not null default \"\",                      \n" +
                     "  short_description text not null default \"\",         \n" +
@@ -59,126 +60,131 @@ public class SqlController extends SQLiteOpenHelper {
                     "  source text not null default \"\",\n" +
                     "  deleted boolean not null default false,\n" +
                     "  time_modified text not null default CURRENT_TIMESTAMP\n" +
-                    ");                                           \n" +
-                    "CREATE TABLE ingredient_list(\n" +
+                    ");";
+            final String s6 = "CREATE TABLE ingredient_list(\n" +
                     "  recipe_id integer not null references recipe(id) ON DELETE CASCADE,   \n" +
                     "  quantity real not null default 1,                             \n" +
                     "  description text not null default \"\",                          \n" +
                     "  other_recipe integer null references recipe(id) ON DELETE RESTRICT     \n" +
-                    ");\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_update_recipe\n" +
+                    ");";
+            final String s7 = "CREATE TRIGGER on_update_recipe\n" +
                     "AFTER UPDATE ON recipe\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_update_ingredient_list\n" +
+                    "END;";
+            final String s8 = "CREATE TRIGGER on_update_ingredient_list\n" +
                     "AFTER UPDATE ON ingredient_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_update_instruction_list\n" +
+                    "END;";
+            final String s9 = "CREATE TRIGGER on_update_instruction_list\n" +
                     "AFTER UPDATE ON instruction_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_update_comment_list\n" +
+                    "END;";
+            final String s10 = "CREATE TRIGGER on_update_comment_list\n" +
                     "AFTER UPDATE ON comment_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_update_tag_list\n" +
+                    "END;";
+            final String s11 = "CREATE TRIGGER on_update_tag_list\n" +
                     "AFTER UPDATE ON tag_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_insert_ingredient_list\n" +
+                    "END;";
+            final String s12 = "CREATE TRIGGER on_insert_ingredient_list\n" +
                     "AFTER INSERT ON ingredient_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_insert_instruction_list\n" +
+                    "END;\n";
+            final String s13 = "CREATE TRIGGER on_insert_instruction_list\n" +
                     "AFTER INSERT ON instruction_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_insert_comment_list\n" +
+                    "END;\n";
+            final String s14 = "CREATE TRIGGER on_insert_comment_list\n" +
                     "AFTER INSERT ON comment_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_insert_tag_list\n" +
+                    "END;\n";
+            final String s15 = "CREATE TRIGGER on_insert_tag_list\n" +
                     "AFTER INSERT ON tag_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_delete_ingredient_list\n" +
+                    "END;\n";
+            final String s16 = "CREATE TRIGGER on_delete_ingredient_list\n" +
                     "AFTER DELETE ON ingredient_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = OLD.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_delete_instruction_list\n" +
+                    "END;\n";
+            final String s17 = "CREATE TRIGGER on_delete_instruction_list\n" +
                     "AFTER DELETE ON instruction_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = OLD.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_delete_tag_list\n" +
+                    "END;\n";
+            final String s18 = "CREATE TRIGGER on_delete_tag_list\n" +
                     "AFTER DELETE ON tag_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = OLD.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_delete_comment_list\n" +
+                    "END;\n";
+            final String s19 = "CREATE TRIGGER on_delete_comment_list\n" +
                     "AFTER DELETE ON comment_list\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE recipe\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = OLD.recipe_id;\n" +
-                    "END;\n" +
-                    "\n" +
-                    "CREATE TRIGGER on_update_tag\n" +
+                    "END;\n";
+            final String s20 = "CREATE TRIGGER on_update_tag\n" +
                     "AFTER UPDATE ON tag\n" +
                     "BEGIN                                                     \n" +
                     "  UPDATE tag\n" +
                     "  SET time_modified = datetime()\n" +
                     "  WHERE id = NEW.id;\n" +
                     "END;";
-            db.execSQL(create_table);
+            db.execSQL(s1);
+            db.execSQL(s2);
+            db.execSQL(s3);
+            db.execSQL(s4);
+            db.execSQL(s5);
+            db.execSQL(s6);
+            db.execSQL(s7);
+            db.execSQL(s8);
+            db.execSQL(s9);
+            db.execSQL(s10);
+            db.execSQL(s11);
+            db.execSQL(s12);
+            db.execSQL(s13);
+            db.execSQL(s14);
+            db.execSQL(s15);
+            db.execSQL(s16);
+            db.execSQL(s17);
+            db.execSQL(s18);
+            db.execSQL(s19);
+            db.execSQL(s20);
             db.setTransactionSuccessful();
         }
         catch (Exception e) {

@@ -86,8 +86,8 @@ public class RecipeProvider extends ContentProvider {
                 table = tag_list_table;
                 break;
             case recipe_list:
-                return getReadableDatabase()
-                        .rawQuery(
+                SQLiteDatabase db = getReadableDatabase();
+                return db.rawQuery(
                                 "SELECT id AS _id,name,short_description FROM recipe",
                                 null
                         );
