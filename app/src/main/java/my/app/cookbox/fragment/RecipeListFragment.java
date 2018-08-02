@@ -339,7 +339,69 @@ public class RecipeListFragment extends ListFragment {
                     cv.put("deleted", recipe.getBoolean("deleted"));
 
                     cr.insert(RecipeProvider.recipe_uri, cv);
-                    //TODO: Insert all the lists
+                }
+
+                for (int i = 0; i < recipeIds.length(); ++i) {
+                    final long id = recipeIds.getLong(i);
+                    final JSONObject recipe = cookboxApi.get_recipe(id);
+
+                    cr.delete(RecipeProvider.ingredient_uri,
+                            "recipe_id = ?",
+                            new String[] {Long.toString(id)});
+                    cr.delete(RecipeProvider.instruction_uri,
+                            "recipe_id = ?",
+                            new String[] {Long.toString(id)});
+                    cr.delete(RecipeProvider.comment_uri,
+                            "recipe_id = ?",
+                            new String[] {Long.toString(id)});
+                    cr.delete(RecipeProvider.tag_uri,
+                            "recipe_id = ?",
+                            new String[] {Long.toString(id)});
+
+                    JSONArray ingredients = recipe.getJSONArray("ingredient_list");
+                    for (int j = 0; j < ingredients.length(); ++j) {
+                        final JSONObject ingredient = ingredients.getJSONObject(j);
+                        final ContentValues ing_cv = new ContentValues();
+                        ing_cv.put("recipe_id", id);
+                        ing_cv.put("quantity", ingredient.getDouble("quantity"));
+                        ing_cv.put("description", ingredient.getString("description"));
+                        if (ingredient.isNull("other_recipe")) {
+                            ing_cv.putNull("other_recipe");
+                        }
+                        else {
+                            ing_cv.put("other_recipe", ingredient.getLong("other_recipe"));
+                        }
+
+                        cr.insert(RecipeProvider.ingredient_uri, ing_cv);
+                    }
+
+                    JSONArray instructions = recipe.getJSONArray("instruction_list");
+                    for (int j = 0; j < instructions.length(); ++j) {
+                        final ContentValues ins_cv = new ContentValues();
+                        ins_cv.put("recipe_id", id);
+                        ins_cv.put("position", j);
+                        ins_cv.put("instruction", instructions.getString(j));
+
+                        cr.insert(RecipeProvider.instruction_uri, ins_cv);
+                    }
+
+                    JSONArray comments = recipe.getJSONArray("comment_list");
+                    for (int j = 0; j < comments.length(); ++j) {
+                        final ContentValues cmnt_cv = new ContentValues();
+                        cmnt_cv.put("recipe_id", id);
+                        cmnt_cv.put("comment", comments.getString(j));
+
+                        cr.insert(RecipeProvider.comment_uri, cmnt_cv);
+                    }
+
+                    JSONArray tags = recipe.getJSONArray("tag_list");
+                    for (int j = 0; j <  tags.length(); ++j) {
+                        final ContentValues tag_cv = new ContentValues();
+                        tag_cv.put("recipe_id", id);
+                        tag_cv.put("tag_id", tags.getLong(j));
+
+                        cr.insert(RecipeProvider.tag_uri, tag_cv);
+                    }
                 }
                 Log.d(TAG, "doInBackground: Inserted recipes.");
                 return true;
