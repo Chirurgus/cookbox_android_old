@@ -307,21 +307,22 @@ public class RecipeListFragment extends ListFragment {
 
                 // First fetch the tags
                 JSONArray tagIds = sync.getJSONArray("tag_ids");
-                for (int i = 0; i <= tagIds.length(); ++i) {
+                for (int i = 0; i < tagIds.length(); ++i) {
                     final long id = tagIds.getLong(i);
                     final JSONObject tag = cookboxApi.get_tag(id);
                     final ContentValues cv = new ContentValues();
                     cv.put("tag", tag.getString("tag"));
                     cv.put("id", tag.getLong("id"));
+                    cv.put("tag", tag.getString("tag"));
                     cv.put("time_modified", tag.getString("time_modified"));
 
-                    cr.insert(RecipeProvider.tag_uri, cv);
+                    cr.insert(RecipeProvider.tag_list_uri, cv);
                 }
                 Log.d(TAG, "doInBackground: inserted tags.");
 
                 // Then the recipes
                 JSONArray recipeIds = sync.getJSONArray("recipe_ids");
-                for (int i = 0; i <= recipeIds.length(); ++i) {
+                for (int i = 0; i < recipeIds.length(); ++i) {
                     //long id = recipeIds.getJSONObject(i).getLong("id");
                     final long id = recipeIds.getLong(i);
                     final JSONObject recipe = cookboxApi.get_recipe(id);
