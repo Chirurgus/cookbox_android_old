@@ -326,19 +326,26 @@ public class RecipeListFragment extends ListFragment {
                     //long id = recipeIds.getJSONObject(i).getLong("id");
                     final long id = recipeIds.getLong(i);
                     final JSONObject recipe = cookboxApi.get_recipe(id);
-                    final ContentValues cv = new ContentValues();
-                    cv.put("id", recipe.getLong("id"));
-                    cv.put("name", recipe.getString("name"));
-                    cv.put("short_description", recipe.getString("short_description"));
-                    cv.put("long_description", recipe.getString("long_description"));
-                    cv.put("target_quantity", recipe.getString("target_quantity"));
-                    cv.put("target_description", recipe.getString("target_description"));
-                    cv.put("preparation_time", recipe.getDouble("preparation_time"));
-                    cv.put("source", recipe.getString("source"));
-                    cv.put("time_modified", recipe.getString("time_modified"));
-                    cv.put("deleted", recipe.getBoolean("deleted"));
+                    if (recipe.getBoolean("deleted")) {
+                        cr.delete(RecipeProvider.recipe_uri,
+                                "id = ?",
+                                new String[] {Long.toString(id)});
+                    }
+                    else {
+                        final ContentValues cv = new ContentValues();
+                        cv.put("id", recipe.getLong("id"));
+                        cv.put("name", recipe.getString("name"));
+                        cv.put("short_description", recipe.getString("short_description"));
+                        cv.put("long_description", recipe.getString("long_description"));
+                        cv.put("target_quantity", recipe.getString("target_quantity"));
+                        cv.put("target_description", recipe.getString("target_description"));
+                        cv.put("preparation_time", recipe.getDouble("preparation_time"));
+                        cv.put("source", recipe.getString("source"));
+                        cv.put("time_modified", recipe.getString("time_modified"));
+                        cv.put("deleted", recipe.getBoolean("deleted"));
+                        cr.insert(RecipeProvider.recipe_uri, cv);
+                    }
 
-                    cr.insert(RecipeProvider.recipe_uri, cv);
                 }
 
                 for (int i = 0; i < recipeIds.length(); ++i) {
