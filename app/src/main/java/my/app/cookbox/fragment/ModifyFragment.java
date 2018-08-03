@@ -374,11 +374,11 @@ public class ModifyFragment extends BaseFragment {
         tgt_desc.setText(r.target_description == null ? "" : r.target_description);
 
         EditText target_qty = getEditTextFromId(R.id.modify_edit_text_tgt_qty, _root_view);
-        if (r.target_quantity == null || r.target_quantity <= 0) {
+        if (r.target_quantity <= 0) {
             target_qty.setText("1");
         }
         else {
-            target_qty.setText(r.target_quantity.toString());
+            target_qty.setText(Float.toString(r.target_quantity));
         }
 
         for (int i = 0; i < r.ingredients.size(); ++i) {

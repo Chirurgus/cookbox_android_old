@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.function.Predicate;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
@@ -38,6 +39,7 @@ import my.app.cookbox.activity.SettingsActivity;
 import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
 import my.app.cookbox.recipe.Recipe;
+import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.CookboxServerAPIHelper;
 import my.app.cookbox.sqlite.RecipeProvider;
 import my.app.cookbox.sqlite.RecipeSyncAdapter;
@@ -282,26 +284,34 @@ public class RecipeListFragment extends ListFragment {
                 final JSONObject sync = cookboxApi.sync(time_token);
                 Log.d(TAG, "doInBackground: Got sync data.");
 
-                /*
-                // Compare recipes updated
-                final Cursor ids = contentProviderClient.query(
+                // Get recipes that were updated since last sync
+                final Cursor ids_cursor = cr.query(
                         RecipeProvider.recipe_uri,
                         new String[] {"id"},
                         "time_modified > ?",
-                        new String[] {"2018"},
+                        new String[] {time_token},
                         null
                 );
-                */
-
-                /*
-                // Update db if necessairy
-                final SqlController sqlDb = new SqlController(getContext(), "recipe.db");
-                if (sync.getInt("schema_version") > sqlDb.getDbVersion()) {
-                    final int ver = sync.getInt("schema_version");
-                    final String migration = cookboxApi.get_migration(ver).getString("migration");
-                    sqlDb.execSQL(migration);
+                final ArrayList<Long> updated_ids = new ArrayList<>();
+                if (ids_cursor.moveToFirst()) {
+                    do {
+                       updated_ids.add(ids_cursor.getLong(ids_cursor.getColumnIndex("id")));
+                    } while (ids_cursor.moveToNext());
                 }
-                */
+
+                final Cursor tags_cursor = cr.query(
+                        RecipeProvider.tag_list_uri,
+                        new String[] {"id"},
+                        "time_modified > ?",
+                        new String[] {time_token},
+                        null
+                );
+                final ArrayList<Long> updated_tags = new ArrayList<>();
+                if (tags_cursor.moveToFirst()) {
+                    do {
+                       updated_tags.add(tags_cursor.getLong(tags_cursor.getColumnIndex("id")));
+                    } while (tags_cursor.moveToNext());
+                }
 
                 // First fetch updates from server
 
@@ -309,14 +319,11 @@ public class RecipeListFragment extends ListFragment {
                 JSONArray tagIds = sync.getJSONArray("tag_ids");
                 for (int i = 0; i < tagIds.length(); ++i) {
                     final long id = tagIds.getLong(i);
-                    final JSONObject tag = cookboxApi.get_tag(id);
-                    final ContentValues cv = new ContentValues();
-                    cv.put("tag", tag.getString("tag"));
-                    cv.put("id", tag.getLong("id"));
-                    cv.put("tag", tag.getString("tag"));
-                    cv.put("time_modified", tag.getString("time_modified"));
+                    final RecipeTag tag = RecipeTag.fromJson(cookboxApi.get_tag(id));
+                    RecipeTag.writeToProvider(tag);
 
-                    cr.insert(RecipeProvider.tag_list_uri, cv);
+                    // Remove this recipe from recipes whose changes will be pushed to the server
+                    updated_tags.remove(id);
                 }
                 Log.d(TAG, "doInBackground: inserted tags.");
 
@@ -325,92 +332,58 @@ public class RecipeListFragment extends ListFragment {
                 for (int i = 0; i < recipeIds.length(); ++i) {
                     //long id = recipeIds.getJSONObject(i).getLong("id");
                     final long id = recipeIds.getLong(i);
-                    final JSONObject recipe = cookboxApi.get_recipe(id);
-                    if (recipe.getBoolean("deleted")) {
+                    final BasicRecipe recipe = BasicRecipe.fromJson(cookboxApi.get_recipe(id));
+                    if (recipe.deleted) {
                         cr.delete(RecipeProvider.recipe_uri,
                                 "id = ?",
                                 new String[] {Long.toString(id)});
                     }
                     else {
-                        final ContentValues cv = new ContentValues();
-                        cv.put("id", recipe.getLong("id"));
-                        cv.put("name", recipe.getString("name"));
-                        cv.put("short_description", recipe.getString("short_description"));
-                        cv.put("long_description", recipe.getString("long_description"));
-                        cv.put("target_quantity", recipe.getString("target_quantity"));
-                        cv.put("target_description", recipe.getString("target_description"));
-                        cv.put("preparation_time", recipe.getDouble("preparation_time"));
-                        cv.put("source", recipe.getString("source"));
-                        cv.put("time_modified", recipe.getString("time_modified"));
-                        cv.put("deleted", recipe.getBoolean("deleted"));
-                        cr.insert(RecipeProvider.recipe_uri, cv);
+                        BasicRecipe.writeBasicOnlyToProvider(recipe, cr);
                     }
 
+                    // Remove this recipe from recipes whose changes will be pushed to the server
+                    updated_ids.remove(id);
                 }
 
                 for (int i = 0; i < recipeIds.length(); ++i) {
                     final long id = recipeIds.getLong(i);
-                    final JSONObject recipe = cookboxApi.get_recipe(id);
-
-                    cr.delete(RecipeProvider.ingredient_uri,
-                            "recipe_id = ?",
-                            new String[] {Long.toString(id)});
-                    cr.delete(RecipeProvider.instruction_uri,
-                            "recipe_id = ?",
-                            new String[] {Long.toString(id)});
-                    cr.delete(RecipeProvider.comment_uri,
-                            "recipe_id = ?",
-                            new String[] {Long.toString(id)});
-                    cr.delete(RecipeProvider.tag_uri,
-                            "recipe_id = ?",
-                            new String[] {Long.toString(id)});
-
-                    JSONArray ingredients = recipe.getJSONArray("ingredient_list");
-                    for (int j = 0; j < ingredients.length(); ++j) {
-                        final JSONObject ingredient = ingredients.getJSONObject(j);
-                        final ContentValues ing_cv = new ContentValues();
-                        ing_cv.put("recipe_id", id);
-                        ing_cv.put("quantity", ingredient.getDouble("quantity"));
-                        ing_cv.put("description", ingredient.getString("description"));
-                        if (ingredient.isNull("other_recipe")) {
-                            ing_cv.putNull("other_recipe");
-                        }
-                        else {
-                            ing_cv.put("other_recipe", ingredient.getLong("other_recipe"));
-                        }
-
-                        cr.insert(RecipeProvider.ingredient_uri, ing_cv);
-                    }
-
-                    JSONArray instructions = recipe.getJSONArray("instruction_list");
-                    for (int j = 0; j < instructions.length(); ++j) {
-                        final ContentValues ins_cv = new ContentValues();
-                        ins_cv.put("recipe_id", id);
-                        ins_cv.put("position", j);
-                        ins_cv.put("instruction", instructions.getString(j));
-
-                        cr.insert(RecipeProvider.instruction_uri, ins_cv);
-                    }
-
-                    JSONArray comments = recipe.getJSONArray("comment_list");
-                    for (int j = 0; j < comments.length(); ++j) {
-                        final ContentValues cmnt_cv = new ContentValues();
-                        cmnt_cv.put("recipe_id", id);
-                        cmnt_cv.put("comment", comments.getString(j));
-
-                        cr.insert(RecipeProvider.comment_uri, cmnt_cv);
-                    }
-
-                    JSONArray tags = recipe.getJSONArray("tag_list");
-                    for (int j = 0; j <  tags.length(); ++j) {
-                        final ContentValues tag_cv = new ContentValues();
-                        tag_cv.put("recipe_id", id);
-                        tag_cv.put("tag_id", tags.getLong(j));
-
-                        cr.insert(RecipeProvider.tag_uri, tag_cv);
-                    }
+                    final BasicRecipe recipe = BasicRecipe.fromJson(cookboxApi.get_recipe(id));
+                    BasicRecipe.writeToProvider(recipe, cr);
                 }
-                Log.d(TAG, "doInBackground: Inserted recipes.");
+                Log.d(TAG, "doInBackground: Inserted changes from the server.");
+
+                // Now push changes that weren't overwritten
+                for (Long tag_id : updated_tags) {
+                    final Cursor tag = cr.query(RecipeProvider.tag_list_uri,
+                            null,
+                            "id = ?",
+                            new String[] {tag_id.toString()},
+                            null);
+                    tag.moveToFirst();
+                    cookboxApi.put_tag(new RecipeTag(tag_id, tag.getString(tag.getColumnIndex("tag"))));
+                }
+
+                for (Long id : updated_ids) {
+                    Cursor recipe = cr.query(RecipeProvider.recipe_uri,
+                            null,
+                            "id = ?",
+                            new String[] {id.toString()},
+                            null);
+
+                }
+
+                for (Long id : updated_ids) {
+                    Cursor ingredient_list = cr.query(RecipeProvider.ingredient_uri,
+                            null,
+                            "recipe_id = ?",
+                            new String[]{id.toString()},
+                            null);
+                    if ()
+                        Cursor instruction_list = ;
+                    Cursor comment_list = ;
+                    Cursor tag_list = ;
+                }
                 return true;
             }
             catch (Exception err) {

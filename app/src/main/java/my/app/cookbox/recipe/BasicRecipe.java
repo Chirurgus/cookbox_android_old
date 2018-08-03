@@ -5,6 +5,10 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import my.app.cookbox.sqlite.RecipeProvider;
@@ -14,17 +18,14 @@ import my.app.cookbox.sqlite.RecipeProvider;
  */
 
 public  class BasicRecipe {
-
-    public static final long NO_ID = -1;
-
     public Long id = null;
     public String name = "";
     public String short_desc = "";
     public String long_desc = "";
-    public Float target_quantity = 1f;
+    public double target_quantity = 1f;
     public String target_description = "";
     public String source = "";
-    public double preparation_time = 1;
+    public double preparation_time = 0;
     public String time_modified;
     public boolean deleted = false;
 
@@ -33,7 +34,85 @@ public  class BasicRecipe {
     public ArrayList<String> comments = new ArrayList<>();
     public ArrayList<Long> tags = new ArrayList<>();
 
-    static long writeBasicOnlyToProvider(BasicRecipe br, ContentResolver cr) {
+    public static JSONObject toJson(BasicRecipe br) throws JSONException {
+        JSONObject jsonRecipe = new JSONObject();
+
+        jsonRecipe.put("id", br.id);
+        jsonRecipe.put("name", br.name);
+        jsonRecipe.put("short_description", br.short_desc);
+        jsonRecipe.put("long_description", br.long_desc);
+        jsonRecipe.put("target_description", br.target_description);
+        jsonRecipe.put("target_quantity", br.target_quantity);
+        jsonRecipe.put("preparation_time", br.preparation_time);
+        jsonRecipe.put("source", br.source);
+        jsonRecipe.put("time_modified", br.time_modified);
+        jsonRecipe.put("deleted", br.deleted);
+
+        JSONArray ingredient_list = new JSONArray();
+        for (RecipeIngredient ingredient : br.ingredients) {
+            ingredient_list.put(ingredient.toJson());
+        }
+        jsonRecipe.put("ingredient_list", ingredient_list);
+
+        JSONArray instruction_list = new JSONArray();
+        for (String instruction : br.instructions) {
+            instruction_list.put(instruction);
+        }
+        jsonRecipe.put("instruction_list", ingredient_list);
+
+        JSONArray comment_list = new JSONArray();
+        for (String comment : br.comments) {
+            comment_list.put(comment);
+        }
+        jsonRecipe.put("comment_list", comment_list);
+
+        JSONArray tag_list = new JSONArray();
+        for (long tag_id : br.tags){
+            tag_list.put(tag_id);
+        }
+        jsonRecipe.put("tag_list", tag_list);
+
+        return jsonRecipe;
+    }
+    public static BasicRecipe fromJson(JSONObject jsonRecipe) throws JSONException {
+        BasicRecipe recipe = new BasicRecipe();
+
+        recipe.id = jsonRecipe.getLong("id");
+        recipe.name = jsonRecipe.getString("name");
+        recipe.short_desc = jsonRecipe.getString("short_description");
+        recipe.long_desc = jsonRecipe.getString("long_description");
+        recipe.target_quantity = jsonRecipe.getDouble("target_description");
+        recipe.target_description = jsonRecipe.getString("target_description");
+        recipe.preparation_time = jsonRecipe.getDouble("preparation_time");
+        recipe.source = jsonRecipe.getString("source");
+        recipe.time_modified = jsonRecipe.getString("time_modified");
+        recipe.deleted = jsonRecipe.getBoolean("deleted");
+
+        JSONArray ingredients = jsonRecipe.getJSONArray("ingredient_list");
+        for (int j = 0; j < ingredients.length(); ++j) {
+            final RecipeIngredient ingredient = RecipeIngredient.fromJson(ingredients.getJSONObject(j));
+            recipe.ingredients.add(ingredient);
+        }
+
+        JSONArray instructions = jsonRecipe.getJSONArray("instruction_list");
+        for (int j = 0; j < instructions.length(); ++j) {
+            recipe.instructions.add(instructions.getString(j));
+        }
+
+        JSONArray comments = jsonRecipe.getJSONArray("comment_list");
+        for (int j = 0; j < comments.length(); ++j) {
+            recipe.comments.add(comments.getString(j));
+        }
+
+        JSONArray tags = jsonRecipe.getJSONArray("tag_list");
+        for (int j = 0; j <  tags.length(); ++j) {
+            recipe.tags.add(tags.getLong(j));
+        }
+
+        return recipe;
+    }
+
+    public static long writeBasicOnlyToProvider(BasicRecipe br, ContentResolver cr) {
         ContentValues recipe = new ContentValues();
         recipe.put("name", br.name);
         recipe.put("short_description", br.short_desc);
@@ -55,14 +134,14 @@ public  class BasicRecipe {
         }
         // insert
         else {
-            long id = cr.insert(RecipeProvider.recipe_uri, recipe));
+            long id = ContentUris.parseId(cr.insert(RecipeProvider.recipe_uri, recipe));
             br.id = id;
         }
 
         return br.id;
     }
 
-    static long writeToProvider(BasicRecipe br, ContentResolver cr) {
+    public static long writeToProvider(BasicRecipe br, ContentResolver cr) {
         br.id = writeBasicOnlyToProvider(br, cr);
 
         // Insert lists
@@ -108,7 +187,7 @@ public  class BasicRecipe {
 
         for (long tag_id : br.tags) {
             final ContentValues tag_cv = new ContentValues();
-            tag_cv.put("recipe_id", brid);
+            tag_cv.put("recipe_id", br.id);
             tag_cv.put("tag_id", tag_id);
 
             cr.insert(RecipeProvider.tag_uri, tag_cv);
@@ -116,7 +195,7 @@ public  class BasicRecipe {
 
         return br.id;
     }
-    static BasicRecipe readFromProvider(long id, ContentResolver cr) {
+    public static BasicRecipe readFromProvider(long id, ContentResolver cr) {
         final BasicRecipe br = new BasicRecipe();
 
         final Cursor recipe = cr.query(RecipeProvider.recipe_uri,
@@ -201,8 +280,26 @@ public  class BasicRecipe {
     public static class RecipeIngredient {
         public RecipeIngredient() {}
 
-        public Float quantity = 1f;
+        public Double quantity = 1d;
         public String description = "";
         public Long other_recipe_id = null;
+
+        public JSONObject toJson() throws JSONException {
+            final JSONObject ingredientJson = new JSONObject();
+            ingredientJson.put("quantity", quantity);
+            ingredientJson.put("description", description);
+            ingredientJson.put("other_recipe_id", other_recipe_id);
+            return ingredientJson;
+        }
+
+        public static RecipeIngredient fromJson(JSONObject jsonIngredient) throws JSONException {
+            final RecipeIngredient ingredient = new RecipeIngredient();
+            ingredient.quantity = jsonIngredient.getDouble("quantity");
+            ingredient.description = jsonIngredient.getString("description");
+            if (!jsonIngredient.isNull("other_recipe_id")) {
+                ingredient.other_recipe_id = jsonIngredient.getLong("other_recipe_id");
+            }
+            return ingredient;
+        }
     }
 }
