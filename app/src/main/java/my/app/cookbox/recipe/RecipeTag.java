@@ -34,7 +34,7 @@ public class RecipeTag {
     public static RecipeTag fromJson(JSONObject jsonTag) throws JSONException {
         RecipeTag tag = new RecipeTag();
         tag.id = jsonTag.getLong("id");
-        tag.tag = jsonTag.getString("tag"):
+        tag.tag = jsonTag.getString("tag");
         tag.time_modified = jsonTag.getString("time_modified");
         tag.deleted = jsonTag.getBoolean("deleted");
         return tag;

@@ -36,14 +36,23 @@ public class CookboxServerAPIHelper {
         putJson(uri, recipe);
     }
 
+    public void putRecipeBasicOnly(JSONObject recipe) {
+        final String uri = "/recipe";
+        recipe.remove("ingredient_list");
+        recipe.remove("instruction_list");
+        recipe.remove("comment_list");
+        recipe.remove("tag_list");
+        putJson(uri, recipe);
+    }
+
     public JSONObject get_tag(long id) {
         final String uri = "/recipe/tag/" + id;
         return getJson(uri);
     }
 
-    public void put_tag(RecipeTag tag) {
+    public void put_tag(JSONObject tag) {
         final String uri = "/recipe/tag";
-        putJson(uri, new JSONObject());
+        putJson(uri, tag);
     }
 
     public JSONObject get_schema(long db_version) {

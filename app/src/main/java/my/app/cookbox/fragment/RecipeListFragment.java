@@ -284,7 +284,7 @@ public class RecipeListFragment extends ListFragment {
                 final JSONObject sync = cookboxApi.sync(time_token);
                 Log.d(TAG, "doInBackground: Got sync data.");
 
-                // Get recipes that were updated since last sync
+                // Get the ids of recipes that were updated since last sync
                 final Cursor ids_cursor = cr.query(
                         RecipeProvider.recipe_uri,
                         new String[] {"id"},
@@ -320,17 +320,16 @@ public class RecipeListFragment extends ListFragment {
                 for (int i = 0; i < tagIds.length(); ++i) {
                     final long id = tagIds.getLong(i);
                     final RecipeTag tag = RecipeTag.fromJson(cookboxApi.get_tag(id));
-                    RecipeTag.writeToProvider(tag);
+                    RecipeTag.writeToProvider(tag,cr);
 
                     // Remove this recipe from recipes whose changes will be pushed to the server
                     updated_tags.remove(id);
                 }
                 Log.d(TAG, "doInBackground: inserted tags.");
 
-                // Then the recipes
+                // Then the recipes (without the lists)
                 JSONArray recipeIds = sync.getJSONArray("recipe_ids");
                 for (int i = 0; i < recipeIds.length(); ++i) {
-                    //long id = recipeIds.getJSONObject(i).getLong("id");
                     final long id = recipeIds.getLong(i);
                     final BasicRecipe recipe = BasicRecipe.fromJson(cookboxApi.get_recipe(id));
                     if (recipe.deleted) {
@@ -346,6 +345,8 @@ public class RecipeListFragment extends ListFragment {
                     updated_ids.remove(id);
                 }
 
+                // TODO: Avoid making two get_recipe() cookboxApi calls
+                // Now write the recipes (with the lists)
                 for (int i = 0; i < recipeIds.length(); ++i) {
                     final long id = recipeIds.getLong(i);
                     final BasicRecipe recipe = BasicRecipe.fromJson(cookboxApi.get_recipe(id));
@@ -355,35 +356,16 @@ public class RecipeListFragment extends ListFragment {
 
                 // Now push changes that weren't overwritten
                 for (Long tag_id : updated_tags) {
-                    final Cursor tag = cr.query(RecipeProvider.tag_list_uri,
-                            null,
-                            "id = ?",
-                            new String[] {tag_id.toString()},
-                            null);
-                    tag.moveToFirst();
-                    cookboxApi.put_tag(new RecipeTag(tag_id, tag.getString(tag.getColumnIndex("tag"))));
+                    RecipeTag tag = RecipeTag.readFromProvider(tag_id, cr);
+                    cookboxApi.put_tag(RecipeTag.toJson(tag));
                 }
 
+                // TODO: This will fail if this recipe references another new recipe
                 for (Long id : updated_ids) {
-                    Cursor recipe = cr.query(RecipeProvider.recipe_uri,
-                            null,
-                            "id = ?",
-                            new String[] {id.toString()},
-                            null);
-
+                    BasicRecipe recipe = BasicRecipe.readFromProvider(id,cr);
+                    cookboxApi.put_recipe(BasicRecipe.toJson(recipe));
                 }
 
-                for (Long id : updated_ids) {
-                    Cursor ingredient_list = cr.query(RecipeProvider.ingredient_uri,
-                            null,
-                            "recipe_id = ?",
-                            new String[]{id.toString()},
-                            null);
-                    if ()
-                        Cursor instruction_list = ;
-                    Cursor comment_list = ;
-                    Cursor tag_list = ;
-                }
                 return true;
             }
             catch (Exception err) {
