@@ -27,13 +27,7 @@ public class RecipeActivity extends BaseActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.recipe_toolbar));
         //getSupportActionBar().setDisplayShowTitleEnabled(false);
         Bundle b = getIntent().getExtras();
-        if (b != null && b.getLong("id", Recipe.NO_ID) != Recipe.NO_ID) {
-            startRecipeFragment(b.getLong("id"),false);
-        }
-        else {
-            Toast.makeText(this, "RecipeActiivty started witout a recipe id.", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        startRecipeFragment(b.getLong("id"),false);
     }
 
     @Override

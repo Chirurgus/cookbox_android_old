@@ -85,7 +85,7 @@ public class ModifyFragment extends BaseFragment {
         _parent = (MainActivity) getActivity();
 
         Bundle args = getArguments();
-        if (args != null && args.getLong("id") != Recipe.NO_ID) {
+        if (args != null && args.getLong("id", -1) != -1) {
             long id = args.getLong("id");
             Cursor recipe = getContext()
                     .getContentResolver()
@@ -120,7 +120,7 @@ public class ModifyFragment extends BaseFragment {
             if (ingredients != null && ingredients.moveToFirst()) {
                 do {
                     BasicRecipe.RecipeIngredient ingredient = new BasicRecipe.RecipeIngredient();
-                    ingredient.quantity = ingredients.getFloat(ingredients.getColumnIndex("quantity"));
+                    ingredient.quantity = ingredients.getDouble(ingredients.getColumnIndex("quantity"));
                     ingredient.description = ingredients.getString(ingredients.getColumnIndex("description"));
                     ingredient.other_recipe_id
                             = ingredients.isNull(ingredients.getColumnIndex("other_recipe")) ?
@@ -301,10 +301,10 @@ public class ModifyFragment extends BaseFragment {
             RelativeLayout rl = (RelativeLayout) ing_ll.getChildAt(i);
             String qty = getEditTextFromId(R.id.modify_list_item_edit_text1, rl).getText().toString();
             try {
-                ingredient.quantity = Float.parseFloat(qty);
+                ingredient.quantity = Double.parseDouble(qty);
             }
             catch (Exception e) {
-                ingredient.quantity = 1f;
+                ingredient.quantity = 1d;
             }
             ingredient.description = getEditTextFromId(R.id.modify_list_item_edit_text2, rl).getText().toString();
             Spinner sp = (Spinner) rl.findViewById(R.id.modify_list_item_spinner);
@@ -378,7 +378,7 @@ public class ModifyFragment extends BaseFragment {
             target_qty.setText("1");
         }
         else {
-            target_qty.setText(Float.toString(r.target_quantity));
+            target_qty.setText(Double.toString(r.target_quantity));
         }
 
         for (int i = 0; i < r.ingredients.size(); ++i) {

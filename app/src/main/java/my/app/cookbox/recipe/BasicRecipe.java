@@ -224,7 +224,7 @@ public  class BasicRecipe {
         if (ingredient_list.moveToFirst()) {
             do {
                 RecipeIngredient ing = new RecipeIngredient();
-                ing.quantity = ingredient_list.getFloat(ingredient_list.getColumnIndex("quantity"));
+                ing.quantity = ingredient_list.getDouble(ingredient_list.getColumnIndex("quantity"));
                 ing.description = ingredient_list.getString(ingredient_list.getColumnIndex("description"));
                 if (ingredient_list.isNull(ingredient_list.getColumnIndex("other_recipe_id"))) {
                     ing.other_recipe_id = null;

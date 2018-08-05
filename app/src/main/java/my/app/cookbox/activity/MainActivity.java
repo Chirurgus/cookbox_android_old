@@ -32,7 +32,6 @@ import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
 import my.app.cookbox.fragment.TagSelectionListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 
 /**
@@ -61,7 +60,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public RecipeListFragment startListFragment() {
-        return startListFragment(Recipe.NO_ID);
+        return startListFragment(null);
     }
 
      /* shows all recipes, always on the bottom of the fragment stack */
@@ -71,23 +70,21 @@ public class MainActivity extends BaseActivity {
             frag = new RecipeListFragment();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-            Bundle b = new Bundle();
-            b.putLong("tag_id", Recipe.NO_ID);
-            frag.setArguments(b);
-
             ft.replace(R.id.main_fragment_frame, frag);
             ft.commit();
         }
         return frag;
     }
 
-    public RecipeListFragment startListFragment(long tag_id) {
+    public RecipeListFragment startListFragment(Long tag_id) {
         RecipeListFragment new_frag = new RecipeListFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-        Bundle b = new Bundle();
-        b.putLong("tag_id", tag_id);
-        new_frag.setArguments(b);
+        if (tag_id != null) {
+            Bundle b = new Bundle();
+            b.putLong("tag_id", tag_id);
+            new_frag.setArguments(b);
+        }
 
         ft.replace(R.id.main_fragment_frame, new_frag);
         ft.addToBackStack(null);
@@ -169,7 +166,7 @@ public class MainActivity extends BaseActivity {
             case R.id.dlist_context_edit: {
                 int tag_pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
                 RecipeTag tag = ((RecipeTag) ((ListView) findViewById(R.id.drawer_list)).getAdapter().getItem(tag_pos));
-                long tag_id = tag.getId();
+                long tag_id = tag.id;
                 startTagSelectionListFragment(tag_id);
                 return true;
             }
@@ -208,7 +205,7 @@ public class MainActivity extends BaseActivity {
             case R.id.dlist_context_rename: {
                 int tag_pos = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
                 RecipeTag tag = ((RecipeTag) ((ListView) findViewById(R.id.drawer_list)).getAdapter().getItem(tag_pos));
-                final long tag_id = tag.getId();
+                final long tag_id = tag.id;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Enter new Tag name");
@@ -291,7 +288,7 @@ public class MainActivity extends BaseActivity {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                        long tag_id = ((RecipeTag) parent.getAdapter().getItem(pos)).getId();
+                        long tag_id = ((RecipeTag) parent.getAdapter().getItem(pos)).id;
                         startListFragment(tag_id);
                     }
                 }

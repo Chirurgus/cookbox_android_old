@@ -12,7 +12,6 @@ import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
 import my.app.cookbox.fragment.TagSelectionListFragment;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.TagSelectionAdapter;
 

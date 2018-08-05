@@ -65,13 +65,13 @@ public class RecipeListFragment extends ListFragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("All recipes");
 
         Cursor list_cursor = null;
-        if (_tag_id != Recipe.NO_ID) {
+        if (_tag_id != empty_tag_id) {
            list_cursor = getContext()
                 .getContentResolver()
                 .query(RecipeProvider.recipe_list_uri,
                         null,
                         "id in (select recipe_id from tag_list where tag_id = ?)",
-                        new String[] {Float.toString(_tag_id)},
+                        new String[] {Long.toString(_tag_id)},
                         null
                 );
         }
@@ -96,7 +96,7 @@ public class RecipeListFragment extends ListFragment {
         setHasOptionsMenu(true);
 
         Bundle b = getArguments();
-        _tag_id = b.getLong("tag_id", Recipe.NO_ID);
+        _tag_id = b.getLong("tag_id", empty_tag_id);
 
         setRetainInstance(true);
     }
@@ -258,7 +258,8 @@ public class RecipeListFragment extends ListFragment {
     }
 
     private boolean sort_order = false;
-    private long _tag_id = Recipe.NO_ID;
+    private Long _tag_id = null;
+    private static long empty_tag_id = -1;
 
 
     class TestHTTPRequest extends AsyncTask<Void, Void, Boolean> {
