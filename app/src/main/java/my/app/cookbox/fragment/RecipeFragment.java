@@ -140,7 +140,7 @@ public class RecipeFragment extends BaseFragment {
                         null
                 );
         if (!recipe.moveToFirst() || recipe.getColumnCount() != 1) {
-            //TODO: abord
+            //TODO: abort
         }
         TextView name = (TextView) getRootView().findViewById(R.id.recipe_text_name);
         name.setText(recipe.getString(recipe.getColumnIndex("name")));
