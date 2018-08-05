@@ -10,7 +10,6 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 
 /**

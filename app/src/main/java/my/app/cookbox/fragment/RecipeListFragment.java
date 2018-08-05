@@ -38,7 +38,6 @@ import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.activity.SettingsActivity;
 import my.app.cookbox.activity.RecipeActivity;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.CookboxServerAPIHelper;
 import my.app.cookbox.sqlite.RecipeProvider;

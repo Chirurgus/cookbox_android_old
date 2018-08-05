@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 
 import static android.content.ContentValues.TAG;

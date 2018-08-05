@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import my.app.cookbox.R;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.sqlite.RecipeProvider;
 
 /**

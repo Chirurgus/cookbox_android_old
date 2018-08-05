@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.sqlite.RecipeProvider;
 
 /**

@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
 import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.utility.TagSelectionAdapter;
 
 /**
@@ -37,9 +36,9 @@ public class TagSelectionListFragment extends ListFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle b = getArguments();
-        _tag = b.getLong("tag_id", Recipe.NO_ID);
+        _tag = b.getLong("tag_id", -1);
 
-        if (_tag == Recipe.NO_ID) {
+        if (_tag == -1) {
             Log.e(TAG, TAG + " created without a tag id");
         }
     }
@@ -84,7 +83,7 @@ public class TagSelectionListFragment extends ListFragment {
         }
     }
 
-    private long _tag = Recipe.NO_ID;
+    private long _tag;
     public class TagSelectionTag {
         long tag;
         ArrayList<Long> recipes;

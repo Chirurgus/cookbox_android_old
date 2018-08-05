@@ -12,7 +12,6 @@ import my.app.cookbox.R;
 import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
-import my.app.cookbox.recipe.Recipe;
 
 /**
  * Created by Alexander on 023, 23 Oct.
