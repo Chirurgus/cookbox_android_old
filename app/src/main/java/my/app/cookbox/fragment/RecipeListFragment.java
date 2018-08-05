@@ -1,9 +1,7 @@
 package my.app.cookbox.fragment;
 
 import android.app.ListFragment;
-import android.content.ContentProvider;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -29,20 +27,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.function.Predicate;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
-import my.app.cookbox.activity.SettingsActivity;
 import my.app.cookbox.activity.RecipeActivity;
-import my.app.cookbox.recipe.BasicRecipe;
+import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 import my.app.cookbox.sqlite.CookboxServerAPIHelper;
 import my.app.cookbox.sqlite.RecipeProvider;
-import my.app.cookbox.sqlite.RecipeSyncAdapter;
-import my.app.cookbox.sqlite.SqlController;
 import my.app.cookbox.utility.RecipeCursorAdapter;
 
 import static android.content.ContentValues.TAG;
@@ -331,14 +323,14 @@ public class RecipeListFragment extends ListFragment {
                 JSONArray recipeIds = sync.getJSONArray("recipe_ids");
                 for (int i = 0; i < recipeIds.length(); ++i) {
                     final long id = recipeIds.getLong(i);
-                    final BasicRecipe recipe = BasicRecipe.fromJson(cookboxApi.get_recipe(id));
+                    final Recipe recipe = Recipe.fromJson(cookboxApi.get_recipe(id));
                     if (recipe.deleted) {
                         cr.delete(RecipeProvider.recipe_uri,
                                 "id = ?",
                                 new String[] {Long.toString(id)});
                     }
                     else {
-                        BasicRecipe.writeBasicOnlyToProvider(recipe, cr);
+                        Recipe.writeBasicOnlyToProvider(recipe, cr);
                     }
 
                     // Remove this recipe from recipes whose changes will be pushed to the server
@@ -349,8 +341,8 @@ public class RecipeListFragment extends ListFragment {
                 // Now write the recipes (with the lists)
                 for (int i = 0; i < recipeIds.length(); ++i) {
                     final long id = recipeIds.getLong(i);
-                    final BasicRecipe recipe = BasicRecipe.fromJson(cookboxApi.get_recipe(id));
-                    BasicRecipe.writeToProvider(recipe, cr);
+                    final Recipe recipe = Recipe.fromJson(cookboxApi.get_recipe(id));
+                    Recipe.writeToProvider(recipe, cr);
                 }
                 Log.d(TAG, "doInBackground: Inserted changes from the server.");
 
@@ -362,8 +354,8 @@ public class RecipeListFragment extends ListFragment {
 
                 // TODO: This will fail if this recipe references another new recipe
                 for (Long id : updated_ids) {
-                    BasicRecipe recipe = BasicRecipe.readFromProvider(id,cr);
-                    cookboxApi.put_recipe(BasicRecipe.toJson(recipe));
+                    Recipe recipe = Recipe.readFromProvider(id,cr);
+                    cookboxApi.put_recipe(Recipe.toJson(recipe));
                 }
 
                 return true;

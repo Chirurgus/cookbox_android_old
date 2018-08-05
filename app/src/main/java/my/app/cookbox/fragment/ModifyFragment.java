@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 import my.app.cookbox.R;
 import my.app.cookbox.activity.MainActivity;
-import my.app.cookbox.recipe.BasicRecipe;
+import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.sqlite.RecipeProvider;
 
 /**
@@ -118,7 +118,7 @@ public class ModifyFragment extends BaseFragment {
                             null);
             if (ingredients != null && ingredients.moveToFirst()) {
                 do {
-                    BasicRecipe.RecipeIngredient ingredient = new BasicRecipe.RecipeIngredient();
+                    Recipe.RecipeIngredient ingredient = new Recipe.RecipeIngredient();
                     ingredient.quantity = ingredients.getDouble(ingredients.getColumnIndex("quantity"));
                     ingredient.description = ingredients.getString(ingredients.getColumnIndex("description"));
                     ingredient.other_recipe_id
@@ -165,7 +165,7 @@ public class ModifyFragment extends BaseFragment {
             comments.close();
         }
         else {
-            _brecipe = new BasicRecipe();
+            _brecipe = new Recipe();
         }
 
         setHasOptionsMenu(true);
@@ -239,7 +239,7 @@ public class ModifyFragment extends BaseFragment {
                         "recipe_id = ?",
                         new String[] {_brecipe.id.toString()});
 
-        for (BasicRecipe.RecipeIngredient ing : _brecipe.ingredients) {
+        for (Recipe.RecipeIngredient ing : _brecipe.ingredients) {
             ContentValues ingredient = new ContentValues();
 
             ingredient.put("quantity", ing.quantity);
@@ -283,8 +283,8 @@ public class ModifyFragment extends BaseFragment {
     }
 
     // Read recipe from data provided by the user
-    private BasicRecipe readRecipe(Long id) {
-        BasicRecipe ret = new BasicRecipe();
+    private Recipe readRecipe(Long id) {
+        Recipe ret = new Recipe();
 
         ret.id = id;
         ret.name = getEditTextFromId(R.id.modify_edit_text_name, _root_view).getText().toString();
@@ -295,7 +295,7 @@ public class ModifyFragment extends BaseFragment {
 
         LinearLayout ing_ll = (LinearLayout) _root_view.findViewById(R.id.modify_ingredient_list);
         for (int i = 0; i < ing_ll.getChildCount(); ++i) {
-            BasicRecipe.RecipeIngredient ingredient = new BasicRecipe.RecipeIngredient();
+            Recipe.RecipeIngredient ingredient = new Recipe.RecipeIngredient();
 
             RelativeLayout rl = (RelativeLayout) ing_ll.getChildAt(i);
             String qty = getEditTextFromId(R.id.modify_list_item_edit_text1, rl).getText().toString();
@@ -359,7 +359,7 @@ public class ModifyFragment extends BaseFragment {
         return ret;
     }
 
-    private void populateFields(BasicRecipe r) {
+    private void populateFields(Recipe r) {
         EditText name = getEditTextFromId(R.id.modify_edit_text_name, _root_view);
         name.setText(r.name == null ? "" : r.name);
 
@@ -560,7 +560,7 @@ public class ModifyFragment extends BaseFragment {
 
     private MainActivity _parent = null;
     private View _root_view = null;
-    private BasicRecipe _brecipe = new BasicRecipe();
+    private Recipe _brecipe = new Recipe();
 
     /* Remove item from list onClickListener */
     private static final View.OnClickListener _onClickListener = new View.OnClickListener() {

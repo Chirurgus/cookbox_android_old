@@ -4,16 +4,8 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.ArrayList;
-
-import my.app.cookbox.R;
 import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
-import my.app.cookbox.fragment.RecipeListFragment;
-import my.app.cookbox.fragment.TagSelectionListFragment;
-import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.sqlite.SqlController;
-import my.app.cookbox.utility.TagSelectionAdapter;
 
 /**
  * Created by Alexander on 024, 24 Oct.

@@ -31,7 +31,7 @@ import my.app.cookbox.fragment.ModifyFragment;
 import my.app.cookbox.fragment.RecipeFragment;
 import my.app.cookbox.fragment.RecipeListFragment;
 import my.app.cookbox.fragment.TagSelectionListFragment;
-import my.app.cookbox.recipe.BasicRecipe;
+import my.app.cookbox.recipe.Recipe;
 import my.app.cookbox.recipe.RecipeTag;
 
 /**
@@ -55,7 +55,7 @@ public class MainActivity extends BaseActivity {
         setupNavigationDrawer();
     }
 
-    public void addToRecipeList(BasicRecipe new_br) {
+    public void addToRecipeList(Recipe new_br) {
         startListFragment();
     }
 

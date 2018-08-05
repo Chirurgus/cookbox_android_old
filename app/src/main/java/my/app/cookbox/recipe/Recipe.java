@@ -17,7 +17,7 @@ import my.app.cookbox.sqlite.RecipeProvider;
  * Created by Alexander on 026,  26 Apr.
  */
 
-public  class BasicRecipe {
+public  class Recipe {
     public Long id = null;
     public String name = "";
     public String short_desc = "";
@@ -34,7 +34,7 @@ public  class BasicRecipe {
     public ArrayList<String> comments = new ArrayList<>();
     public ArrayList<Long> tags = new ArrayList<>();
 
-    public static JSONObject toJson(BasicRecipe br) throws JSONException {
+    public static JSONObject toJson(Recipe br) throws JSONException {
         JSONObject jsonRecipe = new JSONObject();
 
         jsonRecipe.put("id", br.id);
@@ -74,8 +74,8 @@ public  class BasicRecipe {
 
         return jsonRecipe;
     }
-    public static BasicRecipe fromJson(JSONObject jsonRecipe) throws JSONException {
-        BasicRecipe recipe = new BasicRecipe();
+    public static Recipe fromJson(JSONObject jsonRecipe) throws JSONException {
+        Recipe recipe = new Recipe();
 
         recipe.id = jsonRecipe.getLong("id");
         recipe.name = jsonRecipe.getString("name");
@@ -112,7 +112,7 @@ public  class BasicRecipe {
         return recipe;
     }
 
-    public static long writeBasicOnlyToProvider(BasicRecipe br, ContentResolver cr) {
+    public static long writeBasicOnlyToProvider(Recipe br, ContentResolver cr) {
         ContentValues recipe = new ContentValues();
         recipe.put("name", br.name);
         recipe.put("short_description", br.short_desc);
@@ -141,7 +141,7 @@ public  class BasicRecipe {
         return br.id;
     }
 
-    public static long writeToProvider(BasicRecipe br, ContentResolver cr) {
+    public static long writeToProvider(Recipe br, ContentResolver cr) {
         br.id = writeBasicOnlyToProvider(br, cr);
 
         // Insert lists
@@ -149,7 +149,7 @@ public  class BasicRecipe {
                         "recipe_id = ?",
                         new String[] {br.id.toString()});
 
-        for (BasicRecipe.RecipeIngredient ing : br.ingredients) {
+        for (Recipe.RecipeIngredient ing : br.ingredients) {
             ContentValues ingredient = new ContentValues();
 
             ingredient.put("quantity", ing.quantity);
@@ -195,8 +195,8 @@ public  class BasicRecipe {
 
         return br.id;
     }
-    public static BasicRecipe readFromProvider(long id, ContentResolver cr) {
-        final BasicRecipe br = new BasicRecipe();
+    public static Recipe readFromProvider(long id, ContentResolver cr) {
+        final Recipe br = new Recipe();
 
         final Cursor recipe = cr.query(RecipeProvider.recipe_uri,
                 null,

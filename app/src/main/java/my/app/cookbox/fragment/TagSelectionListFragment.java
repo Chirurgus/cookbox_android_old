@@ -1,24 +1,6 @@
 package my.app.cookbox.fragment;
 
 import android.app.ListFragment;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-
-import my.app.cookbox.R;
-import my.app.cookbox.activity.MainActivity;
-import my.app.cookbox.recipe.BasicRecipe;
-import my.app.cookbox.utility.TagSelectionAdapter;
 
 /**
  * Created by Alexander on 012, 12 Sep.
@@ -65,7 +47,7 @@ public class TagSelectionListFragment extends ListFragment {
         switch (item.getItemId()) {
             case R.id.tag_selection_confirm:
                 for (int i = 0; i < getListAdapter().getCount(); ++i) {
-                    long recipe_id = ((BasicRecipe)getListAdapter().getItem(i)).getId();
+                    long recipe_id = ((Recipe)getListAdapter().getItem(i)).getId();
                     long tag_id = _tag;
                     if (((TagSelectionAdapter) getListAdapter()).isItemChecked(i)) {
                     }
