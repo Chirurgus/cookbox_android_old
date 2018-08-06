@@ -121,7 +121,7 @@ public class ModifyFragment extends BaseFragment {
                     Recipe.RecipeIngredient ingredient = new Recipe.RecipeIngredient();
                     ingredient.quantity = ingredients.getDouble(ingredients.getColumnIndex("quantity"));
                     ingredient.description = ingredients.getString(ingredients.getColumnIndex("description"));
-                    ingredient.other_recipe_id
+                    ingredient.other_recipe
                             = ingredients.isNull(ingredients.getColumnIndex("other_recipe")) ?
                                 ingredients.getLong(ingredients.getColumnIndex("other_recipe")) : null;
 
@@ -244,7 +244,7 @@ public class ModifyFragment extends BaseFragment {
 
             ingredient.put("quantity", ing.quantity);
             ingredient.put("description", ing.description);
-            ingredient.put("other_recipe", ing.other_recipe_id);
+            ingredient.put("other_recipe", ing.other_recipe);
             ingredient.put("recipe_id", _brecipe.id);
 
             getContext().getContentResolver().insert(RecipeProvider.ingredient_uri,ingredient);
@@ -317,14 +317,14 @@ public class ModifyFragment extends BaseFragment {
                             null);
                 int pos = sp.getSelectedItemPosition() - 1;
                 if (other_r.getCount() < pos) {
-                    ingredient.other_recipe_id = null;
+                    ingredient.other_recipe = null;
                 }
                 other_r.moveToPosition(pos);
-                ingredient.other_recipe_id = other_r.getLong(other_r.getColumnIndex("id"));
+                ingredient.other_recipe = other_r.getLong(other_r.getColumnIndex("id"));
                 other_r.close();
             }
             else {
-                ingredient.other_recipe_id = null;
+                ingredient.other_recipe = null;
             }
             ret.ingredients.add(ingredient);
         }
@@ -392,7 +392,7 @@ public class ModifyFragment extends BaseFragment {
             ing_desc.setText(r.ingredients.get(i).description);
 
             Spinner other_r_sp = (Spinner) rl.findViewById(R.id.modify_list_item_spinner);
-            Long other_r_id = r.ingredients.get(i).other_recipe_id;
+            Long other_r_id = r.ingredients.get(i).other_recipe;
             if (other_r_id == null) {
                 other_r_sp.setSelection(0);
             }
@@ -408,11 +408,11 @@ public class ModifyFragment extends BaseFragment {
                     int br_pos = 0;
                     do {
                         if (br_pos < other_r.getCount() ||
-                                other_r.getLong(other_r.getColumnIndex("id")) == r.ingredients.get(i).other_recipe_id) {
+                                other_r.getLong(other_r.getColumnIndex("id")) == r.ingredients.get(i).other_recipe) {
                             break;
                         }
                     } while (other_r.moveToNext());
-                    if (other_r.getLong(other_r.getColumnIndex("id")) == r.ingredients.get(i).other_recipe_id) {
+                    if (other_r.getLong(other_r.getColumnIndex("id")) == r.ingredients.get(i).other_recipe) {
                         other_r_sp.setSelection(br_pos + 1);
                     } else {
                         other_r_sp.setSelection(0);

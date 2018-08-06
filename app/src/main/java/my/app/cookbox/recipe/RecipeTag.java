@@ -12,7 +12,7 @@ import my.app.cookbox.sqlite.RecipeProvider;
 /**
  * Created by Alexander on 031, 31 Aug.
  *
- * A struct for Category
+ * A struct for a recipe tag
  */
 
 public class RecipeTag {
@@ -21,14 +21,12 @@ public class RecipeTag {
     public Long id = null;
     public String tag = null;
     public String time_modified = null;
-    public boolean deleted = false;
 
     public static JSONObject toJson(RecipeTag tag) throws JSONException {
         JSONObject jsonTag = new JSONObject();
         jsonTag.put("id", tag.id);
         jsonTag.put("tag", tag.tag);
         jsonTag.put("time_modified", tag.time_modified);
-        jsonTag.put("deleted", tag.deleted);
         return jsonTag;
     }
     public static RecipeTag fromJson(JSONObject jsonTag) throws JSONException {
@@ -36,7 +34,6 @@ public class RecipeTag {
         tag.id = jsonTag.getLong("id");
         tag.tag = jsonTag.getString("tag");
         tag.time_modified = jsonTag.getString("time_modified");
-        tag.deleted = jsonTag.getBoolean("deleted");
         return tag;
     }
 
@@ -45,7 +42,6 @@ public class RecipeTag {
         cv.put("id", tag.id);
         cv.put("tag", tag.tag);
         cv.put("time_modified", tag.time_modified);
-        cv.put("deleted", tag.deleted);
         cr.insert(RecipeProvider.tag_list_uri, cv);
     }
     public static RecipeTag readFromProvider(long id, ContentResolver cr) {
@@ -59,7 +55,6 @@ public class RecipeTag {
         tag.id = tagCursor.getLong(tagCursor.getColumnIndex("id"));
         tag.tag = tagCursor.getString(tagCursor.getColumnIndex("tag"));
         tag.time_modified = tagCursor.getString(tagCursor.getColumnIndex("time_modified"));
-        tag.deleted = tagCursor.getInt(tagCursor.getColumnIndex("deleted")) != 0;
         return tag;
     }
 }

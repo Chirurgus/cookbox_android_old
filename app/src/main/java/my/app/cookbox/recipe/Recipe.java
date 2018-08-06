@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +13,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import my.app.cookbox.sqlite.RecipeProvider;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by Alexander on 026,  26 Apr.
@@ -50,7 +53,7 @@ public  class Recipe {
 
         JSONArray ingredient_list = new JSONArray();
         for (RecipeIngredient ingredient : br.ingredients) {
-            ingredient_list.put(ingredient.toJson());
+            ingredient_list.put(RecipeIngredient.toJson(ingredient));
         }
         jsonRecipe.put("ingredient_list", ingredient_list);
 
@@ -81,7 +84,7 @@ public  class Recipe {
         recipe.name = jsonRecipe.getString("name");
         recipe.short_desc = jsonRecipe.getString("short_description");
         recipe.long_desc = jsonRecipe.getString("long_description");
-        recipe.target_quantity = jsonRecipe.getDouble("target_description");
+        recipe.target_quantity = jsonRecipe.getDouble("target_quantity");
         recipe.target_description = jsonRecipe.getString("target_description");
         recipe.preparation_time = jsonRecipe.getDouble("preparation_time");
         recipe.source = jsonRecipe.getString("source");
@@ -124,18 +127,18 @@ public  class Recipe {
         recipe.put("time_modified", br.time_modified);
         recipe.put("deleted", br.deleted);
 
-        // Update
         if (br.id != null) {
             recipe.put("id",br.id);
-            cr.update(RecipeProvider.recipe_uri,
+            final int count = cr.update(RecipeProvider.recipe_uri,
                         recipe,
                         "id = ?",
-                        new String[] {br.id.toString()});
+                        new String[] {Long.toString(br.id)});
+            if (count == 0) {
+                cr.insert(RecipeProvider.recipe_uri, recipe);
+            }
         }
-        // insert
         else {
-            long id = ContentUris.parseId(cr.insert(RecipeProvider.recipe_uri, recipe));
-            br.id = id;
+            br.id = ContentUris.parseId(cr.insert(RecipeProvider.recipe_uri, recipe));
         }
 
         return br.id;
@@ -150,14 +153,7 @@ public  class Recipe {
                         new String[] {br.id.toString()});
 
         for (Recipe.RecipeIngredient ing : br.ingredients) {
-            ContentValues ingredient = new ContentValues();
-
-            ingredient.put("quantity", ing.quantity);
-            ingredient.put("description", ing.description);
-            ingredient.put("other_recipe", ing.other_recipe_id);
-            ingredient.put("recipe_id", br.id);
-
-            cr.insert(RecipeProvider.ingredient_uri,ingredient);
+            RecipeIngredient.writeToProvider(ing, br.id, cr);
         }
 
         cr.delete(RecipeProvider.instruction_uri,
@@ -216,26 +212,7 @@ public  class Recipe {
         br.deleted = recipe.getInt(recipe.getColumnIndex("deleted")) != 0;
         recipe.close();
 
-        final Cursor ingredient_list = cr.query(RecipeProvider.ingredient_uri,
-                null,
-                "recipe_id = ?",
-                new String[] {Long.toString(id)},
-                null);
-        if (ingredient_list.moveToFirst()) {
-            do {
-                RecipeIngredient ing = new RecipeIngredient();
-                ing.quantity = ingredient_list.getDouble(ingredient_list.getColumnIndex("quantity"));
-                ing.description = ingredient_list.getString(ingredient_list.getColumnIndex("description"));
-                if (ingredient_list.isNull(ingredient_list.getColumnIndex("other_recipe_id"))) {
-                    ing.other_recipe_id = null;
-                }
-                else {
-                    ing.other_recipe_id = ingredient_list.getLong(ingredient_list.getColumnIndex("other_recipe_id"));
-                }
-                br.ingredients.add(ing);
-            } while(ingredient_list.moveToNext());
-        }
-        ingredient_list.close();
+        br.ingredients = RecipeIngredient.readFromProvider(br.id, cr);
 
         final Cursor instruction_list = cr.query(RecipeProvider.instruction_uri,
                 null,
@@ -282,24 +259,63 @@ public  class Recipe {
 
         public Double quantity = 1d;
         public String description = "";
-        public Long other_recipe_id = null;
+        public Long other_recipe = null;
 
-        public JSONObject toJson() throws JSONException {
+        public static JSONObject toJson(RecipeIngredient ingredient) throws JSONException {
             final JSONObject ingredientJson = new JSONObject();
-            ingredientJson.put("quantity", quantity);
-            ingredientJson.put("description", description);
-            ingredientJson.put("other_recipe_id", other_recipe_id);
+            ingredientJson.put("quantity", ingredient.quantity);
+            ingredientJson.put("description", ingredient.description);
+            ingredientJson.put("other_recipe", ingredient.other_recipe);
             return ingredientJson;
         }
-
         public static RecipeIngredient fromJson(JSONObject jsonIngredient) throws JSONException {
             final RecipeIngredient ingredient = new RecipeIngredient();
             ingredient.quantity = jsonIngredient.getDouble("quantity");
             ingredient.description = jsonIngredient.getString("description");
-            if (!jsonIngredient.isNull("other_recipe_id")) {
-                ingredient.other_recipe_id = jsonIngredient.getLong("other_recipe_id");
+            if (!jsonIngredient.isNull("other_recipe")) {
+                ingredient.other_recipe = jsonIngredient.getLong("other_recipe");
             }
             return ingredient;
+        }
+
+        public static void writeToProvider(RecipeIngredient ing, long recipe_id, ContentResolver cr) {
+            ContentValues ing_cv = new ContentValues();
+
+            ing_cv.put("recipe_id", recipe_id);
+            ing_cv.put("quantity", ing.quantity);
+            ing_cv.put("description", ing.description);
+            if (ing.other_recipe == null) {
+                ing_cv.putNull("other_recipe");
+            }
+            else {
+                ing_cv.put("other_recipe", ing.other_recipe);
+            }
+
+            cr.insert(RecipeProvider.ingredient_uri, ing_cv);
+        }
+        public static ArrayList<RecipeIngredient> readFromProvider(long recipe_id, ContentResolver cr) {
+            ArrayList<RecipeIngredient> ingredients = new ArrayList<>();
+            final Cursor ingredient_list = cr.query(RecipeProvider.ingredient_uri,
+                null,
+                "recipe_id = ?",
+                new String[] {Long.toString(recipe_id)},
+                null);
+            if (ingredient_list.moveToFirst()) {
+                do {
+                    RecipeIngredient ing = new RecipeIngredient();
+                    ing.quantity = ingredient_list.getDouble(ingredient_list.getColumnIndex("quantity"));
+                    ing.description = ingredient_list.getString(ingredient_list.getColumnIndex("description"));
+                    if (ingredient_list.isNull(ingredient_list.getColumnIndex("other_recipe"))) {
+                        ing.other_recipe = null;
+                    }
+                    else {
+                        ing.other_recipe = ingredient_list.getLong(ingredient_list.getColumnIndex("other_recipe"));
+                    }
+                    ingredients.add(ing);
+                } while(ingredient_list.moveToNext());
+            }
+            ingredient_list.close();
+            return ingredients;
         }
     }
 }

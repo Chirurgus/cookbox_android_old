@@ -87,7 +87,12 @@ public class RecipeListFragment extends ListFragment {
         setHasOptionsMenu(true);
 
         Bundle b = getArguments();
-        _tag_id = b.getLong("tag_id", empty_tag_id);
+        if (b != null) {
+            _tag_id = b.getLong("tag_id", empty_tag_id);
+        }
+        else {
+            _tag_id = empty_tag_id;
+        }
 
         setRetainInstance(true);
     }
@@ -280,8 +285,8 @@ public class RecipeListFragment extends ListFragment {
                 final Cursor ids_cursor = cr.query(
                         RecipeProvider.recipe_uri,
                         new String[] {"id"},
-                        "time_modified > ?",
-                        new String[] {time_token},
+                        time_token != null ? "time_modified > ?" : null,
+                        time_token != null ? new String[] {time_token} : null,
                         null
                 );
                 final ArrayList<Long> updated_ids = new ArrayList<>();
@@ -294,8 +299,8 @@ public class RecipeListFragment extends ListFragment {
                 final Cursor tags_cursor = cr.query(
                         RecipeProvider.tag_list_uri,
                         new String[] {"id"},
-                        "time_modified > ?",
-                        new String[] {time_token},
+                        time_token != null ? "time_modified > ?" : null,
+                        time_token != null ? new String[] {time_token} : null,
                         null
                 );
                 final ArrayList<Long> updated_tags = new ArrayList<>();
@@ -324,14 +329,7 @@ public class RecipeListFragment extends ListFragment {
                 for (int i = 0; i < recipeIds.length(); ++i) {
                     final long id = recipeIds.getLong(i);
                     final Recipe recipe = Recipe.fromJson(cookboxApi.get_recipe(id));
-                    if (recipe.deleted) {
-                        cr.delete(RecipeProvider.recipe_uri,
-                                "id = ?",
-                                new String[] {Long.toString(id)});
-                    }
-                    else {
-                        Recipe.writeBasicOnlyToProvider(recipe, cr);
-                    }
+                    Recipe.writeBasicOnlyToProvider(recipe, cr);
 
                     // Remove this recipe from recipes whose changes will be pushed to the server
                     updated_ids.remove(id);
